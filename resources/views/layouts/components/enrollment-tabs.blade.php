@@ -13,6 +13,8 @@
 @endphp
 
 
+<a id="enrollmentModal_trigger" style="display:none;" href="#launchEnrollmentModal">modalEnrollment</a>
+@include('_partial.enrollmentModal')
 <section class="tab-wrapper">
    <div class="tab-content">
       <!-- Tab links -->
@@ -26,7 +28,7 @@
                         <p data-title="{{ $item['name'] }}">{{ $item['name'] }}</p>
                     </button>
                 @endforeach         
-                <button class="tablinks" data-country="summary">
+                <button class="tablinks" data-country="summary" id="enrollment-summary">
                     <p data-title="Summary">Summary</p>
                 </button>
                 <button class="tablinks" data-country="enrollment-history">
@@ -83,7 +85,7 @@
         @endif                      
          <div id="summary" class="tabcontent">
             <h3>Summary</h3>
-            <div id="summary"></div>
+            <div id="summary_content"></div>
          </div>
          <div id="enrollment-history" class="tabcontent">
             <h3>Enrollment History</h3>
@@ -185,19 +187,32 @@ function planBindEvents() {
             if ($(this).is(':checked')) {
                 var subCatId = $(this).attr('data-sc-id');
                 var planId = $(this).attr('data-plan-id');
-                let planDetailArr = ['ptf','pt','osa','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
-                'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa'];
+                let planDetailArr = ['bpName', 'ptf','pt','osa','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
+                'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa'];
 
                 planDetailArr.forEach(function (item,index) {
                     itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));
                 });
 
                 // Conditional UI
-                $('#coresumRow' + subCatId).show();
-                //console.log('BPSA:' + $('#planDetails' + planId).attr('data-bpsa'));
-                if ($('#planDetails' + planId).attr('data-bpsa') == '') {
-                    $('.coresumToggle' + subCatId).hide();
-                    $('#coresumRow' + subCatId).hide();
+                $('#coresumRow' + subCatId).hide();
+                $('#coreSum' + subCatId).hide();
+                $('#coreMultiple' + subCatId).hide();
+                // summary core row having base plan
+                if ($('#planDetails' + planId).attr('data-bpsa') != '') {
+                    $('#coresumRow' + subCatId).show();
+                    $('#coreSum' + subCatId).show();
+                }
+                //core-lumpsum or core-sa
+                /* if ($('#planDetails' + planId).attr('data-bpsa') != '' && 
+                ($('#planDetails' + planId).attr('data-is-lupsm') == '1' || 
+                    $('#planDetails' + planId).attr('data-is-sa') == '1' || 
+                    $('#planDetails' + planId).attr('data-is-si-sa') == '1')) {
+                    $('#coreSum' + subCatId).show();
+                }  */               
+                //core-multiple
+                if ($('#planDetails' + planId).attr('data-is-si-sa') == '1') {
+                    $('#coreMultiple' + subCatId).show();
                 }
 
                 // dependent structure
@@ -257,6 +272,64 @@ function policyDetailsforSubCategory(subCatId) {
     }, 3000);
 }
 
+function saveEnrollment(catId){
+    var polData = new Object();
+    var fypmapId = 0;
+    $('form#subCategoryForm' + catId).find('input[type=radio]:checked').each(function(item){
+        let policyID = $(this).val();
+        polDet = $('#planDetails' + policyID);
+        
+        var polDet = document.getElementById('planDetails' + policyID);
+        // iterate each attribute
+        if (parseInt(polDet.attributes['data-isbp'].nodeValue)) {
+            $('#launchEnrollmentModal .modal-title').html('Invalid Selection!').addClass('text-danger');
+            $('#launchEnrollmentModal .modal-body>p').html('Base plan is already present. Please select top-up to increase coverage.');
+            $('#launchEnrollmentModal .btn.modal_close').html('I\'ll select again');
+            $("#enrollmentModal_trigger").click();
+        } else {
+            for (var i = 0; i < polDet.attributes.length; i++) {            
+                attr = polDet.attributes[i];    // current attr
+                if (/^data-/.test(attr.nodeName)) { // If attribute nodeName starts with 'data-'
+                    attrName = attr.nodeName.replace(/^data-/, '');
+                    polData[attrName] = attr.nodeValue;
+                    if(attrName=='fypmap') {
+                        fypmapId = parseInt(attr.nodeValue);
+                    }
+                }
+            }            
+            if (fypmapId) {
+                $.ajax({
+                    url: "/enrollment/save",
+                    type:"POST",
+                    data:{
+                        "_token": '{{ csrf_token() }}',
+                        'fypmap':fypmapId,
+                        'catId': catId,
+                        'policyId' : policyID,
+                        'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(polData))))
+                    },
+                    success:function(response) {
+                        if (response.status) {
+                            title = 
+                            $('#launchEnrollmentModal .modal-title').html('Yay!! Selection Saved').addClass('text-success');
+                            $('#launchEnrollmentModal .btn.modal_close').html('Proceed Ahead');
+                        } else {                            
+                            $('#launchEnrollmentModal .modal-title').html('OOPS.. :( Something went wrong').addClass('text-danger');
+                            $('#launchEnrollmentModal .btn.modal_close').html('Try Again');
+                            $("#enrollmentModal_trigger").click();
+                        }
+                        $('#launchEnrollmentModal .modal-body>p').html(response.message);                        
+                        $("#enrollmentModal_trigger").click();
+                    }
+                });
+            } else {
+
+            }
+        }        
+    });
+    //console.log(btoa(unescape(encodeURIComponent(JSON.stringify(polData)))));
+}
+
 
 </script>
 <script src="/assets/js/number-rush.js"></script>
@@ -271,16 +344,22 @@ $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
         }
-    });  
+});  
 
-    $('[id^=enrollmentSubCategory]').click(function() {
-        $('[id^=subCtgryDetail]').hide();
-        $('#subCtgryDetail' + $(this).attr('data-cat-id')).fadeIn(1000);    
-        let offset = $('#subCtgryDetail' + $(this).attr('data-cat-id')).offset().top;
-    });
+$('[id^=enrollmentSubCategory]').click(function() {
+    $('[id^=subCtgryDetail]').hide();
+    $('#subCtgryDetail' + $(this).attr('data-cat-id')).fadeIn(1000);    
+    let offset = $('#subCtgryDetail' + $(this).attr('data-cat-id')).offset().top;
+});
 
 $('[id^=policySubCategoryList]').each(function(){
     policyDetailsforSubCategory($(this).attr('data-scid'));
+});
+
+$('#enrollment-summary').on('click', function(){
+    $('#summary_content').load('/enrollment/summary', function(response){
+        
+    });
 });
 
 {{-- // trigger for radio button --}}

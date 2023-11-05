@@ -467,18 +467,17 @@ header
 }
 
 .header-area .main-nav .nav li.submenu {
-  position: relative;
-  padding-right: 30px;
+  /* position: relative; */
+  /* padding-right: 30px; */
 }
 
 .header-area .main-nav .nav li.submenu:after {
-  font-family: FontAwesome;
-  content: "\f107";
-  font-size: 12px;
+  /* content: '\205E'; */
+  font-size: 18px;
   color: #2a2a2a;
   position: absolute;
   right: 18px;
-  top: 12px;
+  top:8px;
 }
 
 .background-header .main-nav .nav li.submenu:after {
@@ -1909,13 +1908,13 @@ PopUp
 
 .btn {
   padding: 10px 20px;
-  background: #4b8ef1;
+  /* background: #4b8ef1; */
   color: #fff;
   transition: all .3s;
 }
 
 .btn_red {
-  background: #4b8ef1;
+  /* background: #4b8ef1; */
   color: #FFF;
 }
 

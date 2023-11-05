@@ -41,6 +41,10 @@ class InsurancePolicy extends Model
         return $this->hasOne(Currency::class, 'id', 'currency_id_fk');
     }
 
+    public function subcategory() {
+        return $this->hasOne(InsuranceSubCategory::class, 'id', 'ins_subcategory_id_fk')->with('categories');
+    }
+
     public function map_fy_policies() {
         return $this->hasManyThrough(MapFYPolicy::class, 'ins_policy_id_fk', 'id');
     }

@@ -26,7 +26,7 @@ class MapFYPolicy extends Model
 
     public function policy()
     {
-        return $this->hasOne(InsurancePolicy::class, 'id', 'ins_policy_id_fk')->with('currency');
+        return $this->hasOne(InsurancePolicy::class, 'id', 'ins_policy_id_fk')->with(['currency', 'subcategory']);
     }
 
     

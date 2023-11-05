@@ -12,14 +12,16 @@
                     <h4 class="py-1">Optional Benefits</h4>                                        
                 </div>
                 <div class="col-3 offset-1">
+                    <form id="subCategoryForm{{ $subCatId }}">
                     <table class="tab-content-table table-responsive mb-3 fs-11 col-3">
                         <th>Additional Coverage</th>
                         <th>TopUp Value</th>
                         @foreach($activePolicyForSubCategoryFY as $key => $item)
                             @php //$subCatId = $item['ins_subcategory_id_fk']; 
                                 $currenySymbol = html_entity_decode($item['policy']['currency']['symbol']);
+                                
                             @endphp
-                            <tr>
+                            <tr @php echo ($item['policy']['is_base_plan']) ? 'style="display:none"':'';@endphp>
                                 <td>
                                     <input name="plan{{ $subCatId }}" data-sc-id="{{ $subCatId }}" data-plan-id="{{  $item['policy']["id"] }}"
                                     data-default-select="{{ $item['policy']['is_default_selection'] }}"
@@ -35,6 +37,7 @@
                             </tr>
                         @endforeach                        
                     </table>
+                    </form>
                 </div>
                 <div class="col-8">
                     <div class="row">
@@ -150,8 +153,8 @@
                                         <dl>
                                             <dt class="col" data-toggle="tooltip"
                                                 data-placement="top" title="Total allocated points for current user">
-                                                Core
-                                                </dt>
+                                                <label id="bpName{{ $subCatId }}"></label>
+                                            </dt>
                                         </dl>
                                     </div>
                                     <div class="col-3">
@@ -256,86 +259,125 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                                           
+                </div>                                           
                 <hr class="my-2">                                      
             </div>
         </div>
         
         <div class="col-12 text-center">
-                <button name="saveCategorySelection{{ $subCatId }}" class="col-3 my-2 p-3 fs-15 btn-primary text-uppercase"> Save Selection  </button>
+                <button onclick="saveEnrollment('{{ $subCatId }}')" class="col-3 my-2 p-3 fs-15 btn-primary text-uppercase"> Save Selection  </button>
                 <button name="closeSubCategory" class="col-3 closeSubCategory my-2 p-3 fs-15 btn-info  text-uppercase" style="color:#FFF"> Close Sub Category</button>
         </div>
-        
+    @foreach($activePolicyForSubCategoryFY as $key => $item)
+        @php
+        $bpsa = 0;
+        $bpName = '';
+        $is_lumpsum = $is_si_sa = $is_sa = FALSE;
+        $base_si_factor = 0;
+        if($item['policy']['is_base_plan']) {
+            // first priority will be given to lumpsum value
+            $lumpsum = $item['policy']['lumpsum_amount']; //@todo check Data and verify logic of SA
+            if (!is_null($lumpsum)) {
+                $bpsa = (int)$lumpsum;
+                $is_lumpsum = TRUE;
+            } else {
+                $sa = !is_null($item['policy']['sum_insured']) ? $item['policy']['sum_insured'] : 0;
+                $sa_si = !is_null($item['policy']['si_factor']) ?
+                        $sa_si = $item['policy']['si_factor'] * Auth::user()->salary : 0;
+                if($sa_si > $sa) {
+                    $bpsa = (int)$sa_si;
+                    $is_si_sa = TRUE;
+                    $base_si_factor = $item['policy']['si_factor'];
+                } else {
+                    $bpsa = (int)$sa;
+                    $is_sa = TRUE;
+                }
+            }
+            // name of base policy
+            $bpName = $item['policy']['name'];
+            break;
+        }
+        @endphp
+    @endforeach    
     @foreach($activePolicyForSubCategoryFY as $key => $item)
         @php
             $currenySymbol = html_entity_decode($item['policy']['currency']['symbol']);
+            //if(!$item['policy']['is_base_plan']) {
         @endphp
-        <span id="planDetails{{ $item['policy']['id'] }}" style="display:none;" 
-            data-ptf="{{ $item['policy']['price_tag'] }}" data-pt="{{ $item['policy']['price_tag'] }}" data-osa="{{ $currenySymbol . $item['policy']['sum_insured'] }}"
+        <span id="planDetails{{ $item['policy']['id'] }}" style="display:none;"
+            data-ptf="{{ $item['policy']['price_tag'] }}"
+            data-bpName="{{ $bpName }}"
+            data-pt="{{ $item['policy']['price_tag'] }}"
+            data-osa="{{ $currenySymbol . $item['policy']['sum_insured'] }}"
             data-allo="0" data-currs="4324" data-avail="675343"
             data-tots="{{ $item['policy']['price_tag'] }}"
+            data-is-sa="{{ $is_sa }}"
+            data-is-si-sa="{{ $is_si_sa }}"
+            data-is-lupsm="{{ $is_lumpsum }}"
+            data-fypmap="{{ $item['id'] }}"
+            data-isbp ="{{ $item['policy']['is_base_plan'] ? 1 : 0 }}"
             data-bpsa="@php
-                echo strlen(trim($item['policy']['base_plan_sum_assured_text'])) && strlen(trim($item['policy']['base_plan_text'])) ?
+                /* echo strlen(trim($item['policy']['base_plan_sum_assured_text'])) && strlen(trim($item['policy']['base_plan_text'])) ?
                     $currenySymbol . $item['policy']['base_plan_sum_assured_text'] :
-                    '';
+                    ''; */
+                echo $bpsa > 0 ? $currenySymbol . $bpsa : '';
             @endphp"
-            data-opplsa="{{ $currenySymbol . $item['policy']['sum_insured'] }}"
-            data-totpt="@php    
-                $pts = 0;
-                if (!is_null($item['policy']['price_tag']) && $item['policy']['price_tag'] > 0) {
-                    $pts = ($item['policy']['sum_insured']) * $item['policy']['price_tag'] * (100/100);
-                } else if (!is_null($item['policy']['points'])){
-                    $pts = $item['policy']['points'] * (100/100);
-                }
-                echo $currenySymbol . $pts;
+            data-opplsa="{{ $currenySymbol . (!$item['policy']['is_base_plan'] ? $item['policy']['sum_insured'] : 0) }}"
+            
+            data-totsa="@php
+                $tsa = $bpsa + (!$item['policy']['is_base_plan'] ? (int)$item['policy']['sum_insured'] : 0);
+                echo $currenySymbol . $tsa;
                 @endphp"
-            data-totsa="@php    // calculate using (SI factor * annual CTC) OR (lumpsum_amount) OR (max of these)
-                $sa = !is_null($item['policy']['sum_insured']) ? $item['policy']['sum_insured'] : 0;
-                $sa_si = !is_null($item['policy']['si_factor']) ? $sa_si = $item['policy']['si_factor'] * Auth::user()->salary : 0;
-                $lumpsum = $item['policy']['lumpsum_amount']; //@todo check Data and verify logic of SA
-                $tsa = max($lumpsum, $sa, $sa_si) + (!$item['policy']['is_base_plan'] ? (int)$item['policy']['base_plan_sum_assured_text'] : 0);
-                //elseif (!is_null($item['policy']['lumpsum_amount']) && $item['policy']['lumpsum_amount'] > $sa) {
-                //    $sa = $item['policy']['lumpsum_amount'];
-                //}
-                //echo ((int)$item['policy']['sum_insured'] + (int)$item['policy']['base_plan_sum_assured_text']);
-                echo $currenySymbol. $tsa;
-                @endphp"
-            data-opplpt="@php
-                $pts =0;
-                if (!is_null($item['policy']['price_tag']) && $item['policy']['price_tag'] > 0) {
-                    $pts = ($item['policy']['sum_insured']) * $item['policy']['price_tag'] * (100/100);
-                } else if (!is_null($item['policy']['points'])){
-                    $pts = $item['policy']['points'] * (100/100);
-                }
-                echo $currenySymbol . $pts;
-                @endphp"
-            data-effecp="@php // Sum Insured * price_tag * (proration_factor/100)
-                $pts =0;
-                if (!is_null($item['policy']['price_tag']) && $item['policy']['price_tag'] > 0) {
-                    $pts = ($item['policy']['sum_insured']) * $item['policy']['price_tag'] * (100/100);
-                } else if (!is_null($item['policy']['points'])){
-                    $pts = $item['policy']['points'] * (100/100);
-                }
-                echo $currenySymbol . $pts;
-                @endphp" data-prorf="100"
+
             data-annup="@php
                 //echo ($item['policy']['sum_insured']) * $item['policy']['price_tag']
                 echo $currenySymbol . $item['policy']['points']
                 @endphp"                
-                data-psd="@php
+            data-psd="@php
                     $fyStartDate = '2023-04-01';    // @todo replace with account FY start date
                     $joiningDate = Auth::user()->hire_date;
                     $policyStartDate = $joiningDate > $fyStartDate ? $joiningDate : $fyStartDate;
                     echo date_format(date_create($policyStartDate), 'd-M-Y');
-                @endphp" data-ped="
-                @php
+                @endphp"
+            data-ped="@php
                     $fyEndDate = '2024-03-31';    // @todo replace with account FY end date
                     echo date_format(date_create($fyEndDate), 'd-M-Y');
                 @endphp"
-                data-totdc="@php
+            data-totdc="@php
                     $totalDays = date_diff(date_create($policyStartDate), date_create($fyEndDate));
                     echo $totalDays->days . ' Days';
+                @endphp"                
+            data-prorf="@php
+                $prorationfactor = number_format(($totalDays->days/date_diff(date_create($fyStartDate), 
+                date_create($fyEndDate))->days) * 100, '2', '.', '');
+                echo $prorationfactor;
+            @endphp"
+            data-opplpt="@php
+                $pts =0;
+                if (!is_null($item['policy']['price_tag']) && $item['policy']['price_tag'] > 0) {
+                    $pts = ($item['policy']['sum_insured']) * $item['policy']['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($item['policy']['points'])){
+                    $pts = $item['policy']['points'] * ($prorationfactor/100);
+                }
+                echo !$item['policy']['is_base_plan'] ? $currenySymbol . round($pts) : 0;
+                @endphp"
+            data-effecp="@php // Sum Insured * price_tag * (proration_factor/100)
+                $pts = 0;
+                if (!is_null($item['policy']['price_tag']) && $item['policy']['price_tag'] > 0) {
+                    $pts = ($item['policy']['sum_insured']) * $item['policy']['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($item['policy']['points'])){
+                    $pts = $item['policy']['points'] * ($prorationfactor/100);
+                }
+                echo !$item['policy']['is_base_plan'] ? $currenySymbol . round($pts) : 0;
+                @endphp"                
+            data-totpt="@php    
+                $pts = 0;
+                if (!is_null($item['policy']['price_tag']) && $item['policy']['price_tag'] > 0) {
+                    $pts = ($item['policy']['sum_insured']) * $item['policy']['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($item['policy']['points'])){
+                    $pts = $item['policy']['points'] * ($prorationfactor/100);
+                }
+                echo !$item['policy']['is_base_plan'] ? $currenySymbol . round($pts) : 0;
                 @endphp"
             data-memcvrd="@php
                 echo ($item['policy']['dependent_structure'])
@@ -344,17 +386,19 @@
                 echo $item['policy']['is_parent_sublimit'] ? $item['policy']['parent_sublimit_amount'] : 0;
                 @endphp"
             data-corem="@php
-                echo $item['policy']['base_plan_text'];
+                echo $base_si_factor . 'X of CTC';
                 @endphp"
             data-coresa="@php
-                echo $currenySymbol . $item['policy']['base_plan_sum_assured_text'];
+                echo $currenySymbol .$bpsa;
                 @endphp"
             data-jongDate="@php
                 echo $currenySymbol . $item['policy']['base_plan_sum_assured_text'];
                 @endphp"
         >&nbsp;</span>
-    @endforeach 
-    
+        @php
+            //}
+        @endphp
+    @endforeach        
 @else 
     <div class="row">
         <div class="col-12">

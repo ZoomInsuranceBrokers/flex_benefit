@@ -30,8 +30,8 @@
                         @foreach($data['sub_categories_data'] as $subcat)
                             @if($item['id'] == $subcat->ic_id)
                                 <tr>
-                                    <td><a id="enrollmentSubCategory{{ $subcat->id }}" data-cat-id="{{ $subcat->id }}" href="#enrollmentSubCategory{{ $subcat->id }}">{{ $subcat->name }}</a></a></td>
-                                    <td>{{ strlen($subcat->description) < 70 ? $subcat->description : substr($subcat->description, 0, 67) . '...' }}</td>
+                                    <td><a id="enrollmentSubCategory{{ $subcat->id }}" data-cat-id="{{ $subcat->id }}" href="javascript:return false;">{{ $subcat->name }}</a></a></td>
+                                    <td>{{ html_entity_decode(strlen($subcat->description) < 70 ? $subcat->description : substr($subcat->description, 0, 67) . '...') }}</td>
                                     <td>GL - Top UP 2X salary</td>
                                     <td>123456</td>
                                 </tr>                        
@@ -85,7 +85,7 @@
                                                 <dd class="col">{{ $subcat->fullname }}</dd>
                                             </dl>
                                         </div>
-                                        <div class="col text-center coresumToggle{{ $subcat->id }}">
+                                        <div class="col text-center" id="coreMultiple{{ $subcat->id }}">
                                             <dl>
                                                 <dt class="col">Core Multiple</dt>
                                                 <dd class="col">
@@ -93,7 +93,7 @@
                                                 </dd>
                                             </dl>
                                         </div>                                        
-                                        <div class="col text-center coresumToggle{{ $subcat->id }}">
+                                        <div class="col text-center" id="coreSum{{ $subcat->id }}">
                                             <dl>
                                                 <dt class="col">Core Sum Assured</dt>
                                                 <dd class="col">

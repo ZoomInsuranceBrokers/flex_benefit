@@ -49,4 +49,8 @@ class UserController extends Controller
             return view('home');
         }
     }
+
+    public function logout() {
+        return redirect('/')->with(Auth::logout());
+    }
 }

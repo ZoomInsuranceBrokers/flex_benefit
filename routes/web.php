@@ -42,10 +42,13 @@ use App\Http\Controllers\UserController;
     Route::get('/dependents', function () { return view('dependent'); });
 //});
 
-Route::get('/enrollment/getPolicybySubCategory/', [EnrollmentController::class, 'yg4']);
+Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
+Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
+Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);
 Route::get('/enrollment', [EnrollmentController::class, 'home']);
 
 Route::get('/', [UserController::class, 'home']);
+Route::get('/logout', [UserController::class, 'logout']);
 
 
 

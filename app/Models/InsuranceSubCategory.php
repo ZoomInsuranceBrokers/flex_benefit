@@ -25,7 +25,7 @@ class InsuranceSubCategory extends Model
 
     public function categories() 
     {
-        return $this->belongsTo(InsuranceCategory::class, 'id', 'ins_category_id_fk');
+        return $this->belongsTo(InsuranceCategory::class, 'ins_category_id_fk', 'id');
     }
 
     /*'sfdc_id','ins_category_id_fk','name','fullname',
