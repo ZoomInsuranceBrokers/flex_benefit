@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClaimController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 use App\Http\Controllers\ContactController;
@@ -44,11 +45,20 @@ use App\Http\Controllers\UserController;
 
 Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
 Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
+Route::get('/enrollment/summaryDownload', [EnrollmentController::class, 'downloadSummary']);
 Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);
 Route::get('/enrollment', [EnrollmentController::class, 'home']);
 
-Route::get('/', [UserController::class, 'home']);
+// Route::post('/claim/create', [DependentController::class, 'create']);
+// Route::post('/claim/update', [DependentController::class, 'update']);
+Route::any('/claim/loadHospital', [ClaimController::class, 'loadNetworkHospital']);
+Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);    
+
+
+
 Route::get('/logout', [UserController::class, 'logout']);
+Route::get('/user/ecard', [UserController::class, 'downloadEcard']);
+Route::get('/', [UserController::class, 'home']);
 
 
 

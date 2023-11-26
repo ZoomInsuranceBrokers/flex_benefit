@@ -1,5 +1,7 @@
 @if(isset($activePolicyForSubCategoryFY) && count($activePolicyForSubCategoryFY))
     @php
+    
+        $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);  
         //dd($activePolicyForSubCategoryFY[0]);
         $subCatId = array_key_exists('policy', $activePolicyForSubCategoryFY[0]) ? 
             $activePolicyForSubCategoryFY[0]['policy']['ins_subcategory_id_fk'] : 0;
@@ -33,7 +35,7 @@
                                         {{ $item['policy']["name"] }}
                                     </label>
                                 </td>
-                                <td>{{ $currenySymbol . $item['policy']["sum_insured"] }}</td>
+                                <td>{{ $formatter->formatCurrency($item['policy']["sum_insured"], 'INR') }}</td>
                             </tr>
                         @endforeach                        
                     </table>
@@ -298,17 +300,19 @@
             break;
         }
         @endphp
-    @endforeach    
+    @endforeach
     @foreach($activePolicyForSubCategoryFY as $key => $item)
         @php
-            $currenySymbol = html_entity_decode($item['policy']['currency']['symbol']);
+            //$currenySymbol = html_entity_decode($item['policy']['currency']['symbol']);
+            //echo $formatter->formatCurrency(2500000, 'INR');
             //if(!$item['policy']['is_base_plan']) {
         @endphp
         <span id="planDetails{{ $item['policy']['id'] }}" style="display:none;"
             data-ptf="{{ $item['policy']['price_tag'] }}"
             data-bpName="{{ $bpName }}"
             data-pt="{{ $item['policy']['price_tag'] }}"
-            data-osa="{{ $currenySymbol . $item['policy']['sum_insured'] }}"
+            {{-- data-osa="{{ $currenySymbol . $item['policy']['sum_insured'] }}" --}}
+            data-osa="{{ $formatter->formatCurrency($item['policy']['sum_insured'], 'INR') }}"
             data-allo="0" data-currs="4324" data-avail="675343"
             data-tots="{{ $item['policy']['price_tag'] }}"
             data-is-sa="{{ $is_sa }}"
@@ -316,22 +320,17 @@
             data-is-lupsm="{{ $is_lumpsum }}"
             data-fypmap="{{ $item['id'] }}"
             data-isbp ="{{ $item['policy']['is_base_plan'] ? 1 : 0 }}"
-            data-bpsa="@php
-                /* echo strlen(trim($item['policy']['base_plan_sum_assured_text'])) && strlen(trim($item['policy']['base_plan_text'])) ?
-                    $currenySymbol . $item['policy']['base_plan_sum_assured_text'] :
-                    ''; */
-                echo $bpsa > 0 ? $currenySymbol . $bpsa : '';
-            @endphp"
-            data-opplsa="{{ $currenySymbol . (!$item['policy']['is_base_plan'] ? $item['policy']['sum_insured'] : 0) }}"
-            
+            data-bpsa="@php echo $bpsa > 0 ? $formatter->formatCurrency($bpsa, 'INR') : ''; @endphp"
+            data-opplsa="{{ (!$item['policy']['is_base_plan'] ? 
+                $formatter->formatCurrency($item['policy']['sum_insured'], 'INR') : 0) }}"
             data-totsa="@php
                 $tsa = $bpsa + (!$item['policy']['is_base_plan'] ? (int)$item['policy']['sum_insured'] : 0);
-                echo $currenySymbol . $tsa;
+                echo $formatter->formatCurrency($tsa, 'INR');
                 @endphp"
 
             data-annup="@php
                 //echo ($item['policy']['sum_insured']) * $item['policy']['price_tag']
-                echo $currenySymbol . $item['policy']['points']
+                echo $formatter->formatCurrency($item['policy']['points'], 'INR');
                 @endphp"                
             data-psd="@php
                     $fyStartDate = '2023-04-01';    // @todo replace with account FY start date
@@ -359,7 +358,7 @@
                 } else if (!is_null($item['policy']['points'])){
                     $pts = $item['policy']['points'] * ($prorationfactor/100);
                 }
-                echo !$item['policy']['is_base_plan'] ? $currenySymbol . round($pts) : 0;
+                echo !$item['policy']['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;
                 @endphp"
             data-effecp="@php // Sum Insured * price_tag * (proration_factor/100)
                 $pts = 0;
@@ -368,7 +367,7 @@
                 } else if (!is_null($item['policy']['points'])){
                     $pts = $item['policy']['points'] * ($prorationfactor/100);
                 }
-                echo !$item['policy']['is_base_plan'] ? $currenySymbol . round($pts) : 0;
+                echo !$item['policy']['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;
                 @endphp"                
             data-totpt="@php    
                 $pts = 0;
@@ -377,19 +376,28 @@
                 } else if (!is_null($item['policy']['points'])){
                     $pts = $item['policy']['points'] * ($prorationfactor/100);
                 }
-                echo !$item['policy']['is_base_plan'] ? $currenySymbol . round($pts) : 0;
+                echo !$item['policy']['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;
+                @endphp"
+            data-totptwocurr="@php    
+                $pts = 0;
+                if (!is_null($item['policy']['price_tag']) && $item['policy']['price_tag'] > 0) {
+                    $pts = ($item['policy']['sum_insured']) * $item['policy']['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($item['policy']['points'])){
+                    $pts = $item['policy']['points'] * ($prorationfactor/100);
+                }
+                echo !$item['policy']['is_base_plan'] ? round($pts) : 0;
                 @endphp"
             data-memcvrd="@php
                 echo ($item['policy']['dependent_structure'])
                 @endphp"
             data-prntSbLim="@php
-                echo $item['policy']['is_parent_sublimit'] ? $item['policy']['parent_sublimit_amount'] : 0;
+                echo $item['policy']['is_parent_sublimit'] ? $formatter->formatCurrency($item['policy']['parent_sublimit_amount'], 'INR') : 0;
                 @endphp"
             data-corem="@php
                 echo $base_si_factor . 'X of CTC';
                 @endphp"
             data-coresa="@php
-                echo $currenySymbol .$bpsa;
+                echo $formatter->formatCurrency($bpsa, 'INR');
                 @endphp"
             data-jongDate="@php
                 echo $currenySymbol . $item['policy']['base_plan_sum_assured_text'];

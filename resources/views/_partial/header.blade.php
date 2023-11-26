@@ -11,28 +11,40 @@
             <!-- ***** Menu Start ***** -->            
             <ul class="nav">
               @if(Auth::check())
-                <li class="nav-item scroll-to-section bg-light">
+                {{-- <li class="nav-item scroll-to-section bg-light">
                     <a id="header_home" href="/" class="active">Program Details</a>
                 </li>
-                &nbsp;
+                &nbsp; --}}
                 <li class="nav-item scroll-to-section bg-light">
                     <a id="header_dependents" href="/dependents">Dependents</a></li>
                 &nbsp;
                 <li class="nav-item scroll-to-section bg-light">
                     <a id="header_enrollment" href="/enrollment">Enrollment</a></li>
                 &nbsp;
-                <li class="nav-item scroll-to-section bg-light">
-                    <a id="header_pricing" onclick="getEcard()" href="javascript:return false;">Claims</a></li>
+                <li class="nav-item scroll-to-section bg-light submenu">
+                    <a id="header_claim" onclick="getEcard()" href="javascript:return false;">Claims</a>
+                    <ul>
+                      <li>
+                        <a href="/caim/initiate">Initiate Claim</a>
+                      </li>
+                      <li>
+                        <a href="/claim/track">Track Claim</a>
+                      </li>
+                      <li>
+                        <a href="/claim/loadHospital">Network Hospital</a>
+                      </li>
+                    </ul>
+                </li>
                 &nbsp;
                 <li class="nav-item scroll-to-section bg-light">
                     <a id="header_dependentsLE" href="/dependents/life-events">Life Events</a></li>
                 &nbsp;
-                <li class="nav-item scroll-to-section bg-light">
+                {{-- <li class="nav-item scroll-to-section bg-light">
                     <a id="header_hradmin" href="#hradmin">HR Admin</a></li>
                 &nbsp;
                 <li class="nav-item scroll-to-section bg-light">
                     <a id="header_report" href="#report">Report</a></li>
-                &nbsp;
+                &nbsp; --}}
                 <li id="modal_trigger_user"class="submenu">
                     <div class="gradient-button">
                         <a>                        
@@ -48,7 +60,7 @@
                           <a href="/">User Profile</a>
                         </li>
                         <li>
-                          <a href="/">Network Hospitals</a>
+                          <a href="/user/ecard">Download Ecard</a>
                         </li>
                         <li>
                           <a id="logoutModal_trigger" href="#launchLogout">Logout</a>

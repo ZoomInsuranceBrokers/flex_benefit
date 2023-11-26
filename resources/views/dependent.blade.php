@@ -1,4 +1,4 @@
--*//=142557210eSXg?*-@extends('layouts.layout')
+@extends('layouts.layout')
 @section('content')
     <div id="dependents" class="pricing-tables">
         <div class="container">

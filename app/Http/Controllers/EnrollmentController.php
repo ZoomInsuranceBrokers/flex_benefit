@@ -12,6 +12,7 @@ use App\Models\MapUserFYPolicy;
 use Illuminate\Support\Facades\Auth;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Client\Response as ClientResponse;
+use Dompdf\Dompdf;
 
 class EnrollmentController extends Controller
 {
@@ -133,7 +134,7 @@ class EnrollmentController extends Controller
         $whereConditionData = ['id' => -1, 'user_id_fk' => -1];
         $mapUserFYPolicyRow = $message = null;
         $status = false;
-        if (count($userPolDataForCatId) > 0) {
+        //if (count($userPolDataForCatId) > 0) {
             foreach($userPolDataForCatId as $item) {
                 if($item->is_base_plan) {
                     continue;
@@ -146,11 +147,11 @@ class EnrollmentController extends Controller
             $mapUserFYPolicyRow = MapUserFYPolicy::updateOrCreate($whereConditionData,$data);
             $status = true;
             $message = 'Data ' . ($whereConditionData['id'] != -1 ? 'updated' : 'saved') . ' successfully. You need to do final submission(only one submission allowed per user per financial year) of data across policies/categories from "Summary" section post review';
-        }
-        if(!count($userPolDataForCatId)) {
-            $status = false;
-            $message = 'No Base Policy Exist';
-        }
+        // }
+        // if(!count($userPolDataForCatId)) {
+        //     $status = false;
+        //     $message = 'No Base Policy Exist';
+        // }
 
         return response()->json([
             'status' => $status,
@@ -186,6 +187,37 @@ class EnrollmentController extends Controller
 
         $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy'])
                 ->get()->toArray();
-        dd($mapUserFYPolicyData);
+        
+        //dd($mapUserFYPolicyData);
+
+        $html = view('summary')
+            ->with('mapUserFYPolicyData', $mapUserFYPolicyData)->render();
+        return $html;
+        
+        // return response()->json([
+        //     'status' => true,
+        //     'html' => $html,
+        // ]);
+    }
+
+    public function downloadSummary (){
+        $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy'])
+                ->get()->toArray();
+        
+        //dd($mapUserFYPolicyData);
+
+        $html = view('summaryDownload')
+            ->with('mapUserFYPolicyData', $mapUserFYPolicyData)->render();
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'landscape');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+
+        // Output the generated PDF to Browser
+        $dompdf->stream();
     }
 }

@@ -467,16 +467,23 @@ header
 }
 
 .header-area .main-nav .nav li.submenu {
-  /* position: relative; */
-  /* padding-right: 30px; */
+  position: relative;
+  padding-right: 30px;
 }
 
-.header-area .main-nav .nav li.submenu:after {
+.header-area .main-nav .nav li.submenu:not(:last-child):after {
   /* content: '\205E'; */
-  font-size: 18px;
+  content: '\21DF';
+  content: '\2B07';
+  content: '\2BEF';
+  content: '\25E2';
+  font-size: 17px;
   color: #2a2a2a;
+  color:  rgba(91,104,235,1);
+  /*background-image: linear-gradient(white, white), 
+  linear-gradient(45deg, rgba(91,104,235,1) 0%, rgba(40,225,253,1)); */
   position: absolute;
-  right: 18px;
+  right: 15px;
   top:8px;
 }
 

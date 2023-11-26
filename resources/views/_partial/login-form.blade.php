@@ -44,9 +44,10 @@
         </div>
     </section>
 </div>
-@section('script')
-<script>
-$(document).ready(function(){
+{{-- @section('script') --}}
+@section('document_ready')
+{{-- <script> --}}
+//$(document).ready(function(){
     $('#emp_login').on('submit', function(e){
         e.preventDefault();
         $('[id$=ErrorMsg]').text('');
@@ -78,6 +79,6 @@ $(document).ready(function(){
             },
         });
     });
-});
-</script>
+//});
+{{-- </script> --}}
 @endsection

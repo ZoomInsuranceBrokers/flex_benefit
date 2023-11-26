@@ -343,3 +343,27 @@
 #emp_login span.text-danger {
   font-size:10px;
 }
+#summary_tbl {
+  
+}
+/* #summary_tbl tr>th{
+  font-size:22px;
+  top:3px;
+} */
+#summary_tbl tr>th>.summarySubCat::before {
+  content:'\2BA9';
+  position:relative;
+  padding-left:20px;
+  font-size:22px;
+  top:3px;
+}
+#summary_tbl tr>th>.summaryPolName::before {
+  content:'\2BA9';
+  position:relative;
+  padding-left:40px;
+  font-size:22px;
+  top:3px;
+}
+#summary_tbl tr>td>dl {
+  font-size:12px;
+}

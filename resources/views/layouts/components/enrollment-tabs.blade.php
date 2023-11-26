@@ -359,6 +359,7 @@ $('[id^=policySubCategoryList]').each(function(){
 $('#enrollment-summary').on('click', function(){
     $('#summary_content').load('/enrollment/summary', function(response){
         
+        
     });
 });
 

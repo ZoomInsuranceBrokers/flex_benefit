@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
@@ -52,5 +53,22 @@ class UserController extends Controller
 
     public function logout() {
         return redirect('/')->with(Auth::logout());
+    }
+
+    public function downloadEcard(){
+        if (Auth::check()) {
+            $arr = ["username"=>"AGSW4",
+                "password"=>"AGSW@#4",
+                "policyno"=>"P0023100023/6115/100051",
+                "employeecode"=>"EL-0676"];
+            $response = Http::withBody(json_encode($arr), 'text/json')
+                    ->post('http://brokerapi.safewaytpa.in/api/EcardEmpMember')->json();
+            if ($response['Status'] == 1) {
+                //return '<script>window.open("' . $response['E_Card'] . '", "")</script>';
+                return redirect($response['E_Card']);
+            }
+        } else {
+            return redirect('/');
+        }
     }
 }
