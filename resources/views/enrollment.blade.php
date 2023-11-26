@@ -1,5 +1,5 @@
 @php
-    //dd($data['category']);
+    //dd($data['dependent']);
     $tabCount = (Auth::check()) ? count($data['category']) + 3 : 1;
 @endphp
 
@@ -129,4 +129,16 @@ font-size:14px;
             </div>
         </div>
     </div>
+    
+    @php
+        if (count($data['dependent'])) {
+            foreach ($data['dependent'] as $depItem) {
+    @endphp
+            <span id="dependent-list{{ $depItem['id'] }}" style="display:none;" data-name="{{ $depItem['dependent_name'] }}"
+            data-depCode="{{ $depItem['dependent_code'] }}" data-depNom="{{ $depItem['nominee_percentage'] }}"
+            data-depId = "{{ $depItem['id'] }}"></span>
+    @php
+           }
+        }
+    @endphp
 @stop

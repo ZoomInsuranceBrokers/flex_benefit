@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use Dompdf\Dompdf;
+use App\Models\Dependent;
+use App\Models\MapFYPolicy;
 use Illuminate\Http\Request;
 use App\Models\InsurancePolicy;
+use App\Models\MapUserFYPolicy;
 use App\Models\InsuranceCategory;
 use Illuminate\Support\Facades\DB;
 use App\Models\InsuranceSubCategory;
-use App\Models\MapFYPolicy;
-use App\Models\MapUserFYPolicy;
 use Illuminate\Support\Facades\Auth;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Client\Response as ClientResponse;
-use Dompdf\Dompdf;
 
 class EnrollmentController extends Controller
 {
@@ -29,9 +30,17 @@ class EnrollmentController extends Controller
                     ->select('ic.id as ic_id','ic.name as category', 'sequence', 'tagline','isc.*')
                     ->get();
 
+        // dependent
+        $dependents = Dependent::where('is_active', config('constant.$_YES'))
+                                //->where('is_deceased',config('constant.$_NO'))
+                                ->where('user_id_fk',Auth::user()->id)
+                                ->where('is_deceased',config('constant.$_NO'))
+                                ->get();
+
         return view('enrollment')->with('data', 
         [   'sub_categories_data' => $data->toArray(), 
-            'category' => $category->toArray()
+            'category' => $category->toArray(),
+            'dependent' => $dependents->toArray()
         ]);
     }
 

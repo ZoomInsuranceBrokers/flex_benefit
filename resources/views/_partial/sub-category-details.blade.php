@@ -236,7 +236,7 @@
                                         <dl>
                                             <dt data-toggle="tooltip"
                                                 data-placement="top" title="Optional Sum Insured shows xyz lorem ipsum">
-                                                <label id="memcvrd{{ $subCatId }}"></label>
+                                                <div id="memcvrd{{ $subCatId }}"></div>
                                             </dt>
                                         </dl>
                                     </div>

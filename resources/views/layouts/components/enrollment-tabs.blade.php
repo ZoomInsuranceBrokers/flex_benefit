@@ -181,6 +181,40 @@ function getDependentList(dependentStructure){
     return dsArr.concat(dependentStructure.split(''));
 }
 
+function generateDependentItems(subCatId, depList) {
+    $('#memcvrd' + subCatId).html('');
+    var memCvrdStr = '';
+    var parentRadio = false;
+    if (depList.length > 0) {
+        if (depList[0] == '/') {
+            parentRadio = true;
+            depList.splice(0,1); 
+        }
+        $('[id^=dependent-list]').each(function(){
+            var dCode = $(this).attr('data-depcode');
+            var depId = $(this).attr('data-depId');
+            var depName = $(this).attr('data-name');
+            var depNom = $(this).attr('data-depNom');
+            depList.forEach(function(x) {
+                if(dCode.toLowerCase() == x.toLowerCase()) {
+                    if(['PIL','P'].includes(dCode)) {   // match if dependent added is PIL or P case
+                        memCvrdStr += '<input id="depMemCrvd' + depId + '" name="depMemCrvd[]" type="' + (parentRadio ? 'radio' : 'checkbox')  + '" value="' 
+                        + depId + '"/>&nbsp;<label for="depMemCrvd' + depId + '">' + depName + '[' + 
+                        getMemberFullNames(dCode) + ',Nomination(%):' +  depNom + ']' + '</label>';
+                    } else {
+                        memCvrdStr += '<input id="depMemCrvd' + depId + '" name="depMemCrvd[]" type="checkbox" value="' 
+                        + depId + '"/>&nbsp;<label for="depMemCrvd' + depId + '">' + depName + '[' + 
+                        getMemberFullNames(dCode) + ',Nomination(%):' +  depNom + ']' + '</label>';   
+                    }
+                }  
+            });
+        });
+        $('#memcvrd' + subCatId).html(memCvrdStr);
+        //return memCvrdStr;
+    }
+    return memCvrdStr;
+}
+
 function planBindEvents() {
         // trigger for radio button 
         $('[id^=planId]').click(function(){ 
@@ -216,9 +250,12 @@ function planBindEvents() {
                 }
 
                 // dependent structure
-                const depList = getDependentList($('#planDetails' + planId).attr('data-memcvrd'));
-                membersCovered = depList.flatMap((x) => getMemberFullNames(x));
-                $('#memcvrd' + subCatId).html(membersCovered.join(','));
+                var depList = getDependentList($('#planDetails' + planId).attr('data-memcvrd'));
+
+                //membersCovered = depList.flatMap((x) => getMemberFullNames(x));
+                //$('#memcvrd' + subCatId).html(membersCovered.join(','));
+                //$('#memcvrd' + subCatId).html(generateDependentItems(depList));
+                generateDependentItems(subCatId, depList);
                 //$('#fp-numbers-mcoverage' + subCatId).show();
 
                 $('#parentSubLimit' + subCatId).hide();

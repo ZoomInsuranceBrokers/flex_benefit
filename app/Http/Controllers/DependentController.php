@@ -29,7 +29,7 @@ class DependentController extends Controller {
         $dependents = Dependent::where('is_active', config('constant.$_YES'))
                                 //->where('is_deceased',config('constant.$_NO'))
                                 ->where('user_id_fk',Auth::user()->id)
-                                ->get();        
+                                ->get();
         if(!count($dependents)) {       // no/zero dependent count
             $jTableResult['Result'] = 'ERROR';
             $jTableResult['Message'] = 'No dependents found for you! Please secure your loved ones asap.';
