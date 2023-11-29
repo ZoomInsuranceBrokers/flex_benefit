@@ -11,7 +11,10 @@
                     <div class="section-heading">
                         <h4>Keep your <em>Life Events</em> updated </h4>
                         <img src="{{asset('assets/images/heading-line-dec.png') }}" alt="">
-                        <h5>Ensure nominations add upto <em>100%</em> across elected dependents</h5>
+                        <div class="bg-light">If you recently entered marriage, experienced a change in your marital status, or 
+                        welcomed a new addition to your family, you might consider adjusting your benefits to 
+                        align with these life changes. Feel free to modify your dependent information in this 
+                        section to ensure your benefits accurately reflect your current situation.</div>
                     </div>
                     </div>
                 </div>
@@ -19,22 +22,21 @@
                     <div class="col-lg-12">
                         <div class="section-border">
                             <div class="section-heading m-3">
-                                <h6>Who all can be your secured dependents under Zoom Benefits!!</h6>
+                                <h6>Who can be added?</h6>
                             </div>
                             <ul class="ul-points">
-                                <li><b>Employee (Self)</b></li>
-
-                                <li><b>Spouse</b> - Legally married to the employee. Spouse may include live-in partners of the opposite sex as per the corporate policy of Zoom. Spouse to also include legal guardian of adopted kids</li>
-
-                                <li><b>Children</b> – 2 children upto 25 years of age, unmarried and must be dependent on employee for financial support, are eligible. Children definition also covers legally adopted.</li>
-
-                                <li><b>Parents</b> - Dependent parents or parents-in law. Cross selection of 1parent and 1 parent-in-law is not applicable under plans 5-10. This is possible if the employee has declared the other parent and parent-in-law as deceased on the tool. Employee can include both parents and parents-in-law together under plan 11-13</li>
-
-                                <li><b>LGBTQIA+</b> - (Lesbian, Gay, Bi-sexual, Transgender, Queer, Agender) - Employees are eligible to cover their partners (married or unmarried) as dependents</li>
-
-                                <li><b>Live in Partners</b> - Employees are eligible to cover their live in partners as defined by Indian Law</li>
-
+                                <li>Newly married spouse</li>
+                                <li>Newborn/ adopted child</li>
                             </ul> 
+                            <div class="section-heading m-3">
+                                <h6>How it works?</h6>
+                            </div>
+                            <ul class="ul-points">
+                                <li>You can add the dependents within 30 days of the occurrence of the Life Event.
+</li>
+                                <li>Necessary approvals required from the company HR/Admin after submitting the required documents such as (Birth certificates, adoption records, and Marriage Certificate).
+</li>
+                            </ul>
                         </div>     
                     </div>  
                 </div>

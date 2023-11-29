@@ -41,39 +41,46 @@
          <div id="how-it-works" class="tabcontent active">
             <h3>How It Works</h3>
             <div id="how_it_works_static">
-                <h2>Core Benefits: These are mandatory minimum level of benefitsoffered:</h2>
-                <p>
-                    <ul>
-                        <li>Medical Insurance – INR 500,000 for Employee only</li>
-                        <li>Personal Accident Insurance – Grade- wise ranging from INR 1200,000 to INR, 10,000,000</li>
-                        <li>Life Insurance - 36 months’ total fixed salarywith a minimum of INR 2,000,000 and a maximum of
-                        INR 60,000,000. Thepolicy features of the existing Insurance Benefits (Medical/Accident/Life) continue
-                        to be the same</li>
-                        <li>For employees joined before 31st March 2023, benefits which were opted in the previous year will 
-                        act as default cover however, for employees who have joined after 31st March 2023 default cover will 
-                        be E +S+2C - 500,000</li>
-                        <li>In case any employee does not participate in the enrollment process, he/she will stay in the plan
-                        opted in the previous year</li>
-                    </ul>
-                </p>
-
-                <p><h3>Optional benefits</h3>
-                These are combination of Insurance and Flexi cash benefits. Insurance Benefits consist of voluntary
-                plan enhancement and multiple top up options. Flexi cash benefits consist of fitness, health & wellness,
-                learning & development related plans.</p>
-
-                <h3>Under the program</h3>
-                <li>Select your benefit options by utilizing your flex points. You may also exceed your allocated flex
-                pointsforinsured benefits by opting forpayroll deduction</li>
-                <li>Opt foroptional benefits fromthe defined catalogue</li>
-                <li>For Group Medical Insurance, a two year rolling lock-in was introduced from 2020 onwards.
-                During the lock-in period, employees can only select higher level plans. Upon completion of lock-in period,
-                they may move down by up to two levels of Sum Insured</li>
-
-
-                {{-- <p>Paris is in the Paris department of the Paris-Isle-of-France region The French historic,
-                political and economic capital, with a population of only 2.5 million is located in the northern
-                part of France. One of the most beautiful cities in the world. Home to historical monuments such as Notre Dame, the Eiffel tower (320m), Bastille, Louvre and many more. </p> --}}
+                <h5>Follow the steps provided below to finalize your enrollment for the plan year 2023-24:</h5>
+                <ul class="ul-points">
+                    <li>Each tab within the enrollment menu provides an opportunity to choose benefits within a specific category. For instance, 
+                    benefits such as term life are located in the "Term Life Insurance" section. The three main sections are</li>
+                    
+                        <ul class="ul-points">
+                            <li>Life Insurance</li>
+                            <li>Accident Insurance</li>
+                            <li>Medical Insurance</li>
+                            <li>Flexi Cash Benefits</li>
+                        </ul>
+                    <li>Sequentially navigate through each of these sections to explore and select from 
+                    the various available benefits. It's important to note that a positive point balance 
+                    is required for the selection of Flexi Cash Benefits
+                    </li>
+                    <li>
+                    Within each section, you'll find a list of different benefits presented in a tabular 
+                    format. Begin your selection by clicking on the desired benefit and then choosing the 
+                    relevant option
+                    </li> 
+                    <li>
+                    For insured benefits, the names of your dependents eligible for coverage will be 
+                    visible in tabular form. Ensure you select the dependents you wish to include in applicable
+                    benefits by checking against their names
+                    </li>
+                    <li>
+                    As you make your choices for benefits, the FlexPoints utilization table will automatically
+                    reflect the updates. If the cost of the insured benefits surpasses the available 
+                    FlexPoints, any surplus will be covered through salary deduction
+                    </li>
+                    <li>
+                    After finalizing your benefit selections and saving the enrollment, navigate to the
+                     'Summary' tab to ensure accurate capture of all details
+                    </li>
+                    <li>
+                    Click the 'Confirm enrollment' button to validate your benefit choices for the plan year
+                    2023-24. It's important to note that once enrollment is confirmed, no further 
+                    alterations or edits can be made to your selection
+                    </li>
+                </ul>
             </div>
          </div>
         @if(count($data['category']))
@@ -209,6 +216,22 @@ function generateDependentItems(subCatId, depList) {
                 }  
             });
         });
+        var existingDependent = [];
+        var i = 0;
+        $('[id^=dependent-list]').each(function(){
+            var dCode = $(this).attr('data-depcode');
+            var depId = $(this).attr('data-depId');
+            var depName = $(this).attr('data-name');
+            var depNom = $(this).attr('data-depNom');
+            if (typeof existingDependent[dCode] === 'undefined'){
+                existingDependent[dCode] = [[depId,depName,depNom]];    // array of array
+            } else {
+                existingDependent[dCode].splice(
+                    existingDependent[dCode].length,0,[depId,depName,depNom]
+                );
+            }
+        });
+        console.log(existingDependent);
         $('#memcvrd' + subCatId).html(memCvrdStr);
         //return memCvrdStr;
     }

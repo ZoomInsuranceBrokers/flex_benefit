@@ -123,8 +123,8 @@ function openTabs(el) {
                 title: 'Deceased',
                 width: 'auto',
                 options: [@php echo config('constant.boolean_jTable') @endphp],
-                create: true,
-                edit: true,
+                create: false,
+                edit: false,
             },
             approval_status: {
                 title: 'Approval Status',

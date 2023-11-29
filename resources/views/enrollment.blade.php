@@ -97,6 +97,8 @@ font-size:14px;
     <div id="enrollements" class="pricing-tables">
         <div class="container">
                 <div class="row">
+                    @php
+                    /*    
                     <div class="col-lg-12">
                         <div class="section-heading">                        
                             <h4>Follow below instructions to complete enrollment for <em>2023-2024</em> year</h4>
@@ -121,7 +123,9 @@ font-size:14px;
                                 </ul> 
                             </div>     
                         </div>  
-                    </div>                   
+                    </div> 
+                    */
+                    @endphp                   
                     <div class="col-lg-12" id="enrollment-tabs">
                         @include('layouts.components.enrollment-tabs')
                     </div>

@@ -14,7 +14,7 @@ class AddColumnsToInsurancePolicyTable extends Migration
     public function up()
     {
         Schema::table('insurance_policy', function (Blueprint $table) {
-            $table->float('si_factor')->nullable()->after('curreny_id_fk');
+            $table->float('si_factor')->nullable()->after('currency_id_fk');
             $table->boolean('is_base_plan')->default(false)->after('si_factor');
             $table->boolean('is_default_selection')->default(false)->after('is_base_plan');
             $table->integer('base_plan_id')->nullable()->after('is_default_selection');

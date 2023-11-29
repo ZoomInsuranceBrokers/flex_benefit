@@ -5,35 +5,28 @@
           <div class="row">
             <div class="col-lg-6 align-self-center">
               <div class="left-content show-up header-text wow fadeInLeft" data-wow-duration="1s" data-wow-delay="1s">
-                <div class="row">
+                <div class="row fs-15">
                   <div class="col-lg-12">
-                    <h2>My Benefits, My Way</h2>
+                    <h2 class="mb-1">My Benefits, My Way</h2>
+                    Empower your choices with MyBenefits@Zoom, offering enhanced flexibility and a personalized approach to shaping your perks package. Annually, you'll have the opportunity to curate your benefits portfolio during the enrollment period. 
+                    The new benefit year will start from 17th Dec 2023 & will be valid till 16th Dec 2024. The benefits you choose will be applicable for the same period.
+                    <br>
 
-                    Flex Benefits@Zoom gives you greater flexibility and choice, by providing you the freedom to design
-                    your personal benefits package with your unique needs in mind. The new benefit yearwill run 
-                    from 1stApril 2023 to 31st March 2024. If you are a new hire enrolling post 1st April 2023 your 
-                    coverage will beginfrom your joining date with Zoom till 31st March 2024.<br><br>
+                    <h3>How does it work</h3>
+                    Every employee is automatically enrolled in a foundational set of Core Benefits to prevent inadvertent choices. In addition to this, you will be granted 5000 FlexPoints( 1 flex point to 1 INR ) for a personalized touch to your benefits package. These FlexPoints allow you to tailor your coverage by selecting from various options available. 
+                    Should the selected insured benefits surpass the available FlexPoints, any excess will be covered through salary contributions deducted via payroll.
+                    <br>
 
-                    <h3>Scope of Coverage</h3>
-                    They’re your benefits – make the most of them. Flex Benefits@Zoom allows you to choose a mix of 
-                    benefits that best suit you and your family’s needs.<br><br>
+                    <h3>For new hire</h3>
+                    For new hires enrolling after December 17, 2023, your coverage will commence from your joining date and extend through 16th Dec 2024 of the subsequent year. The FlexPoints will be prorated based on the joining date.
+                    <br>
 
-                    <h3>You are always covered</h3>
-                    Each employee is protected with a core benefit to avoid erroneous selection. Over and above this,
-                    each employee is given flex points. Employees can then select various levels of coverage from the
-                    various options to suit their individual needs, using the allocated flex points.<br><br>
-
-                    <h3>Need Extra?</h3>
-                        Over and above each employee will receive 23,500 flex points. You can choose how to spend those flex points. These will be prorated for new hires from your date of joining. 1Point = 1INR
-                    </div><br><br>
-                  <div class="col-lg-12">
-                    <div class="white-button first-button scroll-to-section">
-                      <a href="#contact">Free Quote <i class="fab fa-apple"></i></a>
+                    <div class="mt-2">To know more please reach out to us at 
+                      <a style="color:#020241;border-bottom:1px solid #FFF" href="email:support.flexbenefits@zoominsurancebrokers.com">
+                        support.flexbenefits@zoominsurancebrokers.com
+                      </a>
                     </div>
-                    <div class="white-button scroll-to-section">
-                      <a href="#contact">Free Quote <i class="fab fa-google-play"></i></a>
-                    </div>
-                  </div>
+                    </div>                  
                 </div>
               </div>
             </div>  

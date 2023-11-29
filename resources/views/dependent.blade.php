@@ -5,32 +5,33 @@
                 <div class="row">
                     <div class="col-lg-8 offset-lg-2">
                     <div class="section-heading">
-                        <h4>Secure your <em>loved</em> ones and avail <em>insured b+enefits</em></h4>
+                        <h4>Secure your <em>loved</em> ones and avail <em>insured benefits</em></h4>
                         <img src="{{asset('assets/images/heading-line-dec.png') }}" alt="">
-                        <h5>Ensure nominations add upto <em>100%</em> across elected dependents</h5>
+                        <div class="bg-light">The system has already uploaded your dependents' details based on the information available 
+                        from the company's records. If you need to make any changes to the dependent information, please 
+                        use the editing function located in the 'Dependents' tab.</div>
                     </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="section-border">
-                            <div class="section-heading m-3">
-                                <h6>Who all can be your secured dependents under Zoom Benefits!!</h6>
+                            <div class="text-dark m-3">
+                                <h5>Verify your dependent information. Please take note of the following: </h5>
                             </div>
                             <ul class="ul-points">
-                                <li><b>Employee (Self)</b></li>
-
-                                <li><b>Spouse</b> - Legally married to the employee. Spouse may include live-in partners of the opposite sex as per the corporate policy of Zoom. Spouse to also include legal guardian of adopted kids</li>
-
-                                <li><b>Children</b> – 2 children upto 25 years of age, unmarried and must be dependent on employee for financial support, are eligible. Children definition also covers legally adopted.</li>
-
-                                <li><b>Parents</b> - Dependent parents or parents-in law. Cross selection of 1parent and 1 parent-in-law is not applicable under plans 5-10. This is possible if the employee has declared the other parent and parent-in-law as deceased on the tool. Employee can include both parents and parents-in-law together under plan 11-13</li>
-
-                                <li><b>LGBTQIA+</b> - (Lesbian, Gay, Bi-sexual, Transgender, Queer, Agender) - Employees are eligible to cover their partners (married or unmarried) as dependents</li>
-
-                                <li><b>Live in Partners</b> - Employees are eligible to cover their live in partners as defined by Indian Law</li>
-
+                                <li>All your dependents for the fiscal year 2022-23 have already been updated. Proceed to add any new dependents or if any dependent is not visible below</li>
+                                <li>The maximum number of eligible dependents allowed under MyBenefits@Zoom includes the employee, spouse/partner, 2 dependent children, dependent parents, and parents-in-law</li>
+                                <li>Click on the “Edit Icon” to modify the dependent details</li>
+                                <li>Click on “Add New Record” to add new dependent</li>
+                                <li>The nominee percentage signifies the allocation of proceeds from group term life and accident insurance among your chosen dependents</li>
+                                <li>The total nominee percentage for all selected dependents must add up to 100 for the tool to permit enrollment; this is a crucial requirement</li>
+                                <li>You have the option to edit dependents or indicate them as deceased. For updates to dependents previously covered, HR approval is mandatory</li>
+                                <li>Adding dependents does not automatically include them in the policy. Ensure to select the dependents in the "Medical Insurance" section under the "Enrollment" tab to provide coverage in the policy</li>
                             </ul> 
+                            <div class="text-info m-3">
+                                Please attach the relevant government document such as Aadhar Card, PAN Card, birth certificate, or death certificate, etc., as applicable when submitting your request. The processing time for updating such dependents is 2 working days
+                            </div>
                         </div>     
                     </div>  
                 </div>
