@@ -1,3 +1,8 @@
+<style>
+.btn{background: #4b8ef1;}
+.btn_red{background: #4b8ef1;}
+</style>
+
 <div id="modal" class="popupContainer" style="display:none;">
     <div class="popupHeader">
         <span class="header_title">Login</span>
@@ -33,9 +38,14 @@
                 </div>
 
                 <div class="action_btns">
-                    <div class="one_half"><a href="#" class="btn back_btn"><i class="fa fa-angle-double-left"></i> Back</a></div>
-                    <div class="one_half last">                        
-                        <input type="submit" id="loginSubmission" class="btn btn_red" value="Login" />
+                    <div class="one_half">
+                        <a href="#" class="btn back_btn">
+                        <i class="fa fa-angle-double-left"></i> Back</a>
+                    </div>
+
+                    <div class="one_half last"> 
+                        <i class="fa fa-angle-double-right"></i> 
+                        <input type="submit" class="btn btn_red" value="Login" />
                     </div>
                 </div>
             </form>
