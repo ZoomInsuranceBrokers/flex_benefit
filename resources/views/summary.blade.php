@@ -8,9 +8,10 @@
             $summaryData[$item['id']]['subcategory'] = $item['fy_policy']['policy']['subcategory']['name'];
             $summaryData[$item['id']]['policy'] = $item['fy_policy']['policy']['name'];
             $summaryData[$item['id']]['summary'] = json_decode(base64_decode($item['encoded_summary']));
+            $summaryData[$item['id']]['points'] = $item['points_used'];
         }
     }
-    //dd($summaryData[$item['id']]['summary']);
+    //dd($summaryData);
 @endphp
 @if(count($summaryData)) 
     <table class="table" id="summary_tbl" style="border-bottom:2px solid #000;">
@@ -25,9 +26,9 @@
         <tbody>
         @php $totalPoints = 0; @endphp
         @foreach($summaryData as $item)
-            @php $totalPoints += $item['summary']->totptwocurr; 
+            @php $totalPoints += $item['points']; 
              @endphp
-                    <tr style="border-top:2px solid #000;">
+                <tr style="border-top:2px solid #000;">
                     <th rowspan="2" scope="row" class="fs-14">
                         <span>{{ $item['category'] }}</span><br>
                         <span class="summarySubCat">{{ $item['subcategory'] }}</span><br>
@@ -56,39 +57,27 @@
                         </dl>
                     </td>
                 </tr>
-                <tr>
-                    {{-- <td>
-                        <dl>
-                            <dt>Annual Points</dt>
-                            <dd>{{ $item['summary']->annup }}</dd>
-                        </dl> 
-                    </td>
-                    <td>                           
-                        <dl>
-                            <dt>Effective Points</dt>
-                            <dd>{{ $item['summary']->opplpt }}</dd>
-                        </dl>
-                    </td> --}}
+                <tr>                   
                     <td>
                         <dl>
                             <dt>Points Used</dt>
-                            <dd>{{ $item['summary']->totpt }}</dd>
+                            <dd>{{  $formatter->formatCurrency($item['points'], 'INR') }}</dd>
                         </dl>
                     </td>        
                 </tr>
         @endforeach
-                <tr style="border-top:2px solid #000;">
+                {{-- <tr style="border-top:2px solid #000;">
                     <th colspan="3" scope="row" class="fs-14">
                         <span>{{ $item['category'] }}</span><br>
                         <span class="summarySubCat">{{ $item['subcategory'] }}</span><br>
                         <span class="summaryPolName">{{ $item['policy'] }}</span>
                     </th>
-                </tr>
-                <tr>
-                    <td>
+                </tr> --}}
+                <tr style="border-top:2px solid #000;">                    
+                    <td colspan="4">
                         <dl>
-                            <dt>Total Points Used</dt>
-                            <dd>{{ $totalPoints }}</dd>
+                            <dt style="text-align:right;">Total Points Used</dt>
+                            <dd style="text-align:right;">{{ $formatter->formatCurrency($totalPoints, 'INR') }}</dd>
                         </dl>
                     </td>        
                 </tr>

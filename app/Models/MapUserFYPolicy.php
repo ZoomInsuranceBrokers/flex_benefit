@@ -14,6 +14,10 @@ class MapUserFYPolicy extends Model
         'encoded_summary','is_active','created_by','modified_by'
     ];
 
+    public function getTableName(){
+        return $this->table;
+    }
+
     public function fyPolicy()
     {
         return $this->hasOne(MapFYPolicy::class, 'id', 'fypolicy_id_fk')->with('policy');

@@ -44,6 +44,7 @@ use App\Http\Controllers\UserController;
 //});
 
 Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
+Route::post('/enrollment/savePV', [EnrollmentController::class, 'saveEnrollmentPV']);
 Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
 Route::get('/enrollment/summaryDownload', [EnrollmentController::class, 'downloadSummary']);
 Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);

@@ -32,7 +32,7 @@
 
 @component('layouts.components.header') @endcomponent
 @yield('content')
-@component('layouts.components.footer') @endcomponent
+{{-- @component('layouts.components.footer') @endcomponent --}}
 
 
   <!-- Scripts -->

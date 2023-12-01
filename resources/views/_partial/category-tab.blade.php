@@ -63,7 +63,7 @@
                             @if(count($detailPoints))
                                 <div class="row">
                                     <div class="col-12">
-                                        <ul class="ul-points fs-13">                    
+                                        <ul class="ul-points fs-16">                    
                                             @foreach($detailPoints as $detailItem)
                                                 <li>{{ $detailItem }}</li>
                                             @endforeach
@@ -77,7 +77,7 @@
                                 <hr class="my-2">
                                     <div class="row">                                
                                         <div class="section-heading">
-                                            <h4 class="py-1">Core Benefits</h4>                                        
+                                            <h4 class="py-1">Policy Details</h4>                                        
                                         </div>
                                         <div class="col text-center">
                                             <dl>

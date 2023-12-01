@@ -20,22 +20,22 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="section-border">
+                        <div class="section-border"> 
+                            <div class="section-heading m-3">
+                                <h6>How it works?</h6>
+                            </div>
+                            <ul class="ul-points">
+                                <li>You can add the dependents within 30 days of the occurrence of the Life Event.
+                                </li>
+                                <li>Necessary approvals required from the company HR/Admin after submitting the required documents such as (Birth certificates, adoption records, and Marriage Certificate).
+                                </li>
+                            </ul>
                             <div class="section-heading m-3">
                                 <h6>Who can be added?</h6>
                             </div>
                             <ul class="ul-points">
                                 <li>Newly married spouse</li>
                                 <li>Newborn/ adopted child</li>
-                            </ul> 
-                            <div class="section-heading m-3">
-                                <h6>How it works?</h6>
-                            </div>
-                            <ul class="ul-points">
-                                <li>You can add the dependents within 30 days of the occurrence of the Life Event.
-</li>
-                                <li>Necessary approvals required from the company HR/Admin after submitting the required documents such as (Birth certificates, adoption records, and Marriage Certificate).
-</li>
                             </ul>
                         </div>     
                     </div>  

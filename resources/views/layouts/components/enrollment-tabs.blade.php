@@ -296,7 +296,37 @@ function planBindEvents() {
                 //countNumber('currentPlanValue', currPlanValue);        
                 //countNumber('allPlanValue', allPlanValue);
                 //countNumber('remainingPlanValue', balancePlanValue);
-            }            
+        }
+        
+        // toggle disable of point based policy
+        $('[id^=chkValuePlanId]').on('change', function(){
+            var polId = $(this).attr('data-plan-id');
+            if ($(this).is(':checked')) {
+                $('#txtValuePlanId' + polId).removeAttr('disabled');
+            } else {
+                $('#txtValuePlanId' + polId).attr('disabled', 'disabled');
+                $('#txtValuePlanId' + polId).val('');
+            }
+        });
+
+        // value based keyup validation 
+        $('[id^=txtValuePlanId]').on('keyup', function(){
+            $(this).removeClass('bg-danger');
+            var polId = $(this).attr('data-plan-id');
+            var totalPointsAvailable = {{ Auth::user()->points_available }};
+            
+            var totalPointEntered = 0;
+            $('[id^=txtValuePlanId]').each(function(){
+                
+                totalPointEntered += parseInt($(this).val() != '' ? $(this).val() : 0); 
+            });
+            console.log(totalPointEntered);
+
+            if (totalPointEntered > totalPointsAvailable) {
+                $(this).val('').addClass('bg-danger');
+                alert('Maximum points across all benefit cannot be more than available ' + totalPointsAvailable + ' point(s)');
+            }
+        });
     });
 }
 
@@ -335,38 +365,46 @@ function policyDetailsforSubCategory(subCatId) {
 function saveEnrollment(catId){
     var polData = new Object();
     var fypmapId = 0;
-    $('form#subCategoryForm' + catId).find('input[type=radio]:checked').each(function(item){
-        let policyID = $(this).val();
-        polDet = $('#planDetails' + policyID);
-        
-        var polDet = document.getElementById('planDetails' + policyID);
-        // iterate each attribute
-        if (parseInt(polDet.attributes['data-isbp'].nodeValue)) {
-            $('#launchEnrollmentModal .modal-title').html('Invalid Selection!').addClass('text-danger');
-            $('#launchEnrollmentModal .modal-body>p').html('Base plan is already present. Please select top-up to increase coverage.');
-            $('#launchEnrollmentModal .btn.modal_close').html('I\'ll select again');
-            $("#enrollmentModal_trigger").click();
-        } else {
-            for (var i = 0; i < polDet.attributes.length; i++) {            
-                attr = polDet.attributes[i];    // current attr
-                if (/^data-/.test(attr.nodeName)) { // If attribute nodeName starts with 'data-'
-                    attrName = attr.nodeName.replace(/^data-/, '');
-                    polData[attrName] = attr.nodeValue;
-                    if(attrName=='fypmap') {
-                        fypmapId = parseInt(attr.nodeValue);
+    if ($('form#subCategoryForm' + catId).attr('data-ispv')==1) {
+        var checkboxCounter = 0;
+        var policySelected = [];
+        $('form#subCategoryForm' + catId).find('input[type=checkbox]:checked').each(function(item){
+            checkboxCounter++;
+            policySelected.push($(this).val());
+        });
+        if (checkboxCounter && policySelected.length) {
+            let savePoints = [];
+            let isvbsd = 0;
+            let polData = [];
+            let summary = [];
+            policySelected.forEach(function(policyID){
+                polDet = $('#planDetails' + policyID);
+                var fypmap = polDet.attr('data-fypmap');
+                polDetJs = document.getElementById('planDetails' + policyID);
+                for (var i = 0; i < polDetJs.attributes.length; i++) {            
+                    attr = polDetJs.attributes[i];    // current attr
+                    if (/^data-/.test(attr.nodeName)) { // If attribute nodeName starts with 'data-'
+                        attrName = attr.nodeName.replace(/^data-/, '');
+                        summary.push(fypmap + ':' + attrName + ':' + attr.nodeValue);    // array of array
                     }
                 }
-            }            
-            if (fypmapId) {
+                isvbsd = polDet.attr('data-isvbsd');
+                if (isvbsd) {
+                    savePoints.push(fypmap + ':' + parseInt($('#txtValuePlanId' + policyID).val()));
+                } else {
+                    savePoints.push(fypmap + ':' + parseInt(polDet.attr('data-annupwocurr')));
+                }
+            });    
+            console.log('--summary',summary,'--savePoints', savePoints);     
+            if (savePoints.length) {
                 $.ajax({
-                    url: "/enrollment/save",
+                    url: "/enrollment/savePV",
                     type:"POST",
                     data:{
                         "_token": '{{ csrf_token() }}',
-                        'fypmap':fypmapId,
+                        'savePoints':btoa(unescape(encodeURIComponent(JSON.stringify(savePoints)))),
                         'catId': catId,
-                        'policyId' : policyID,
-                        'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(polData))))
+                        'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(summary))))
                     },
                     success:function(response) {
                         if (response.status) {
@@ -382,12 +420,73 @@ function saveEnrollment(catId){
                         $("#enrollmentModal_trigger").click();
                     }
                 });
-            } else {
-
             }
-        }        
-    });
-    //console.log(btoa(unescape(encodeURIComponent(JSON.stringify(polData)))));
+        } else {
+            $('#launchEnrollmentModal .modal-title').html('No benefits selected!').addClass('text-danger');
+            $('#launchEnrollmentModal .modal-body>p').html('Please choose available benefits as you still have <b>' +
+                @php echo Auth::user()->points_available @endphp + '</b> points');
+            $('#launchEnrollmentModal .btn.modal_close').html('I\'ll select again');
+            $("#enrollmentModal_trigger").click();
+        }
+    } else {
+        $('form#subCategoryForm' + catId).find('input[type=radio]:checked').each(function(item){
+            let policyID = $(this).val();
+            polDet = $('#planDetails' + policyID);
+            let points = 0;
+            
+            var polDet = document.getElementById('planDetails' + policyID);
+            // iterate each attribute
+            if (parseInt(polDet.attributes['data-isbp'].nodeValue)) {
+                $('#launchEnrollmentModal .modal-title').html('Invalid Selection!').addClass('text-danger');
+                $('#launchEnrollmentModal .modal-body>p').html('Base plan is already present. Please select top-up to increase coverage.');
+                $('#launchEnrollmentModal .btn.modal_close').html('I\'ll select again');
+                $("#enrollmentModal_trigger").click();
+            } else {
+                for (var i = 0; i < polDet.attributes.length; i++) {            
+                    attr = polDet.attributes[i];    // current attr
+                    if (/^data-/.test(attr.nodeName)) { // If attribute nodeName starts with 'data-'
+                        attrName = attr.nodeName.replace(/^data-/, '');
+                        polData[attrName] = attr.nodeValue;
+                        if(attrName=='fypmap') {
+                            fypmapId = parseInt(attr.nodeValue);
+                        }
+                        if (attrName == 'totptwocurr') {
+                            points = attr.nodeValue;
+                        }
+                    }
+                }            
+                if (fypmapId) {
+                    $.ajax({
+                        url: "/enrollment/save",
+                        type:"POST",
+                        data:{
+                            "_token": '{{ csrf_token() }}',
+                            'fypmap':fypmapId,
+                            'catId': catId,
+                            'policyId' : policyID,
+                            'points': points,
+                            'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(polData))))
+                        },
+                        success:function(response) {
+                            if (response.status) {
+                                title = 
+                                $('#launchEnrollmentModal .modal-title').html('Yay!! Selection Saved').addClass('text-success');
+                                $('#launchEnrollmentModal .btn.modal_close').html('Proceed Ahead');
+                            } else {                            
+                                $('#launchEnrollmentModal .modal-title').html('OOPS.. :( Something went wrong').addClass('text-danger');
+                                $('#launchEnrollmentModal .btn.modal_close').html('Try Again');
+                                $("#enrollmentModal_trigger").click();
+                            }
+                            $('#launchEnrollmentModal .modal-body>p').html(response.message);                        
+                            $("#enrollmentModal_trigger").click();
+                        }
+                    });
+                } else {
+
+                }
+            }        
+        });
+    }
 }
 
 
@@ -421,7 +520,7 @@ $('#enrollment-summary').on('click', function(){
         
         
     });
-});
+}); 
 
 {{-- // trigger for radio button --}}
     {{-- $('[id^=planId]').click(function(){
