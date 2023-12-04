@@ -283,7 +283,7 @@ function planBindEvents() {
 
                 $('#parentSubLimit' + subCatId).hide();
                 let parent_sublimit_amount = $('#planDetails' + planId).attr('data-prntSbLim');
-                if( parent_sublimit_amount > 0) {
+                if( parent_sublimit_amount != '0') {
                     console.log('#planDetails' + planId + '----' +parent_sublimit_amount);
                     $('#parentSubLimit' + subCatId).show();
                     $('#prntSbLim' + subCatId).html(parent_sublimit_amount);
@@ -320,7 +320,6 @@ function planBindEvents() {
                 
                 totalPointEntered += parseInt($(this).val() != '' ? $(this).val() : 0); 
             });
-            console.log(totalPointEntered);
 
             if (totalPointEntered > totalPointsAvailable) {
                 $(this).val('').addClass('bg-danger');
@@ -349,7 +348,6 @@ function policyDetailsforSubCategory(subCatId) {
             url: '/enrollment/getPolicybySubCategory',
             data: {'subCatId':subCatId},
             success: function(response){
-                //console.log(subCatId);
                 $('#policySubCategoryList' + subCatId).html(response.html);
                 planBindEvents();
                 triggerInitialClick();
@@ -395,7 +393,6 @@ function saveEnrollment(catId){
                     savePoints.push(fypmap + ':' + parseInt(polDet.attr('data-annupwocurr')));
                 }
             });    
-            console.log('--summary',summary,'--savePoints', savePoints);     
             if (savePoints.length) {
                 $.ajax({
                     url: "/enrollment/savePV",

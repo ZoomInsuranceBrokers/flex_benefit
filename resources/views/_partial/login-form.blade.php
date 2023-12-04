@@ -75,13 +75,10 @@
             rememberMe:rememberMe
             },
             success:function(response) {
-                //console.log(response);
                 window.location.href = '{{ env('APP_URL') }}';
             },
             error: function(response) {
-                //console.log('error:',JSON.parse(response.responseText));
                 $.each(JSON.parse(response.responseText).errors, function(k,v){
-                    //console.log(k,v);
                     $('#' + k + 'ErrorMsg').html(v);
                 });
                

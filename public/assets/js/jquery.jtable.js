@@ -53,6 +53,7 @@ THE SOFTWARE.
             fields: {},
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
+            defaultMaxDate: '',
             dialogShowEffect: 'fade',
             dialogHideEffect: 'fade',
             showCloseButton: false,
@@ -1586,7 +1587,8 @@ THE SOFTWARE.
             }
             
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-            $input.datepicker({ dateFormat: displayFormat });
+            var maxData = field.maxDate || this.options.defaultMaxDate;
+            $input.datepicker({ dateFormat: displayFormat, maxData: maxData });
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);

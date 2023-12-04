@@ -114,6 +114,8 @@ function openTabs(el) {
                 title: 'Date of Birth',
                 width: 'auto',
                 type: 'date',
+                displayFormat: 'dd-mm-yy',
+                maxDate: "+0D"
             },
             nominee_percentage: {
                 title: 'Nomination Percentage',

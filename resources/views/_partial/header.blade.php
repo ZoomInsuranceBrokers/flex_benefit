@@ -11,10 +11,10 @@
             <!-- ***** Menu Start ***** -->            
             <ul class="nav">
               @if(Auth::check())
-                {{-- <li class="nav-item scroll-to-section bg-light">
+                <li class="nav-item scroll-to-section bg-light">
                     <a id="header_home" href="/" class="active">Program Details</a>
                 </li>
-                &nbsp; --}}
+                &nbsp;
                 <li class="nav-item scroll-to-section bg-light">
                     <a id="header_dependents" href="/dependents">Dependents</a></li>
                 &nbsp;

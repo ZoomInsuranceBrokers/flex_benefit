@@ -61,4 +61,8 @@ Route::get('/user/create/', function(Request $request){
     ]);
 });
 
+Route::get('/account/', function(Request $request){
+
+});
+
 

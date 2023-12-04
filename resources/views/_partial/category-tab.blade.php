@@ -32,8 +32,8 @@
                                 <tr>
                                     <td><a id="enrollmentSubCategory{{ $subcat->id }}" data-cat-id="{{ $subcat->id }}" href="javascript:return false;">{{ $subcat->name }}</a></a></td>
                                     <td>{{ html_entity_decode(strlen($subcat->description) < 70 ? $subcat->description : substr($subcat->description, 0, 67) . '...') }}</td>
-                                    <td>GL - Top UP 2X salary</td>
-                                    <td>123456</td>
+                                    <td>{{ array_key_exists($subcat->id, $data['currentSelectedData']) ? $data['currentSelectedData'][$subcat->id][0]['polName']  : 'N.A.' }}</td>
+                                    <td>{{ array_key_exists($subcat->id, $data['currentSelectedData']) ? $data['currentSelectedData'][$subcat->id][0]['points']  : 0 }}</td>
                                 </tr>                        
                             @endif
                         @endforeach

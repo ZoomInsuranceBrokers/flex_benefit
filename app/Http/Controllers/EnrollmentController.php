@@ -31,6 +31,26 @@ class EnrollmentController extends Controller
                     ->select('ic.id as ic_id','ic.name as category', 'sequence', 'tagline','isc.*')
                     ->get();
 
+        // get logged in user saved/selected policies
+        $fypmapData = MapUserFYPolicy::where('is_active', true)
+        ->with(['fyPolicy'])
+        ->where('user_id_fk', '=', Auth::user()->id)
+        //->whereRelation('policy', 'ins_subcategory_id_fk',$request->subCatId)
+        ->get()->toArray();
+
+        //dd($fypmapData);
+        $currentSelectedData = [];
+        if (count($fypmapData)) {
+            foreach ($fypmapData as $fypRow) {
+                if (!$fypRow['fy_policy']['policy']['is_base_plan']) {
+                    $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
+                        'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']];
+                }
+            }
+        }
+
+        //dd($currentSelectedData);
+
         // dependent
         $dependents = Dependent::where('is_active', config('constant.$_YES'))
                                 //->where('is_deceased',config('constant.$_NO'))
@@ -41,6 +61,7 @@ class EnrollmentController extends Controller
         return view('enrollment')->with('data', 
         [   'sub_categories_data' => $data->toArray(), 
             'category' => $category->toArray(),
+            'currentSelectedData' => $currentSelectedData,
             'dependent' => $dependents->toArray()
         ]);
     }
