@@ -1,6 +1,6 @@
 @php
     //dd($data['dependent']);
-    $tabCount = (Auth::check()) ? count($data['category']) + 3 : 1;
+    $tabCount = Auth::check() ? (($data['is_enrollment_window'] ? count($data['category']) : 0) + 3) : 1;
 @endphp
 
 @extends('layouts.layout')
@@ -135,7 +135,7 @@ font-size:14px;
     </div>
     
     @php
-        if (count($data['dependent'])) {
+        if ($data['is_enrollment_window'] && count($data['dependent'])) {
             foreach ($data['dependent'] as $depItem) {
     @endphp
             <span id="dependent-list{{ $depItem['id'] }}" style="display:none;" data-name="{{ $depItem['dependent_name'] }}"

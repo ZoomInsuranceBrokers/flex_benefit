@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use Dompdf\Dompdf;
 use App\Models\User;
+use App\Models\Account;
 use App\Models\Dependent;
 use App\Models\MapFYPolicy;
 use Illuminate\Http\Request;
 use App\Models\InsurancePolicy;
 use App\Models\MapUserFYPolicy;
+use App\Models\MapGradeCategory;
 use App\Models\InsuranceCategory;
 use Illuminate\Support\Facades\DB;
 use App\Models\InsuranceSubCategory;
-use App\Models\MapGradeCategory;
 use Illuminate\Support\Facades\Auth;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Contracts\Session\Session;
@@ -22,62 +24,77 @@ class EnrollmentController extends Controller
 {
     public function home()
     {
-        // category data
-        $category = InsuranceCategory::where('is_active', true)->orderBy('sequence')->get();
+        // get enrollment window and if it is open then only extract further data from db
+        $accountData = Account::all()->toArray();
+        $todayDate       = new DateTime(); // Today
+        $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
+        $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
 
-        // sub-category data
-        $data = DB::table('insurance_category as ic')
-                    ->leftJoin('insurance_subcategory as isc' ,'isc.ins_category_id_fk', '=', 'ic.id')
-                    ->where('ic.is_active', '=', true)
-                    ->where('isc.is_active', '=', true)
-                    ->select('ic.id as ic_id','ic.name as category', 'sequence', 'tagline','isc.*')
-                    ->get();
+        if ($todayDate >= $enrollmentDateBegin && $todayDate < $enrollmentDateEnd) {
+            // is in between
+                // category data
+            $category = InsuranceCategory::where('is_active', true)->orderBy('sequence')->get();
 
-        // get logged in user saved/selected policies
-        $fypmapData = MapUserFYPolicy::where('is_active', true)
-        ->with(['fyPolicy'])
-        ->where('user_id_fk', '=', Auth::user()->id)
-        //->whereRelation('policy', 'ins_subcategory_id_fk',$request->subCatId)
-        ->get()->toArray();
+            // sub-category data
+            $data = DB::table('insurance_category as ic')
+                        ->leftJoin('insurance_subcategory as isc' ,'isc.ins_category_id_fk', '=', 'ic.id')
+                        ->where('ic.is_active', '=', true)
+                        ->where('isc.is_active', '=', true)
+                        ->select('ic.id as ic_id','ic.name as category', 'sequence', 'tagline','isc.*')
+                        ->get();
 
-        //dd($fypmapData);
-        $currentSelectedData = [];
-        if (count($fypmapData)) {
-            foreach ($fypmapData as $fypRow) {
-                if (!$fypRow['fy_policy']['policy']['is_base_plan']) {
-                    $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
-                        'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']];
+            // get logged in user saved/selected policies
+            $fypmapData = MapUserFYPolicy::where('is_active', true)
+            ->with(['fyPolicy'])
+            ->where('user_id_fk', '=', Auth::user()->id)
+            //->whereRelation('policy', 'ins_subcategory_id_fk',$request->subCatId)
+            ->get()->toArray();
+
+            //dd($fypmapData);
+            $currentSelectedData = [];
+            if (count($fypmapData)) {
+                foreach ($fypmapData as $fypRow) {
+                    if (!$fypRow['fy_policy']['policy']['is_base_plan']) {
+                        $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
+                            'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']];
+                    }
                 }
             }
-        }
 
-        $mappedGradeData = User::where('id', Auth::user()->id)
-                ->with(['grade'])
-                ->whereRelation('grade', 'id', Auth::user()->grade_id_fk)
-                ->get()->toArray();
-        $gradeData = [];
-        if(count($mappedGradeData)) {
-            foreach($mappedGradeData[0]['grade']['category_mapping'] as $gradeCatData) {
-                $gradeData[$gradeCatData['category_id_fk']] = $gradeCatData['amount'];
+            // mappedgrade data
+            $mappedGradeData = User::where('id', Auth::user()->id)
+                    ->with(['grade'])
+                    ->whereRelation('grade', 'id', Auth::user()->grade_id_fk)
+                    ->get()->toArray();
+            $gradeData = [];
+            if(count($mappedGradeData)) {
+                foreach($mappedGradeData[0]['grade']['category_mapping'] as $gradeCatData) {
+                    $gradeData[$gradeCatData['category_id_fk']] = $gradeCatData['amount'];
+                }
             }
+
+            session(['gradeData' => $gradeData]);
+
+            // enrollment window data
+
+            // dependent
+            $dependents = Dependent::where('is_active', config('constant.$_YES'))
+                                    //->where('is_deceased',config('constant.$_NO'))
+                                    ->where('user_id_fk',Auth::user()->id)
+                                    ->where('is_deceased',config('constant.$_NO'))
+                                    ->get();
+
+            $viewArray = ['sub_categories_data' => $data->toArray(), 
+                    'category' => $category->toArray(),
+                    'currentSelectedData' => $currentSelectedData,
+                    'gradeAmtData' => $gradeData,
+                    'dependent' => $dependents->toArray(),
+                    'is_enrollment_window' => true
+                ];
+        } else {
+            $viewArray = ['is_enrollment_window' => false];
         }
-
-        session(['gradeData' => $gradeData]);
-
-        // dependent
-        $dependents = Dependent::where('is_active', config('constant.$_YES'))
-                                //->where('is_deceased',config('constant.$_NO'))
-                                ->where('user_id_fk',Auth::user()->id)
-                                ->where('is_deceased',config('constant.$_NO'))
-                                ->get();
-
-        return view('enrollment')->with('data', 
-        [   'sub_categories_data' => $data->toArray(), 
-            'category' => $category->toArray(),
-            'currentSelectedData' => $currentSelectedData,
-            'gradeAmtData' => $gradeData,
-            'dependent' => $dependents->toArray()
-        ]);
+        return view('enrollment')->with('data', $viewArray);
     }
 
     public function getInsuranceListBySubCategory(Request $request)

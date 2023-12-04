@@ -24,13 +24,14 @@
                 <p data-title="How It Works">How It Works</p>
             </button>
             @if(Auth::check())
-                @foreach($data['category'] as $item)
-                    <button class="tablinks" id="tabLink{{ $item['id'] }}" 
-                        {{-- data-grdAmt="{{ array_key_exists($item['id'], $data['gradeAmtData']) ? $data['gradeAmtData'][$item['id']] : '' }}" --}}
-                        data-country="{{ 'content-tab-' . $item['id'] }}">
-                        <p data-title="{{ $item['name'] }}">{{ $item['name'] }}</p>
-                    </button>
-                @endforeach         
+                @if($data['is_enrollment_window'])
+                    @foreach($data['category'] as $item)
+                        <button class="tablinks" id="tabLink{{ $item['id'] }}" 
+                            data-country="{{ 'content-tab-' . $item['id'] }}">
+                            <p data-title="{{ $item['name'] }}">{{ $item['name'] }}</p>
+                        </button>
+                    @endforeach 
+                @endif      
                 <button class="tablinks" data-country="summary" id="enrollment-summary">
                     <p data-title="Summary">Summary</p>
                 </button>
@@ -86,14 +87,16 @@
                 </ul>
             </div>
          </div>
-        @if(count($data['category']))
-            @foreach($data['category'] as $item)
-                @include('_partial.category-tab') 
-            @endforeach 
-        @else
-            NoCATGEORY FOUND. WRONG SETUP.
-            {{-- @todo: Error to show on no category list available --}}
-        @endif                      
+         @if($data['is_enrollment_window'] )
+            @if(count($data['category']))
+                @foreach($data['category'] as $item)
+                    @include('_partial.category-tab') 
+                @endforeach 
+            @else
+                NoCATGEORY FOUND. WRONG SETUP.
+                {{-- @todo: Error to show on no category list available --}}
+            @endif 
+         @endif
          <div id="summary" class="tabcontent">
             <h3>Summary</h3>
             <div id="summary_content"></div>
