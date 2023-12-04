@@ -3,6 +3,7 @@
 @stop
 
 @php
+//dd($data['gradeAmtData']);
 
 //dd($data['sub_categories_data']);
     /* foreach($data['category'] as $key => $value) {
@@ -24,7 +25,9 @@
             </button>
             @if(Auth::check())
                 @foreach($data['category'] as $item)
-                    <button class="tablinks" data-country="{{ 'content-tab-' . $item['id'] }}">
+                    <button class="tablinks" id="tabLink{{ $item['id'] }}" 
+                        {{-- data-grdAmt="{{ array_key_exists($item['id'], $data['gradeAmtData']) ? $data['gradeAmtData'][$item['id']] : '' }}" --}}
+                        data-country="{{ 'content-tab-' . $item['id'] }}">
                         <p data-title="{{ $item['name'] }}">{{ $item['name'] }}</p>
                     </button>
                 @endforeach         
@@ -87,7 +90,8 @@
             @foreach($data['category'] as $item)
                 @include('_partial.category-tab') 
             @endforeach 
-        @elseif($condition)
+        @else
+            NoCATGEORY FOUND. WRONG SETUP.
             {{-- @todo: Error to show on no category list available --}}
         @endif                      
          <div id="summary" class="tabcontent">
@@ -245,11 +249,13 @@ function planBindEvents() {
                 var subCatId = $(this).attr('data-sc-id');
                 var planId = $(this).attr('data-plan-id');
                 let planDetailArr = ['bpName', 'ptf','pt','osa','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
-                'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa'];
+                'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa','is_grade_based'];
 
                 planDetailArr.forEach(function (item,index) {
                     itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));
                 });
+
+                
 
                 // Conditional UI
                 $('#coresumRow' + subCatId).hide();

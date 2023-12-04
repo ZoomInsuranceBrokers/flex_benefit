@@ -26,7 +26,10 @@
         <tbody>
         @php $totalPoints = 0; @endphp
         @foreach($summaryData as $item)
-            @php $totalPoints += $item['points']; 
+            
+            @php 
+            //dd(array_key_exists('data-isvbsd',$item) ? $item['data-isvbsd'] : '0');
+             $totalPoints += $item['points']; 
              @endphp
                 <tr style="border-top:2px solid #000;">
                     <th rowspan="2" scope="row" class="fs-14">
@@ -85,7 +88,13 @@
         </tbody>
     </table>
     <br>
-    <h5 class="text-secondary" style="text-align:right;">Make your decision <em>FINAL</em> by clicking <button class="btn btn-primary">Final Submission</button></h5>
+    @php //if (Auth::users()->points_available > 0) { 
+        @endphp
+    <h5 class="text-secondary" style="text-align:right;">Make your decision <em>FINAL</em> by clicking <button class="btn btn-primary">Final Submission</button>
+    </h5>
+    @php //} 
+    @endphp
+
     
 
 @else

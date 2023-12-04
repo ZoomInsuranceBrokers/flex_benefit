@@ -32,15 +32,20 @@
         @php
         $bpsa = 0;
         $bpName = '';
-        $is_lumpsum = $is_si_sa = $is_sa = FALSE;
+        $is_lumpsum = $is_si_sa = $is_sa = $is_grade_based = FALSE;
         $base_si_factor = 0;
         if($item['policy']['is_base_plan']) {
             // first priority will be given to lumpsum value
-            $lumpsum = $item['policy']['lumpsum_amount']; //@todo check Data and verify logic of SA
-            if (!is_null($lumpsum)) {
+            /* $lumpsum = $item['policy']['lumpsum_amount']; //@todo check Data and verify logic of SA --}}
+             if (!is_null($lumpsum)) {
                 $bpsa = (int)$lumpsum;
                 $is_lumpsum = TRUE;
-            } else {
+            }*/
+            if ($gradeAmount) {
+                $bpsa = (int)$gradeAmount;
+                $is_grade_based = TRUE;
+            } 
+            else {
                 $sa = !is_null($item['policy']['sum_insured']) ? $item['policy']['sum_insured'] : 0;
                 $sa_si = !is_null($item['policy']['si_factor']) ?
                         $sa_si = $item['policy']['si_factor'] * Auth::user()->salary : 0;
@@ -76,6 +81,7 @@
             data-is-sa="{{ $is_sa }}"
             data-is-si-sa="{{ $is_si_sa }}"
             data-is-lupsm="{{ $is_lumpsum }}"
+            data-is-grdbsd="{{ $is_grade_based }}"
             data-fypmap="{{ $item['id'] }}"
             data-isbp ="{{ $item['policy']['is_base_plan'] ? 1 : 0 }}"
             data-bpsa="@php echo $bpsa > 0 ? $formatter->formatCurrency($bpsa, 'INR') : ''; @endphp"

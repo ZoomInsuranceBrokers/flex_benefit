@@ -12,8 +12,10 @@ use App\Models\MapUserFYPolicy;
 use App\Models\InsuranceCategory;
 use Illuminate\Support\Facades\DB;
 use App\Models\InsuranceSubCategory;
+use App\Models\MapGradeCategory;
 use Illuminate\Support\Facades\Auth;
 use Facade\FlareClient\Http\Response;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Client\Response as ClientResponse;
 
 class EnrollmentController extends Controller
@@ -49,7 +51,18 @@ class EnrollmentController extends Controller
             }
         }
 
-        //dd($currentSelectedData);
+        $mappedGradeData = User::where('id', Auth::user()->id)
+                ->with(['grade'])
+                ->whereRelation('grade', 'id', Auth::user()->grade_id_fk)
+                ->get()->toArray();
+        $gradeData = [];
+        if(count($mappedGradeData)) {
+            foreach($mappedGradeData[0]['grade']['category_mapping'] as $gradeCatData) {
+                $gradeData[$gradeCatData['category_id_fk']] = $gradeCatData['amount'];
+            }
+        }
+
+        session(['gradeData' => $gradeData]);
 
         // dependent
         $dependents = Dependent::where('is_active', config('constant.$_YES'))
@@ -62,6 +75,7 @@ class EnrollmentController extends Controller
         [   'sub_categories_data' => $data->toArray(), 
             'category' => $category->toArray(),
             'currentSelectedData' => $currentSelectedData,
+            'gradeAmtData' => $gradeData,
             'dependent' => $dependents->toArray()
         ]);
     }
@@ -108,9 +122,29 @@ class EnrollmentController extends Controller
             //     ->where('ins_subcategory_id_fk',$request->subCatId)
             //     ->get()->toArray();
 
+            //get subcategory and category for user grade
+            $gradeData = session('gradeData');
+            $gradeAmount = 0;
+            $subCatData = null;
+            if(count($gradeData)) {
+                foreach ($gradeData as $gradeCatId => $gradeCatAmount){
+                    $subCatData = InsuranceSubCategory::with('categories')
+                        ->where('id', $request->subCatId)
+                        ->whereRelation('categories','id', $gradeCatId)
+                        ->get()->toArray();
+
+                        if (count($subCatData)) {
+                            $gradeAmount = $gradeCatAmount;
+                            break;
+                        }
+                }
+            }
+
+
             //if (count($userPolData) && count($activePolicyForSubCategory) ) {
                 $html = view('_partial.sub-category-details')
                         ->with('userPolData', $userPolData)
+                        ->with('gradeAmount', $gradeAmount)
                         ->with('activePolicyForSubCategoryFY',$activePolicyForSubCategoryFY)->render();
                 return response()->json([
                     'status' => true,
