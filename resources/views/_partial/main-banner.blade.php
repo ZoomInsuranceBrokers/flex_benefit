@@ -3,10 +3,11 @@
       <div class="row">
         <div class="col-lg-12">
           <div class="row">
-            <div class="col-lg-6 align-self-center">
+            <div class="col-lg-6 align-self-center" style=" margin-top: 68px;
+">
               <div class="left-content show-up header-text wow fadeInLeft" data-wow-duration="1s" data-wow-delay="1s">
                 <div class="row fs-15">
-                  <div class="col-lg-12">
+                  <div class="col-lg-10">
                     <h2 class="mb-1">My Benefits, My Way</h2>
                     Empower your choices with MyBenefits@Zoom, offering enhanced flexibility and a personalized approach to shaping your perks package. Annually, you'll have the opportunity to curate your benefits portfolio during the enrollment period. 
                     The new benefit year will start from 17th Dec 2023 & will be valid till 16th Dec 2024. The benefits you choose will be applicable for the same period.

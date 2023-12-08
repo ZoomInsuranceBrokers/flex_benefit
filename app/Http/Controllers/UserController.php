@@ -20,27 +20,34 @@ class UserController extends Controller
     //     ]);
     //     return response()->json(['success'=>'Successfully']);
     // }
-    
-    public function login(Request $request) {
+
+    public function login(Request $request)
+    {
         $validated = $request->validate([
             'username' => 'required',
             'password' => 'required|min:8'
         ]);
 
+        $user = User::where('email', $request->get('username'))->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Email Not Found!'], 401);
+        }
         $user_data = array(
-            'email'  => $request->get('username'),
+            'email' => $request->get('username'),
             'password' => $request->get('password')
         );
 
         if (Auth::attempt($user_data)) {
             echo json_encode(array('url' => '/'));
-        }
-        else {
-            return back()->withErrors(['invalid credentials']);
+        } else {
+            return response()->json(['error' => 'Invalid credentials!'], 401);
         }
     }
 
-    public function home(Request $request) {
+
+    public function home(Request $request)
+    {
         //echo bcrypt('1234567890');
         //dd(Crypt::decryptString('$2y$10$2OhRE\/zTnRX3OJIfUcBrAuySK375QJf0F2WarzkB3bRor7TYWRdj2'));
 
@@ -51,18 +58,22 @@ class UserController extends Controller
         }
     }
 
-    public function logout() {
+    public function logout()
+    {
         return redirect('/')->with(Auth::logout());
     }
 
-    public function downloadEcard(){
+    public function downloadEcard()
+    {
         if (Auth::check()) {
-            $arr = ["username"=>"AGSW4",
-                "password"=>"AGSW@#4",
-                "policyno"=>"P0023100023/6115/100051",
-                "employeecode"=>"EL-0676"];
+            $arr = [
+                "username" => "AGSW4",
+                "password" => "AGSW@#4",
+                "policyno" => "P0023100023/6115/100051",
+                "employeecode" => "EL-0676"
+            ];
             $response = Http::withBody(json_encode($arr), 'text/json')
-                    ->post('http://brokerapi.safewaytpa.in/api/EcardEmpMember')->json();
+                ->post('http://brokerapi.safewaytpa.in/api/EcardEmpMember')->json();
             if ($response['Status'] == 1) {
                 //return '<script>window.open("' . $response['E_Card'] . '", "")</script>';
                 return redirect($response['E_Card']);

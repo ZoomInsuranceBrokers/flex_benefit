@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\CountryCurrency;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ApiController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +26,10 @@ use Illuminate\Support\Facades\Route;
 // Route::post('/dependents/create', 'create');
 // Route::post('/dependents/update', 'update');
 // Route::post('/dependents/delete', 'delete');
+
+
+Route::post('/users', [ApiController::class, 'getAllUsers']);
+Route::post('/salesforce-data', [ApiController::class, 'getSalesforceData']);
 
 Route::get('/currency/create', function(Request $request){
     echo $contact = Currency::create([
