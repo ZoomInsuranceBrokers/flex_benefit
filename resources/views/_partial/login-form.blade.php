@@ -59,7 +59,7 @@
                 </div>
             </form>
 
-            <a href="#" class="forgot_password">Forgot password?</a>
+            <a href="/forgot-password" class="forgot_password">Forgot password?</a>
         </div>
     </section>
 </div>

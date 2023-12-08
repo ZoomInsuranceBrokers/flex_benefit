@@ -119,14 +119,7 @@ function openTabs(el) {
             },
             nominee_percentage: {
                 title: 'Nomination Percentage',
-                width: 'auto'
-            },
-            is_deceased: {
-                title: 'Deceased',
                 width: 'auto',
-                options: [@php echo config('constant.boolean_jTable') @endphp],
-                create: false,
-                edit: false,
             },
             approval_status: {
                 title: 'Approval Status',

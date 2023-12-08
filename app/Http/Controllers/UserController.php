@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Mail\PasswordResetMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Hash;
+
 
 class UserController extends Controller
 {
@@ -80,6 +87,89 @@ class UserController extends Controller
             }
         } else {
             return redirect('/');
+        }
+    }
+
+
+    public function showForm()
+    {
+        if (Auth::check()) {
+            return view('home')->with('user', Auth::user());
+        } else {
+            return view('auth.forgot-password');
+        }
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+
+        $validated = $request->validate([
+            'email' => 'required',
+        ]);
+
+        $email = $request->input('email');
+
+        $user = DB::table('users')->where('email', $email)->first();
+
+        if (!$user) {
+            return redirect()->route('password.request')->with('message', 'Invalid email');
+        }
+
+
+        $token = Str::random(60);
+
+        DB::table('users')->where('email', $email)->update(['remember_token' => $token]);
+
+        // Mail::to($email)->send(new PasswordResetMail($token));
+
+        return redirect()->route('password.request')->with('message', 'Password reset link sent!');
+    }
+
+    public function showResetForm($token)
+    {
+        $user = DB::table('users')->where('remember_token', $token)->first();
+
+        if (!$user) {
+            abort(404);
+        }
+
+        return view('auth.reset-password', ['token' => $token]);
+    }
+
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'password' => ['required', 'confirmed', Password::defaults(), 'min:6'],
+            'password_confirmation' => 'required',
+        ], [
+            'password.min' => 'The password must be at least 6 characters.',
+            'password.confirmed' => 'The password confirmation does not match.',
+        ]);
+
+
+        $token = $request->input('token');
+        $password = $request->input('password');
+
+        $user = DB::table('users')->where('remember_token', $token)->first();
+
+        if (!$user) {
+            return back()->with('message', 'Invalid token');
+        }
+
+        DB::table('users')
+            ->where('remember_token', $token)
+            ->update(['password' => Hash::make($password), 'remember_token' => null]);
+
+        $user_data = array(
+            'email' => $user->email,
+            'password' => $request->input('password')
+        );
+
+        if (Auth::attempt($user_data)) {
+            return redirect()->route('home');
+        } else {
+            return response()->json(['error' => 'Invalid credentials!'], 401);
         }
     }
 }
