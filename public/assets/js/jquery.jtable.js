@@ -54,7 +54,9 @@ THE SOFTWARE.
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
             defaultMaxDate: '+0D',
-            dialogShowEffect: 'fade',
+            defaultChangeMonth: '+0D',
+            defaultChangeYear: false,
+            dialogShowEffect: false,
             dialogHideEffect: 'fade',
             showCloseButton: false,
             loadingAnimationDelay: 500,
@@ -1588,7 +1590,9 @@ THE SOFTWARE.
             
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
             var maxDate = field.maxDate || this.options.defaultMaxDate;
-            $input.datepicker({ dateFormat: displayFormat, maxDate: maxDate });
+            var changeMonth = field.changeMonth || this.options.defaultChangeMonth;
+            var changeYear = field.changeYear || this.options.defaultchangeYear;
+            $input.datepicker({ dateFormat: displayFormat, maxDate: maxDate,changeMonth:changeMonth,changeYear:changeYear});
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);

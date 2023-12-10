@@ -115,6 +115,8 @@ function openTabs(el) {
                 width: 'auto',
                 type: 'date',
                 displayFormat: 'dd-mm-yy',
+                changeMonth: true,
+                changeYear: true,
                 maxDate: "+0D"
             },
             nominee_percentage: {
