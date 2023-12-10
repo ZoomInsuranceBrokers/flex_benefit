@@ -1,5 +1,6 @@
 @php
     //dd($data['sub_categories_data']);
+    //dd($data['currentSelectedData']);
 @endphp
 <div id="content-tab-{{ $item['id'] }}" class="tabcontent">
     <h3>{{ $item['name'] }}</h3>
@@ -21,7 +22,12 @@
                     <tr>
                         <th>Benefit Name</th>
                         <th>Description</th>
-                        <th>Current Selection</th>
+                        <th @php foreach($data['sub_categories_data'] as $subcat) {
+                            if($item['id'] == $subcat->ic_id) {
+                                echo 'id="currSelectionHeadCol' . $subcat->id . '"';
+                            }
+                        }                             
+                        @endphp>Current Selection</th>
                         <th>Point Used</th>
                     </tr>
                 </thead>
@@ -32,8 +38,16 @@
                                 <tr>
                                     <td><a id="enrollmentSubCategory{{ $subcat->id }}" data-cat-id="{{ $subcat->id }}" href="javascript:return false;">{{ $subcat->name }}</a></a></td>
                                     <td>{{ html_entity_decode(strlen($subcat->description) < 70 ? $subcat->description : substr($subcat->description, 0, 67) . '...') }}</td>
-                                    <td>{{ array_key_exists($subcat->id, $data['currentSelectedData']) ? $data['currentSelectedData'][$subcat->id][0]['polName']  : 'N.A.' }}</td>
-                                    <td>{{ array_key_exists($subcat->id, $data['currentSelectedData']) ? $data['currentSelectedData'][$subcat->id][0]['points']  : 0 }}</td>
+                                    <td id="currSelectionDataCol{{ $subcat->id }}">{{ array_key_exists($subcat->id, $data['currentSelectedData']) ? $data['currentSelectedData'][$subcat->id][0]['polName']  : 'N.A.' }}</td>
+                                    <td>@php $sum = 0;
+                                        if(array_key_exists($subcat->id, $data['currentSelectedData'])) {
+                                            foreach($data['currentSelectedData'][$subcat->id] as $pointRow) {
+                                                $sum += $pointRow['points'];
+                                            } 
+                                        }
+                                        echo $sum;
+                                        @endphp
+                                    </td>
                                 </tr>                        
                             @endif
                         @endforeach
@@ -106,76 +120,79 @@
                             </div>
                             <div id="policySubCategoryList{{ $subcat->id }}" data-scid="{{ $subcat->id }}" ></div> 
                             {{-- CARDS TEMPLATE--}}
-                            <div class="row" style="display:none;">
-                                <div class="col-lg-3">                            
-                                    <div class="card">
-                                        <img class="card-img-top" src="/assets/images/manager.png" alt="Card image cap">
-                                        <div class="card-body">
-                                            <h5 class="card-title">GTL - Employee</h5>
-                                            {{-- <h6 class="card-subtitle mb-2 text-muted">Current Selection : 123456</h6> --}}
-                                            <p class="card-text font-weight-light">Term Life top-up options (upto 3x of salary) for employee</p>
-                                        </div>
-                                        <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Current Selection : GL - Top UP 2X salary</li>
-                                            <li class="list-group-item">Flex Points Used : 123456</li>
-                                        </ul>
-                                        <div class="card-body">
-                                            <a href="#" class="card-link">Show More</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">                            
-                                    <div class="card">
-                                        <img class="card-img-top" src="/assets/images/employee.png" alt="Card image cap">
-                                        <div class="card-body">
-                                            <h5 class="card-title">GTL - Employee</h5>
-                                            {{-- <h6 class="card-subtitle mb-2 text-muted">Current Selection : 123456</h6> --}}
-                                            <p class="card-text font-weight-light">Term Life top-up options (upto 3x of salary) for employee</p>
-                                        </div>
-                                        <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Current Selection : GL - Top UP 2X salary</li>
-                                            <li class="list-group-item">Flex Points Used : 123456</li>
-                                        </ul>
-                                        <div class="card-body">
-                                            <a href="#" class="card-link">Show More</a>
+                            @php /*
+                                <div class="row" style="display:none;">
+                                    <div class="col-lg-3">                            
+                                        <div class="card">
+                                            <img class="card-img-top" src="/assets/images/manager.png" alt="Card image cap">
+                                            <div class="card-body">
+                                                <h5 class="card-title">GTL - Employee</h5>
+                                                {{-- <h6 class="card-subtitle mb-2 text-muted">Current Selection : 123456</h6> --}}
+                                                <p class="card-text font-weight-light">Term Life top-up options (upto 3x of salary) for employee</p>
+                                            </div>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">Current Selection : GL - Top UP 2X salary</li>
+                                                <li class="list-group-item">Flex Points Used : 123456</li>
+                                            </ul>
+                                            <div class="card-body">
+                                                <a href="#" class="card-link">Show More</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-3">                            
-                                    <div class="card">
-                                        {{-- <img class="card-img-top" src="..." alt="Card image cap"> --}}
-                                        <div class="card-body">
-                                            <h5 class="card-title">GTL - Employee</h5>
-                                            {{-- <h6 class="card-subtitle mb-2 text-muted">Current Selection : 123456</h6> --}}
-                                            <p class="card-text font-weight-light">Term Life top-up options (upto 3x of salary) for employee</p>
-                                        </div>
-                                        <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Current Selection : GL - Top UP 2X salary</li>
-                                            <li class="list-group-item">Flex Points Used : 123456</li>
-                                        </ul>
-                                        <div class="card-body">
-                                            <a href="#" class="card-link">Show More</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">                            
-                                    <div class="card">
-                                        {{-- <img class="card-img-top" src="..." alt="Card image cap"> --}}
-                                        <div class="card-body">
-                                            <h5 class="card-title">GTL - Employee</h5>
-                                            {{-- <h6 class="card-subtitle mb-2 text-muted">Current Selection : 123456</h6> --}}
-                                            <p class="card-text font-weight-light">Term Life top-up options (upto 3x of salary) for employee</p>
-                                        </div>
-                                        <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Current Selection : GL - Top UP 2X salary</li>
-                                            <li class="list-group-item">Flex Points Used : 123456</li>
-                                        </ul>
-                                        <div class="card-body">
-                                            <a href="#" class="card-link">Show More</a>
+                                    <div class="col-lg-3">                            
+                                        <div class="card">
+                                            <img class="card-img-top" src="/assets/images/employee.png" alt="Card image cap">
+                                            <div class="card-body">
+                                                <h5 class="card-title">GTL - Employee</h5>
+                                                {{-- <h6 class="card-subtitle mb-2 text-muted">Current Selection : 123456</h6> --}}
+                                                <p class="card-text font-weight-light">Term Life top-up options (upto 3x of salary) for employee</p>
+                                            </div>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">Current Selection : GL - Top UP 2X salary</li>
+                                                <li class="list-group-item">Flex Points Used : 123456</li>
+                                            </ul>
+                                            <div class="card-body">
+                                                <a href="#" class="card-link">Show More</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                    <div class="col-lg-3">                            
+                                        <div class="card">
+                                            {{-- <img class="card-img-top" src="..." alt="Card image cap"> --}}
+                                            <div class="card-body">
+                                                <h5 class="card-title">GTL - Employee</h5>
+                                                {{-- <h6 class="card-subtitle mb-2 text-muted">Current Selection : 123456</h6> --}}
+                                                <p class="card-text font-weight-light">Term Life top-up options (upto 3x of salary) for employee</p>
+                                            </div>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">Current Selection : GL - Top UP 2X salary</li>
+                                                <li class="list-group-item">Flex Points Used : 123456</li>
+                                            </ul>
+                                            <div class="card-body">
+                                                <a href="#" class="card-link">Show More</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">                            
+                                        <div class="card">
+                                            {{-- <img class="card-img-top" src="..." alt="Card image cap"> --}}
+                                            <div class="card-body">
+                                                <h5 class="card-title">GTL - Employee</h5>
+                                                {{-- <h6 class="card-subtitle mb-2 text-muted">Current Selection : 123456</h6> --}}
+                                                <p class="card-text font-weight-light">Term Life top-up options (upto 3x of salary) for employee</p>
+                                            </div>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">Current Selection : GL - Top UP 2X salary</li>
+                                                <li class="list-group-item">Flex Points Used : 123456</li>
+                                            </ul>
+                                            <div class="card-body">
+                                                <a href="#" class="card-link">Show More</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> */
+                            @endphp
+                            
                         </div>                   
                     @endif
                 @endforeach

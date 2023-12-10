@@ -103,8 +103,7 @@ class EnrollmentController extends Controller
         ->leftJoin('map_financial_year_policy as mfyp' ,'mufyp.fypolicy_id_fk', '=', 'mfyp.id')
         ->leftJoin('financial_years as fy' ,'fy.id', '=', 'mfyp.fy_id_fk')
         ->leftJoin('insurance_policy as ip' ,'ip.id', '=', 'mfyp.ins_policy_id_fk')
-        //->where('mufyp.user_id_fk', '=', Auth::user()->id)
-        ->where('mufyp.user_id_fk', '=', 1)
+        ->where('mufyp.user_id_fk', '=', Auth::user()->id)
         ->where('mufyp.is_active', '=', true)
         ->where('mfyp.is_active', '=', true)
         ->where('fy.is_active', '=', true)
@@ -192,7 +191,7 @@ class EnrollmentController extends Controller
         $points = $request->points;
 
         $userPolDataForCatId = DB::table('map_user_fypolicy as mufyp')
-        ->select(/*'mufyp.points_used',*/'mufyp.id as userFYPolMapId', 'mufyp.fypolicy_id_fk as fyPolMapId',
+        ->select('mufyp.points_used','mufyp.id as userFYPolMapId', 'mufyp.fypolicy_id_fk as fyPolMapId',
             'ip.id as ip_id','ip.is_base_plan')
         ->leftJoin('map_financial_year_policy as mfyp' ,'mufyp.fypolicy_id_fk', '=', 'mfyp.id')
         ->leftJoin('financial_years as fy' ,'fy.id', '=', 'mfyp.fy_id_fk')
@@ -213,11 +212,13 @@ class EnrollmentController extends Controller
             'encoded_summary' => $summary,
             'points_used' => $points,
             'created_by' => $userId,
-            'modified_by' => $userId
+            'modified_by' => $userId,
         ];
         $whereConditionData = ['id' => -1, 'user_id_fk' => -1];
         $mapUserFYPolicyRow = $message = null;
+        $savedPoints = 0;
         $status = false;
+        $user = User::where('id',Auth::user()->id)->get()->toArray();
         //if (count($userPolDataForCatId) > 0) {
             foreach($userPolDataForCatId as $item) {
                 if($item->is_base_plan) {
@@ -226,16 +227,18 @@ class EnrollmentController extends Controller
                     $whereConditionData['id'] = (int)$item->userFYPolMapId; 
                     $whereConditionData['user_id_fk'] = $userId; 
                     unset($data['created_by']);
+                    $savedPoints += $item->points_used;
                 }
             }
+            
             $mapUserFYPolicyRow = MapUserFYPolicy::updateOrCreate($whereConditionData,$data);
-            $status = true;
-            // update total points
-            $user = User::where('id',Auth::user()->id)->get()->toArray();
+            // update existing points in case policy is changed
             $userData = [
-                    'points_available'=> $user[0]['points_available']- $points,
-                    'points_used'=> $user[0]['points_used'] + $points,
-                ];
+                'points_available'=> $user[0]['points_available'] + $savedPoints - $points,
+                'points_used'=> $user[0]['points_used'] - $savedPoints + $points,
+            ];
+            
+            $status = true;
             User::where('id',Auth::user()->id)->update($userData);
             $message = 'Data ' . ($whereConditionData['id'] != -1 ? 'updated' : 'saved') . ' successfully. You need to do final submission(only one submission allowed per user per financial year) of data across policies/categories from "Summary" section post review';
         
@@ -259,14 +262,14 @@ class EnrollmentController extends Controller
 
         $summary = array_map("json_encode",$summary);
         $summary = array_map("base64_encode",$summary);
-
+//dd(json_decode(base64_decode($request->savePoints)));
         foreach (json_decode(base64_decode($request->savePoints)) as $spItem) {
             $spRow = explode(':', $spItem);
             $savePoints[$spRow[0]] = (int)$spRow[1];
         }
 
         $userPolDataForCatId = DB::table('map_user_fypolicy as mufyp')
-        ->select(/*'mufyp.points_used',*/'mufyp.id')
+        ->select('mufyp.points_used','mufyp.id')
         ->leftJoin('map_financial_year_policy as mfyp' ,'mufyp.fypolicy_id_fk', '=', 'mfyp.id')
         ->leftJoin('financial_years as fy' ,'fy.id', '=', 'mfyp.fy_id_fk')
         ->leftJoin('insurance_policy as ip' ,'ip.id', '=', 'mfyp.ins_policy_id_fk')
@@ -279,10 +282,14 @@ class EnrollmentController extends Controller
         ->get()->toArray();
         //->toSql();
         //print '<pre>';
+        
         //dd($userPolDataForCatId);
+        $totalPointsSaved = 0; 
+        $user = User::where('id',Auth::user()->id)->get()->toArray();
         if (count($userPolDataForCatId)) {
             foreach ($userPolDataForCatId as $fypmapEntry) {
                 $ids[] = $fypmapEntry->id;
+                $totalPointsSaved += $fypmapEntry->points_used;
             }
             MapUserFYPolicy::whereIn('id', $ids)->delete();       // deleting existing record on every save as updating existing ones may cause corrupted data
         }
@@ -299,6 +306,7 @@ class EnrollmentController extends Controller
             ];
             $pointsCounter += $points;
         }
+
         $message = null;
         $fypmapModel = new MapUserFYPolicy();
         $status = DB::table($fypmapModel->getTable())->insert($finalData);
@@ -306,10 +314,9 @@ class EnrollmentController extends Controller
             $message = 'Data saved successfully. You need to do final submission(only one submission allowed per user per financial year) of data across policies/categories from "Summary" section post review';
             
             // update total points
-            $user = User::where('id',Auth::user()->id)->get()->toArray();
             $userData = [
-                    'points_available'=> $user[0]['points_available']- $pointsCounter,
-                    'points_used'=> $user[0]['points_used'] + $pointsCounter,
+                    'points_available'=> $user[0]['points_available'] - $pointsCounter  + $totalPointsSaved,
+                    'points_used'=> $user[0]['points_used'] + $pointsCounter  - $totalPointsSaved,
                 ];
             User::where('id',Auth::user()->id)->update($userData);
 

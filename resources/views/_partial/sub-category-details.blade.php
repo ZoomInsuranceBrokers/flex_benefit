@@ -2,7 +2,7 @@
     @php
     
         $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);  
-        //dd($activePolicyForSubCategoryFY[0]);
+        //dd($userPolData);
         $subCatId = array_key_exists('policy', $activePolicyForSubCategoryFY[0]) ? 
             $activePolicyForSubCategoryFY[0]['policy']['ins_subcategory_id_fk'] : 0;
         $is_point_value_based = array_key_exists('policy', $activePolicyForSubCategoryFY[0]) ? 

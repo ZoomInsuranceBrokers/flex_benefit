@@ -12,7 +12,7 @@
       </div>
       <div class="modal-footer">
         {{-- <a class="btn-danger btn" href="/logout"></a> --}}
-        <button class="btn-info btn modal_close" data-dismiss="modal"></button>
+        <button class="btn-info btn modal_close" data-dismiss="modal" onclick="window.location.reload()"></button>
       </div>
     </div>
   </div>

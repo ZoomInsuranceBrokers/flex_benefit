@@ -29,6 +29,7 @@ class DependentController extends Controller {
         $dependents = Dependent::where('is_active', config('constant.$_YES'))
                                 //->where('is_deceased',config('constant.$_NO'))
                                 ->where('user_id_fk',Auth::user()->id)
+                                ->orderBy('dependent_name', 'ASC')
                                 ->get();
         if(!count($dependents)) {       // no/zero dependent count
             $jTableResult['Result'] = 'ERROR';
@@ -47,14 +48,10 @@ class DependentController extends Controller {
             $input = $request->all();
             $rules = [
                 'dependent_name' => 'required|between:3,32|',
-                //'contact_id_fk' => 'required|numeric',
-                // 'dependent_code' => 'required|numeric',
-                'dob'=> 'required|date_format:Y-m-d',
+                'dob'=> 'required|date:d-m-Y',
                 'gender' => 'required',
                 'nominee_percentage' => 'required|numeric|digits_between:0,100',
                 'relationship_type'  => 'required|numeric',
-                //'is_active' => 'required',
-                // 'is_deceased' => 'required'
             ];
 
             $validator = Validator::make($input, $rules, $messages = [
@@ -115,12 +112,8 @@ class DependentController extends Controller {
             $input = $request->all();
             $rules = [
                 'dependent_name' => 'required|between:3,32|',
-                //'contact_id_fk' => 'required|numeric',
-                // 'dependent_code' => 'required|numeric',
-                'dob'=> 'required|date_format:Y-m-d',
+                'dob'=> 'required|date_format:d-m-Y',
                 'nominee_percentage' => 'required|numeric|digits_between:0,100',
-                // 'is_active' => 'required',
-                 'is_deceased' => 'required'
             ];
 
             $validator = Validator::make($input, $rules, $messages = [
@@ -148,7 +141,7 @@ class DependentController extends Controller {
                 $dependent->nominee_percentage = $input['nominee_percentage'];
                 //$dependent->relationship_type = $input['relationship_type'];
                 //$dependent->approval_status = 1;      // hard coded
-                $dependent->is_deceased = $input['is_deceased'];                
+                //$dependent->is_deceased = $input['is_deceased'];                
                 $dependent->is_active = config('constant.$_YES') ;
                 $dependent->modified_by = 1;     // hard coded
                 $dependent->save();
@@ -244,7 +237,7 @@ class DependentController extends Controller {
             $input = $request->all();
             $rules = [
                 'dependent_name' => 'required|between:3,32|',
-                'dob'=> 'required|date_format:Y-m-d',
+                'dob'=> 'required|date_format:d-m-Y',
                 'gender' => 'required',
                 'nominee_percentage' => 'required|numeric|digits_between:0,100',
                 'relationship_type'  => 'required|numeric',

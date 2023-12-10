@@ -3,7 +3,7 @@
 @stop
 
 @php
-//dd($data['gradeAmtData']);
+//dd($data['currentSelectedData']);
 
 //dd($data['sub_categories_data']);
     /* foreach($data['category'] as $key => $value) {
@@ -238,7 +238,7 @@ function generateDependentItems(subCatId, depList) {
                 );
             }
         });
-        console.log(existingDependent);
+        //console.log(existingDependent);
         $('#memcvrd' + subCatId).html(memCvrdStr);
         //return memCvrdStr;
     }
@@ -252,7 +252,7 @@ function planBindEvents() {
                 var subCatId = $(this).attr('data-sc-id');
                 var planId = $(this).attr('data-plan-id');
                 let planDetailArr = ['bpName', 'ptf','pt','osa','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
-                'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa','is_grade_based'];
+                'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa','is_grade_based','isvp', 'isvbsd'];
 
                 planDetailArr.forEach(function (item,index) {
                     itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));
@@ -264,6 +264,7 @@ function planBindEvents() {
                 $('#coresumRow' + subCatId).hide();
                 $('#coreSum' + subCatId).hide();
                 $('#coreMultiple' + subCatId).hide();
+                //console.log($('#planDetails' + planId).attr('data-bpsa'));
                 // summary core row having base plan
                 if ($('#planDetails' + planId).attr('data-bpsa') != '') {
                     $('#coresumRow' + subCatId).show();
@@ -298,9 +299,11 @@ function planBindEvents() {
                     $('#prntSbLim' + subCatId).html(parent_sublimit_amount);
                 }
 
-                let currPlanValue = 5607;
-                let allPlanValue = 565607;
-                let balancePlanValue = 20569;
+                // ***** Hide Current Selection if PV policy ***** //
+                {{-- if ($('#planDetails' + planId).attr('data-isvp') == '1') {
+                    console.log('is_vp:' + $('#planDetails' + planId).attr('data-isvp') + ':' + subCatId);
+                    $('#currSelectionHeadCol' + subCatId + ',#currSelectionDataCol' + subCatId).remove();
+                } --}}
 
                 //countNumber('currentPlanValue', currPlanValue);        
                 //countNumber('allPlanValue', allPlanValue);
@@ -316,26 +319,28 @@ function planBindEvents() {
                 $('#txtValuePlanId' + polId).attr('disabled', 'disabled');
                 $('#txtValuePlanId' + polId).val('');
             }
-        });
-
-        // value based keyup validation 
-        $('[id^=txtValuePlanId]').on('keyup', function(){
-            $(this).removeClass('bg-danger');
-            var polId = $(this).attr('data-plan-id');
-            var totalPointsAvailable = {{ Auth::user()->points_available }};
-            
-            var totalPointEntered = 0;
-            $('[id^=txtValuePlanId]').each(function(){
-                
-                totalPointEntered += parseInt($(this).val() != '' ? $(this).val() : 0); 
-            });
-
-            if (totalPointEntered > totalPointsAvailable) {
-                $(this).val('').addClass('bg-danger');
-                alert('Maximum points across all benefit cannot be more than available ' + totalPointsAvailable + ' point(s)');
-            }
-        });
+        });        
     });
+}
+
+function checkPoints(planId){
+    // value based keyup validation 
+    //$('#txtValuePlanId' + planId).on('keyup', function(){
+        $('#txtValuePlanId' + planId).removeClass('bg-danger');
+        var polId = $('#txtValuePlanId' + planId).attr('data-plan-id');
+        var totalPointsAvailable = {{ Auth::user()->points_available }};
+        var pointsVal = $('#txtValuePlanId' + planId).val();
+        var totalPointEntered = parseInt(pointsVal != '' ? pointsVal : 0);
+        {{-- $('#txtValuePlanId' + ).each(function(){
+            
+            totalPointEntered += parseInt($(this).val() != '' ? $(this).val() : 0); 
+        }); --}}
+
+        if (totalPointEntered > totalPointsAvailable) {
+            $('#txtValuePlanId' + planId).val('').addClass('bg-danger');
+            alert('Maximum points across all benefit cannot be more than available ' + totalPointsAvailable + ' point(s)');
+        }
+    //});
 }
 
 function triggerInitialClick() {
@@ -379,6 +384,7 @@ function saveEnrollment(catId){
             checkboxCounter++;
             policySelected.push($(this).val());
         });
+        console.log(policySelected); 
         if (checkboxCounter && policySelected.length) {
             let savePoints = [];
             let isvbsd = 0;
@@ -386,6 +392,7 @@ function saveEnrollment(catId){
             let summary = [];
             policySelected.forEach(function(policyID){
                 polDet = $('#planDetails' + policyID);
+                isvbsd = parseInt(polDet.attr('data-isvbsd'));
                 var fypmap = polDet.attr('data-fypmap');
                 polDetJs = document.getElementById('planDetails' + policyID);
                 for (var i = 0; i < polDetJs.attributes.length; i++) {            
@@ -395,13 +402,12 @@ function saveEnrollment(catId){
                         summary.push(fypmap + ':' + attrName + ':' + attr.nodeValue);    // array of array
                     }
                 }
-                isvbsd = polDet.attr('data-isvbsd');
                 if (isvbsd) {
                     savePoints.push(fypmap + ':' + parseInt($('#txtValuePlanId' + policyID).val()));
                 } else {
                     savePoints.push(fypmap + ':' + parseInt(polDet.attr('data-annupwocurr')));
                 }
-            });    
+            });
             if (savePoints.length) {
                 $.ajax({
                     url: "/enrollment/savePV",

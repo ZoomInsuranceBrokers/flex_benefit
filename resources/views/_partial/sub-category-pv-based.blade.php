@@ -53,7 +53,7 @@
                             {{ $item['policy']["name"] }}
                         </label>
                     </td>
-                    <td><input type="number" pattern="[0-9]" class="w-100" value="" data-plan-id="{{ $item['policy']["id"] }}" disabled name='txtValuePlanName{{ $item['policy']["id"] }}' 
+                    <td><input type="number" pattern="[0-9]" onkeyup="checkPoints({{ $item['policy']["id"] }})" class="w-100" value="" data-plan-id="{{ $item['policy']["id"] }}" disabled name='txtValuePlanName{{ $item['policy']["id"] }}' 
                     id='txtValuePlanId{{ $item['policy']["id"] }}' /></td>
                 </tr>        @php
                     }
@@ -62,4 +62,9 @@
         </tbody>
     </table>
     </form>
+    <script>
+    if(@php echo $is_point_value_based; @endphp) {
+        $('#currSelectionHeadCol' + {{ $subCatId }} + ',#currSelectionDataCol' + {{ $subCatId }}).remove();
+    }
+    </script>
 </div>
