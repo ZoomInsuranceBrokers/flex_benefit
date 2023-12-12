@@ -54,6 +54,19 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'http' => [
+        'verify' => env('HTTP_VERIFY', true),
+        'timeout' => env('HTTP_TIMEOUT', 60),
+        'base_uri' => env('HTTP_BASE_URI', env('APP_URL', 'http://localhost')),
+        'headers' => [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ],
+        'curl' => [
+            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2, // Specify the TLS version
+        ],
+    ],
+
     'asset_url' => env('ASSET_URL', null),
 
     /*

@@ -25,13 +25,13 @@
                     <a id="header_claim" onclick="getEcard()" href="javascript:return false;">Claims</a>
                     <ul>
                       <li>
-                        <a href="/caim/initiate">Initiate Claim</a>
+                        <a href="/claim/initiate">Initiate Claim</a>
                       </li>
                       <li>
                         <a href="/claim/track">Track Claim</a>
                       </li>
                       <li>
-                        <a href="/claim/loadHospital">Network Hospital</a>
+                        <a href="/claim/loadHospital/phs">Network Hospital</a>
                       </li>
                     </ul>
                 </li>
@@ -60,7 +60,7 @@
                           <a href="/">User Profile</a>
                         </li>
                         <li>
-                          <a href="/user/ecard">Download Ecard</a>
+                          <a href="/user/ecard" target="_blank">Download Ecard</a>
                         </li>
                         <li>
                           <a id="logoutModal_trigger" href="#launchLogout">Logout</a>

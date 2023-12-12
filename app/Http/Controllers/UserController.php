@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use App\Mail\PasswordResetMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Hash;
 
 
@@ -73,18 +74,72 @@ class UserController extends Controller
     public function downloadEcard()
     {
         if (Auth::check()) {
-            $arr = [
-                "username" => "AGSW4",
-                "password" => "AGSW@#4",
-                "policyno" => "P0023100023/6115/100051",
-                "employeecode" => "EL-0676"
-            ];
-            $response = Http::withBody(json_encode($arr), 'text/json')
-                ->post('http://brokerapi.safewaytpa.in/api/EcardEmpMember')->json();
-            if ($response['Status'] == 1) {
-                //return '<script>window.open("' . $response['E_Card'] . '", "")</script>';
-                return redirect($response['E_Card']);
+            $policy_number = "323700/34/22/04/00000027";
+            $emp_id = "10447";
+
+            $curl = curl_init();
+
+            $data = json_encode(
+                array(
+                    "USERNAME" => "ZOOM-ADMIN",
+                    "PASSWORD" => "ADMIN-USER@389",
+                    "POLICY_NUMBER" => $policy_number,
+                    "EMPLOYEE_NUMBER" => $emp_id,
+                )
+            );
+
+            curl_setopt_array(
+                $curl,
+                array(
+                    CURLOPT_URL => 'https://webintegrations.paramounttpa.com/ZoomBrokerAPI/Service1.svc/GetFamilyECard',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_HTTPHEADER => array('Content-Type:application/json'),
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $data,
+                )
+            );
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+
+            $apilog = array(
+                'tpa_company' => 'phs',
+                'request' => $data,
+                'response' => $response
+            );
+
+            $response = json_decode($response);
+            
+            if ($response->GetFamilyECardResult[0]->STATUS == 'SUCCESS') {
+
+                $url = $response->GetFamilyECardResult[0]->E_Card;
+                $headers = [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="E_Card.pdf"',
+                ];
+                return Redirect::to($url, 302, $headers);
+            } else {
+                echo 'Something Went Wrong! Kindly Try again Later';
+                exit;
             }
+            // $arr = [
+            //     "username" => "AGSW4",
+            //     "password" => "AGSW@#4",
+            //     "policyno" => "P0023100023/6115/100051",
+            //     "employeecode" => "EL-0676"
+            // ];
+            // $response = Http::withBody(json_encode($arr), 'text/json')
+            //     ->post('http://brokerapi.safewaytpa.in/api/EcardEmpMember')->json();
+            // if ($response['Status'] == 1) {
+            //     //return '<script>window.open("' . $response['E_Card'] . '", "")</script>';
+            //     return redirect($response['E_Card']);
+            // }
         } else {
             return redirect('/');
         }
