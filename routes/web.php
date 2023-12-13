@@ -39,7 +39,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('/dependents/update', [DependentController::class, 'update']);
     Route::post('/dependents/delete', [DependentController::class, 'delete']);
     Route::post('/dependents/getRelationshipTypes', [DependentController::class, 'getRelationshipTypes']);
-    Route::post('/dependents/getGender', [DependentController::class, 'getGenderByRelation']);
+    Route::get('/dependents/nominationCount', [DependentController::class, 'getNominationAllocation']);
     Route::post('/dependents/list', [DependentController::class, 'list']);
     Route::post('/dependents/saveLifeEvent', [DependentController::class, 'createLE']);
     Route::get('/dependents/listLE', [DependentController::class, 'listLifeEvents']);

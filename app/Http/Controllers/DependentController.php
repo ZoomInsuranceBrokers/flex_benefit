@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\Dependent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Validator;
@@ -350,5 +351,63 @@ class DependentController extends Controller {
             config('constant.$_RLTN_FATHER'),
             config('constant.$_RLTN_FATHER'),
         ];
+    }
+
+    public function getNominationAllocation(Request $request) {
+        // $editId = $request->editId;
+        // $response = array('msg'=> '', 'status' => TRUE);
+        // $nomSum = (int)Dependent::where('is_active', config('constant.$_YES'))
+        //     ->where('user_id_fk',Auth::user()->id)
+        //     ->sum('nominee_percentage');
+        // if ($nomSum > 0 && 
+        //         ($nomSum + ($editId == 'undefined' ? (int)$request->nomAlloc : $request->nomAlloc) > 100)) {
+        //     $dep = Dependent::where('is_active', config('constant.$_YES'))
+        //     ->where('user_id_fk',Auth::user()->id)
+        //     ->select(['id','nominee_percentage','dependent_name'])
+        //     ->get()->toArray()
+        //     ;
+        //     $response['status'] = FALSE;
+        //     $str = [];
+        //     foreach ($dep as $depRow) {
+        //         $str[] = $depRow['dependent_name'] . '[' . $depRow['nominee_percentage']  . '%]';
+        //     }
+        //     $response['msg'] = implode(', ', $str);
+            
+        // };
+        // return json_encode($response);
+        $editId = $request->editId;
+        $data = [];
+        $response = array('msg'=> '', 'status' => TRUE);
+        $dep = Dependent::where('is_active', config('constant.$_YES'))
+            ->where('user_id_fk',Auth::user()->id)
+            ->select(['id','nominee_percentage','dependent_name'])
+            ->get()->toArray();
+        $str = [];
+        $nomSum = 0;
+        $idFound = false;
+        if (count($dep)) {
+            foreach ($dep as $depRow) {            
+                if ($depRow['id'] == $editId) {
+                    $nomSum += $request->nomAlloc;
+                    $idFound = true;
+                } else {
+                    $nomSum += $depRow['nominee_percentage'];
+                    $data[$depRow['id']] = ['name'=> $depRow['dependent_name'], 'nomAllocated' => $depRow['nominee_percentage']];
+                }
+            }
+            $totalNom = (int)($nomSum + ($idFound ? 0 : $request->nomAlloc));
+            //dd($totalNom);
+            if ($totalNom > 100) {
+                $response['status'] = FALSE;
+                $str = [];
+                foreach ($data as $depRow) {
+                    $str[] = $depRow['name'] . '[' . (int)$depRow['nomAllocated']  . '%]';
+                }
+                $response['msg'] = implode(', ', $str);
+            }
+        }
+        
+        //dd($response);
+        return json_encode($response);
     }
 }
