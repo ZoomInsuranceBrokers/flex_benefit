@@ -23,8 +23,8 @@
                     <br>
 
                     <div class="mt-2">To know more please reach out to us at 
-                      <a style="color:#020241;border-bottom:1px solid #FFF" href="email:support.flexbenefits@zoominsurancebrokers.com">
-                        support.flexbenefits@zoominsurancebrokers.com
+                      <a style="color:#020241;border-bottom:1px solid #FFF" href="email:support_mybenefits@zoominsurancebrokers.com">
+                        support_mybenefits@zoominsurancebrokers.com
                       </a>
                     </div>
                     </div>                  
