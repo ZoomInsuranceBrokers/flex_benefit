@@ -72,7 +72,7 @@
         <span id="planDetails{{ $item['policy']['id'] }}" style="display:none;"
             data-ptf="{{ $item['policy']['price_tag'] }}"
             data-bpName="{{ $bpName }}"
-            data-pt="{{ $item['policy']['price_tag'] }}"
+            data-pt="{{ $formatter->formatCurrency($item['policy']['points'], 'INR') }}"
             {{-- data-osa="{{ $currenySymbol . $item['policy']['sum_insured'] }}" --}}
             data-osa="{{ $formatter->formatCurrency($item['policy']['sum_insured'], 'INR') }}"
             data-allo="0" data-currs="4324" data-avail="675343"

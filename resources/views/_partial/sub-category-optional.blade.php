@@ -84,10 +84,15 @@
             <div class="fp-numbers col-10 offset-1" id="fp-numbers-premiumcalc{{ $subCatId }}">                                                         
                 <div class="row fs-12">
                     <div class="col-12">
-                        <dl>
+                        <dl id="ptfContainer{{ $subCatId }}" style="display:none;">
                             <dt class="col" data-toggle="tooltip"
-                                data-placement="top" title="Price Tag shows xyz lorem ipsum">Price Tag Factor</dt>
+                                data-placement="top">Price Tag Factor</dt>
                             <dd class="col">Price tag per thousand of sum assured : <label id="ptf{{ $subCatId }}"></label></dd>
+                        </dl>
+                        <dl id="ptsContainer{{ $subCatId }}" style="display:none">
+                            <dt class="col" data-toggle="tooltip"
+                                data-placement="top">Flex Points</dt>
+                            <dd class="col">Fixed flex points: <label id="pt{{ $subCatId }}"></label></dd>
                         </dl>
                     </div>
                     <div class="col-12">
@@ -125,7 +130,7 @@
                     <div class="col-4 offset-1">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
-                                data-placement="top" title="Optional Sum Insured shows xyz lorem ipsum">
+                                data-placement="top" >
                                 Benefit
                             </dt>
                         </dl>
@@ -133,7 +138,7 @@
                     <div class="col-3">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
-                                data-placement="top" title="Optional Sum Insured shows xyz lorem ipsum">
+                                data-placement="top" >
                                 Sum Assured
                             </dt>
                         </dl>
@@ -141,7 +146,7 @@
                     <div class="col-3">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
-                                data-placement="top" title="Optional Sum Insured shows xyz lorem ipsum">
+                                data-placement="top" >
                                 Points/Value
                             </dt>
                         </dl>
@@ -232,7 +237,7 @@
                     <div class="col-10 offset-1">
                         <dl>
                             <dt data-toggle="tooltip"
-                                data-placement="top" title="Optional Sum Insured shows xyz lorem ipsum">
+                                data-placement="top" >
                                 <div id="memcvrd{{ $subCatId }}"></div>
                             </dt>
                         </dl>
@@ -249,7 +254,7 @@
                     <div class="col">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
-                                data-placement="top" title="Optional Sum Insured shows xyz lorem ipsum">
+                                data-placement="top" >
                                 <label id="prntSbLim{{ $subCatId }}"></label>
                             </dt>
                         </dl>

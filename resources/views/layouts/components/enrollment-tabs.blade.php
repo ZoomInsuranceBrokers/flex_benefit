@@ -4,7 +4,7 @@
 
 @php
 //dd($data['currentSelectedData']);
-
+$formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);  
 //dd($data['sub_categories_data']);
     /* foreach($data['category'] as $key => $value) {
         echo '<pre>';
@@ -92,7 +92,7 @@
                                 <td scope="row">{{ $bpRow['subcategory']['categories']['name'] }}</td>
                                 <td>{{ $bpRow['subcategory']['name'] }}</td>
                                 <td>{{ $bpRow['name'] }}</td>
-                                <td>{{ $bpsa }}</td>
+                                <td>{{ $formatter->formatCurrency(round($bpsa), 'INR') }}</td>
                             </tr>
                             @endforeach
                             
@@ -300,8 +300,14 @@ function planBindEvents() {
                     itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));
                 });
 
-                
-
+                // price tag vs points
+                if ($('#planDetails' + planId).attr('data-ptf') > 0) {
+                    $('#ptfContainer'+subCatId).show();
+                    $('#ptsContainer'+subCatId).hide();
+                } else {
+                    $('#ptfContainer'+subCatId).hide();
+                    $('#ptsContainer'+subCatId).show();
+                }
                 // Conditional UI
                 $('#coresumRow' + subCatId).hide();
                 $('#coreSum' + subCatId).hide();
