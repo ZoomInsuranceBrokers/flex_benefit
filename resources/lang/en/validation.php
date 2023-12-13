@@ -158,6 +158,12 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'dob' => '<b><em>Date of Birth</em></b>',
+        'dependent_name' => '<b><em>Dependent\'s Name</em></b>',
+        'nominee_percentage' => '<b><em>Nomination Percentage</em></b>',
+        'nominee_percentage' => '<b><em>Nomination Percentage</em></b>',
+        'gender' => '<b><em>Gender</em></b>',
+    ],
 
 ];

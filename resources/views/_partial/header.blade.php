@@ -57,7 +57,7 @@
                     @if(Auth::check())
                       <ul>
                         <li>
-                          <a href="/">User Profile</a>
+                          <a id="userProfile_trigger" href="#userProfile">User Profile</a>
                         </li>
                         <li>
                           <a href="/user/ecard" target="_blank">Download Ecard</a>

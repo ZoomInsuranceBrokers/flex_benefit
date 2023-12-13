@@ -1,9 +1,9 @@
 @section('link_rel')
-<link href="assets/css/jtable/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/css/jtable/themes/metro/blue/jtable.css" rel="stylesheet" type="text/css" />
 @stop
 
 @section('inline-page-style')
-<style>.ui-dialog{z-index:2 !important;}</style>
+<style>.ui-widget-overlay{opacity:0.4}</style>
 @stop
 
 <section class="tab-wrapper">
@@ -102,13 +102,22 @@ function openTabs(el) {
                 title: 'Relation Type',
                 width: 'auto',
                 edit: false,
-                options: [@php echo config('constant.relationship_type_jTable') @endphp]
+                options: [@php echo config('constant.relationshipDep_type_jTable') @endphp]
+                //options: '/dependents/getRelationshipTypes'
             },
             gender: {
                 title: 'Gender',
+                dependsOn: 'relationship_type',
                 width: 'auto',
                 edit: false,
                 options: [@php echo config('constant.gender_jTable') @endphp]
+                {{-- options: function (data){
+                    if (data.source == 'list') {
+                        //Return url all options for optimization. 
+                        return [@php echo config('constant.gender_jTable') @endphp];
+                    }
+                    return '/dependents/getGender?rltntype=' + data.dependedValues.relationship_type;
+                } --}}
             },
             dob: {
                 title: 'Date of Birth',

@@ -1,3 +1,6 @@
+@php
+    //dd($userPolData[0]->ip_id);
+@endphp
 <div class="col-3 offset-1">
     <form id="subCategoryForm{{ $subCatId }}">
     <table class="tab-content-table table-responsive mb-3 fs-11 col-3">
@@ -6,14 +9,23 @@
         @foreach($activePolicyForSubCategoryFY as $key => $item)
             @php //$subCatId = $item['ins_subcategory_id_fk']; 
                 $currenySymbol = html_entity_decode($item['policy']['currency']['symbol']);
-                
             @endphp
             <tr @php echo ($item['policy']['is_base_plan']) ? 'style="display:none"':'';@endphp>
                 <td >
                     <input name="plan{{ $subCatId }}" data-sc-id="{{ $subCatId }}" data-plan-id="{{  $item['policy']["id"] }}"
                     data-default-select="{{ $item['policy']['is_default_selection'] }}"
                     type="{{ $item['policy']['is_multi_selectable'] ? 'checkbox' : 'radio' }}" 
-                    {{ $item['policy']['is_default_selection'] ? 'checked' : '' }}
+                    @php
+                        if (count($userPolData)) {
+                            foreach($userPolData as $upRow) {
+                                if($item['policy']['id']==$upRow->ip_id){
+                                    echo 'checked';
+                                }
+                            }
+                        } else if ($item['policy']['is_default_selection']) {
+                            echo 'checked';
+                        }
+                    @endphp 
                     id='planId{{ $item['policy']["id"] }}' 
                             value="{{ $item['policy']['id'] }}" />
                     <label for='planId{{ $item['policy']["id"] }}'>

@@ -937,6 +937,7 @@ THE SOFTWARE.
         /* Creates array of options from giving options array.
         *************************************************************************/
         _buildOptionsFromArray: function (optionsArray) {
+            console.log(optionsArray);            
             var list = [];
 
             for (var i = 0; i < optionsArray.length; i++) {

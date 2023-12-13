@@ -44,8 +44,7 @@
             if ($gradeAmount) {
                 $bpsa = (int)$gradeAmount;
                 $is_grade_based = TRUE;
-            } 
-            else {
+            } else {
                 $sa = !is_null($item['policy']['sum_insured']) ? $item['policy']['sum_insured'] : 0;
                 $sa_si = !is_null($item['policy']['si_factor']) ?
                         $sa_si = $item['policy']['si_factor'] * Auth::user()->salary : 0;

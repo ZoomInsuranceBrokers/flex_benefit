@@ -21,7 +21,18 @@
                             echo 'disabled';
                         }
                         @endphp 
-                        type="checkbox" {{ $item['policy']['is_default_selection'] ? 'checked' : '' }}
+                        type="checkbox"
+                        @php
+                            if (count($userPolData)) {
+                                foreach($userPolData as $upRow) {
+                                    if($item['policy']['id']==$upRow->ip_id){
+                                        echo 'checked';
+                                    }
+                                }
+                            } else if ($item['policy']['is_default_selection']) {
+                                echo 'checked';
+                            }
+                        @endphp 
                          />
                         <label @php 
                         if ($item['policy']["points"] > Auth::user()->points_available ) {
@@ -48,12 +59,26 @@
                         <input name="plan{{ $subCatId }}" data-sc-id="{{ $subCatId }}" data-plan-id="{{  $item['policy']["id"] }}"
                         type="checkbox" {{ $item['policy']['is_default_selection'] ? 'checked' : '' }}
                         id='chkValuePlanId{{ $item['policy']["id"] }}' name='chkValuePlanName{{ $item['policy']["id"] }}' 
-                        value="{{ $item['policy']['id'] }}" />
+                        value="{{ $item['policy']['id'] }}"
+                        @php
+                        $txtValue = '';
+                            if (count($userPolData)) {
+                                foreach($userPolData as $upRow) {
+                                    if($item['policy']['id']==$upRow->ip_id){
+                                        echo 'checked';
+                                        $txtValue = $upRow->points_used;
+                                    }
+                                }
+                            } else if ($item['policy']['is_default_selection']) {
+                                echo 'checked';
+
+                            }
+                        @endphp  />
                         <label for='planId{{ $item['policy']["id"] }}'>
                             {{ $item['policy']["name"] }}
                         </label>
                     </td>
-                    <td><input type="number" pattern="[0-9]" onkeyup="checkPoints({{ $item['policy']["id"] }})" class="w-100" value="" data-plan-id="{{ $item['policy']["id"] }}" disabled name='txtValuePlanName{{ $item['policy']["id"] }}' 
+                    <td><input type="number" pattern="[0-9]" onkeyup="checkPoints({{ $item['policy']["id"] }})" class="w-100" value="{{ $txtValue }}" data-plan-id="{{ $item['policy']["id"] }}" disabled name='txtValuePlanName{{ $item['policy']["id"] }}' 
                     id='txtValuePlanId{{ $item['policy']["id"] }}' /></td>
                 </tr>        @php
                     }

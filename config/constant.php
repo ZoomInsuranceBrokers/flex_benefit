@@ -2,6 +2,11 @@
 
 $_YES = 1;
 $_NO = 2;
+
+$_GENDER_MALE = 1;
+$_GENDER_FEMALE = 2;
+$_GENDER_OTHER = 3;
+
 $_RLTN_SELF         = 1;
 $_RLTN_FATHER       = 2;
 $_RLTN_MOTHER       = 3;
@@ -20,6 +25,9 @@ $_APPR_STATUS_REJECTED      = 2;
 $_APPR_STATUS_INPROGRESS    = 3;
 $_APPR_STATUS_NOT_APPROVED  = 4;
 
+$_TITLE_MR = 1;
+$_TITLE_MS= 2;
+$_TITLE_MRS = 3;
 
 $selectLabel = [-1 => '--Select--'];
 
@@ -38,10 +46,29 @@ $relationship_types = [
     $_RLTN_LIVEINPARTNER => 'Live-In Partner',
     $_RLTN_OTHERS => 'Others'
 ];
+$relationshipDep_types = [ 
+    $_RLTN_FATHER => 'Father',
+    $_RLTN_MOTHER => 'Mother',
+    $_RLTN_BRTOHER => 'Brother',
+    $_RLTN_SISTER => 'Sister',
+    $_RLTN_SPOUSE => 'Spouse',
+    $_RLTN_FATHERINLAW => 'Father-in-Law',
+    $_RLTN_MOTHERINLAW=> 'Mother-in-Law',
+    $_RLTN_SON => 'SON',
+    $_RLTN_DAUGHTER => 'Daughter',
+    $_RLTN_LIVEINPARTNER => 'Live-In Partner',
+    $_RLTN_OTHERS => 'Others'
+];
 $relationship_typesLE = [ 
     $_RLTN_SPOUSE => 'Spouse',
     $_RLTN_SON => 'Son',
     $_RLTN_DAUGHTER => 'Daughter',
+];
+
+$titleName = [ 
+    $_TITLE_MR => 'Mr.',
+    $_TITLE_MS => 'Ms.',
+    $_TITLE_MRS => 'Mrs.',
 ];
 
 function generateJtableOptions($arr1,$arr2) {
@@ -51,7 +78,7 @@ function generateJtableOptions($arr1,$arr2) {
     return $generatedOptions;
 }
 /******* GENDER *******/
-$gender = [1 => 'Male',2 => 'Female', 3 => 'Others'];
+$gender = [$_GENDER_MALE => 'Male',$_GENDER_FEMALE => 'Female', $_GENDER_OTHER => 'Others'];
 /******* GENDER *******/
 
 /******* BOOLEAN *******/
@@ -98,11 +125,14 @@ return [
     'relationship_type' => $relationship_types,
     'dependent_code_ui' => $dependent_code_ui,
     'relationship_type_jTable' => implode(',', generateJtableOptions($selectLabel,$relationship_types)),
+    'relationshipDep_type_jTable' => implode(',', generateJtableOptions($selectLabel,$relationshipDep_types)),
     'gender_jTable' => implode(',', generateJtableOptions($selectLabel,$gender)),
     'boolean_jTable' => implode(',', generateJtableOptions($selectLabel,$boolean)),
     'approval_status_jTable' => implode(',', generateJtableOptions($selectLabel,$approval_status)),
     'dependent_code' => $dependent_code,
     'relationshipLE_type_jTable' => generateJtableOptions($selectLabel,$relationship_typesLE),
+    'title' => $titleName,
+    'gender' => $gender,
     
     '$_YES' => $_YES,
     '$_NO' => $_NO,

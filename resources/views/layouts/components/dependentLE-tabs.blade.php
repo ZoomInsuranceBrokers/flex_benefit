@@ -104,6 +104,7 @@ function openTabs(el) {
             },
             gender: {
                 title: 'Gender',
+                dependsOn:'relationship_type'
                 width: 'auto',
                 edit: false,
                 options: [@php echo config('constant.gender_jTable') @endphp]

@@ -75,7 +75,7 @@ class DependentController extends Controller {
                         break;
                     }
                 }
-                $dependent->dob = $input['dob'];
+                $dependent->dob = date('Y-m-d', strtotime($input['dob']));
                 $dependent->gender = $input['gender'];
                 $dependent->nominee_percentage = $input['nominee_percentage'];
                 $dependent->relationship_type = $input['relationship_type'];
@@ -89,9 +89,14 @@ class DependentController extends Controller {
                 $jTableResult['Result'] = "OK";
                 $jTableResult['Record'] = $dependent->toArray();
 
-            } else {                
+            } else {   
+                $error = '';             
                 $jTableResult['Result'] = "ERROR";
-                $jTableResult['Message'] = json_encode($validator->errors());
+                foreach (array_values($validator->errors()->messages()) as $item) {
+                    $error.= '<li>' . $item[0] . '</li>';
+                }
+                //dd($validator->errors()->messages());
+                $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
                 
                 
             }
@@ -110,6 +115,7 @@ class DependentController extends Controller {
         $jTableResult = array();
         if($request->isMethod('post')) {
             $input = $request->all();
+            //dd($input);
             $rules = [
                 'dependent_name' => 'required|between:3,32|',
                 'dob'=> 'required|date_format:d-m-Y',
@@ -136,7 +142,7 @@ class DependentController extends Controller {
                 //         break;
                 //     }
                 // }
-                $dependent->dob = $input['dob'];
+                $dependent->dob = date('Y-m-d', strtotime($input['dob']));
                 //$dependent->gender = $input['gender'];
                 $dependent->nominee_percentage = $input['nominee_percentage'];
                 //$dependent->relationship_type = $input['relationship_type'];
@@ -149,9 +155,14 @@ class DependentController extends Controller {
                 $jTableResult['Result'] = "OK";
                 $jTableResult['Record'] = $dependent->toArray();
 
-            } else {                
+            } else {                   
+                $error = '';             
                 $jTableResult['Result'] = "ERROR";
-                $jTableResult['Message'] = json_encode($validator->errors());
+                foreach (array_values($validator->errors()->messages()) as $item) {
+                    $error.= '<li>' . $item[0] . '</li>';
+                }
+                //dd($validator->errors()->messages());
+                $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
                 
                 
             }
@@ -279,8 +290,13 @@ class DependentController extends Controller {
                 $jTableResult['Result'] = "OK";
                 $jTableResult['Record'] = $dependent->toArray();
             } else {                
+                $error = '';             
                 $jTableResult['Result'] = "ERROR";
-                $jTableResult['Message'] = json_encode($validator->errors());
+                foreach (array_values($validator->errors()->messages()) as $item) {
+                    $error.= '<li>' . $item[0] . '</li>';
+                }
+                //dd($validator->errors()->messages());
+                $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
             }
         }
         else {
@@ -290,5 +306,49 @@ class DependentController extends Controller {
             $jTableResult['Message'] = 0;
         }
         return json_encode($jTableResult);
+    }
+
+    public function getRelationshipTypes () {
+        $relation_Table = config('constant.relationship_type');
+        unset($relation_Table[config('constant.$_RLTN_SELF')]);
+        //$relation_Table = config('constant.relationship_type_jTable');
+        //dd($relation_Table);
+        // check logged in user's existing dependents
+        $dependents = Dependent::where('is_active', config('constant.$_YES'))
+                                ->where('user_id_fk',Auth::user()->id)
+                                //->whereIn('relationship_type',[config('constant.$_RLTN_SPOUSE')])
+                                ->get()->toArray();
+        
+        if (count($dependents)){
+            foreach ($dependents as $depItem) {                    
+                if (array_key_exists($depItem['relationship_type'], $relation_Table) && 
+                (!in_array($depItem['relationship_type'], [config('constant.$_RLTN_SON'), config('constant.$_RLTN_DAUGHTER')]))) {
+                    unset($relation_Table[$depItem['relationship_type']]);
+                }
+            }
+        }
+        foreach (([-1 => '--Select--'] + $relation_Table) as $k => $v) {
+            $generatedOptions[$k] = "{Value:'" . $k . "',DisplayText:'" . $v . "'}";
+        }
+        $jTableResult['Result'] = "OK";
+        $jTableResult['Options'] = '['. json_encode($generatedOptions) . ']';
+        //return view('dependentLE',compact('relationLE_Table'));
+        //dd($jTableResult['Options'] );
+        return json_encode($jTableResult);
+
+    }
+
+    public function getGenderByRelation(Request $request){
+        //return 
+        $maleGenderMap = [
+            config('constant.$_RLTN_FATHER'),
+            config('constant.$_RLTN_BRTOHER'),
+            config('constant.$_RLTN_FATHERINLAW'),
+            config('constant.$_RLTN_SON'),
+            config('constant.$_RLTN_FATHER'),
+            config('constant.$_RLTN_FATHER'),
+            config('constant.$_RLTN_FATHER'),
+            config('constant.$_RLTN_FATHER'),
+        ];
     }
 }

@@ -18,9 +18,6 @@ use App\Http\Controllers\UserController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-
-
 // CONTACT CONTROLLER ROUTES
 //Route::controller(ContactController::class)->group(function () {
 //die('here');
@@ -36,37 +33,53 @@ Route::post('reset-password', [UserController::class,'reset'])->name('password.u
 //});
 
 // DEPENDENT CONTROLLER ROUTES
-//Route::controller(DependentController::class)->group(function () {
-// die('here123');
-Route::post('/dependents/create', [DependentController::class, 'create']);
-Route::post('/dependents/update', [DependentController::class, 'update']);
-Route::post('/dependents/delete', [DependentController::class, 'delete']);
-Route::post('/dependents/list', [DependentController::class, 'list']);
-Route::post('/dependents/saveLifeEvent', [DependentController::class, 'createLE']);
-Route::get('/dependents/listLE', [DependentController::class, 'listLifeEvents']);
-Route::get('/dependents/life-events', [DependentController::class, 'loadDependentsLE']);
-Route::get('/dependents', function () {
-    return view('dependent');
-});
+Route::group(['middleware' => 'auth'], function() {
+    // lots of routes that require auth middleware
+    Route::post('/dependents/create', [DependentController::class, 'create']);
+    Route::post('/dependents/update', [DependentController::class, 'update']);
+    Route::post('/dependents/delete', [DependentController::class, 'delete']);
+    Route::post('/dependents/getRelationshipTypes', [DependentController::class, 'getRelationshipTypes']);
+    Route::post('/dependents/getGender', [DependentController::class, 'getGenderByRelation']);
+    Route::post('/dependents/list', [DependentController::class, 'list']);
+    Route::post('/dependents/saveLifeEvent', [DependentController::class, 'createLE']);
+    Route::get('/dependents/listLE', [DependentController::class, 'listLifeEvents']);
+    Route::get('/dependents/life-events', [DependentController::class, 'loadDependentsLE']);
+    Route::get('/dependents', function () { return view('dependent');});
+
+    Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
+    Route::post('/enrollment/savePV', [EnrollmentController::class, 'saveEnrollmentPV']);
+    Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
+    Route::get('/enrollment/summaryDownload', [EnrollmentController::class, 'downloadSummary']);
+    Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);
+    Route::get('/enrollment', [EnrollmentController::class, 'home']);
+
+    // Route::post('/claim/create', [DependentController::class, 'create']);
+    // Route::post('/claim/update', [DependentController::class, 'update']);
+    Route::any('/claim/loadHospital', [ClaimController::class, 'loadNetworkHospital']);
+    Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
+
+
 //});
 
-Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
-Route::post('/enrollment/savePV', [EnrollmentController::class, 'saveEnrollmentPV']);
-Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
-Route::get('/enrollment/summaryDownload', [EnrollmentController::class, 'downloadSummary']);
-Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);
-Route::get('/enrollment', [EnrollmentController::class, 'home']);
+// Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
+// Route::post('/enrollment/savePV', [EnrollmentController::class, 'saveEnrollmentPV']);
+// Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
+// Route::get('/enrollment/summaryDownload', [EnrollmentController::class, 'downloadSummary']);
+// Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);
+// Route::get('/enrollment', [EnrollmentController::class, 'home']);
 
 // Route::post('/claim/create', [DependentController::class, 'create']);
 // Route::post('/claim/update', [DependentController::class, 'update']);
-Route::any('/claim/loadHospital/{tpa}', [ClaimController::class, 'loadNetworkHospital']);
-Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
-Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
-Route::post('/claim/initiate', [ClaimController::class, 'saveClaimIntimation']);
+    Route::any('/claim/loadHospital/{tpa}', [ClaimController::class, 'loadNetworkHospital']);
+    Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
+    Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
+    Route::post('/claim/initiate', [ClaimController::class, 'saveClaimIntimation']);
+
+
+    Route::get('/logout', [UserController::class, 'logout']);
+    Route::get('/user/ecard', [UserController::class, 'downloadEcard']);
+});
 
 
 
-
-Route::get('/logout', [UserController::class, 'logout']);
-Route::get('/user/ecard', [UserController::class, 'downloadEcard']);
 Route::get('/', [UserController::class, 'home'])->name('home');

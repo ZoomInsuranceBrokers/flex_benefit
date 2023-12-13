@@ -51,7 +51,7 @@ class EnrollmentController extends Controller
             ->get()->toArray();
 
             //dd($fypmapData);
-            $currentSelectedData = [];
+            $currentSelectedData = $basePlan = [];
             if (count($fypmapData)) {
                 foreach ($fypmapData as $fypRow) {
                     if (!$fypRow['fy_policy']['policy']['is_base_plan']) {
@@ -60,6 +60,13 @@ class EnrollmentController extends Controller
                     }
                 }
             }
+
+            $basePlan = InsurancePolicy::where('is_base_plan', 1)
+                    ->where('is_active',1)
+                    ->with('subcategory')
+                    ->get()->toArray();
+            //dd($basePlan);
+            
 
             // mappedgrade data
             $mappedGradeData = User::where('id', Auth::user()->id)
@@ -75,8 +82,6 @@ class EnrollmentController extends Controller
 
             session(['gradeData' => $gradeData]);
 
-            // enrollment window data
-
             // dependent
             $dependents = Dependent::where('is_active', config('constant.$_YES'))
                                     //->where('is_deceased',config('constant.$_NO'))
@@ -87,6 +92,7 @@ class EnrollmentController extends Controller
             $viewArray = ['sub_categories_data' => $data->toArray(), 
                     'category' => $category->toArray(),
                     'currentSelectedData' => $currentSelectedData,
+                    'basePlan' => $basePlan,
                     'gradeAmtData' => $gradeData,
                     'dependent' => $dependents->toArray(),
                     'is_enrollment_window' => true
@@ -104,11 +110,13 @@ class EnrollmentController extends Controller
         ->leftJoin('financial_years as fy' ,'fy.id', '=', 'mfyp.fy_id_fk')
         ->leftJoin('insurance_policy as ip' ,'ip.id', '=', 'mfyp.ins_policy_id_fk')
         ->where('mufyp.user_id_fk', '=', Auth::user()->id)
+        ->where('ip.ins_subcategory_id_fk', '=', $request->subCatId)
+        ->where('ip.is_base_plan', '<>', config('constant.$_YES'))
         ->where('mufyp.is_active', '=', true)
         ->where('mfyp.is_active', '=', true)
         ->where('fy.is_active', '=', true)
         ->where('ip.is_active', '=', true)
-        ->select('mufyp.points_used','fy.name as fy_name','fy.start_date','fy.end_date', 'ip.id as ip_id')
+        ->select('mufyp.id as mufypId','mfyp.id as mfypId','mufyp.points_used','fy.name as fy_name','fy.start_date','fy.end_date', 'ip.id as ip_id')
         ->get()->toArray();
 
         //if(count($userPolData)) {            
@@ -156,7 +164,7 @@ class EnrollmentController extends Controller
                 }
             }
 
-
+            //dd($userPolData);
             //if (count($userPolData) && count($activePolicyForSubCategory) ) {
                 $html = view('_partial.sub-category-details')
                         ->with('userPolData', $userPolData)

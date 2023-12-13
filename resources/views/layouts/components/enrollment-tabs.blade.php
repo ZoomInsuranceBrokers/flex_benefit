@@ -47,8 +47,9 @@
             <div id="how_it_works_static">
                 <h5>Follow the steps provided below to finalize your enrollment for the plan year 2023-24:</h5>
                 <ul class="ul-points">
+                    
                     <li>Each tab within the enrollment menu provides an opportunity to choose benefits within a specific category. For instance, 
-                    benefits such as term life are located in the "Term Life Insurance" section. The three main sections are</li>
+                    benefits such as term life are located in the "Term Life Insurance" section. The four main sections are</li>
                     
                         <ul class="ul-points">
                             <li>Life Insurance</li>
@@ -56,6 +57,47 @@
                             <li>Medical Insurance</li>
                             <li>Flexi Cash Benefits</li>
                         </ul>
+                    </li>
+                    <li>
+                        Below are the default base coverage category wise:
+                        <table class="table table-bordered table-info">
+                            <tr>
+                                <th scope="col">Category</th>
+                                <th scope="col">Sub-Category</th>
+                                <th scope="col">Core Benefit</th>
+                                <th scope="col">Sum Insured</th>
+                            </tr>
+                            @foreach($data['basePlan'] as $bpRow)
+                            @php
+                                if (count($data['gradeAmtData']) && array_key_exists($bpRow['subcategory']['categories']['id'], $data['gradeAmtData'])) {
+                                    $bpsa = (int)$data['gradeAmtData'][$bpRow['subcategory']['categories']['id']];
+                                    $is_grade_based = TRUE;
+                                } else {
+                                    $sa = !is_null($bpRow['sum_insured']) ? $bpRow['sum_insured'] : 0;
+                                    $sa_si = !is_null($bpRow['si_factor']) ?
+                                            $sa_si = $bpRow['si_factor'] * Auth::user()->salary : 0;
+                                    if($sa_si > $sa) {
+                                        $bpsa = (int)$sa_si;
+                                        $is_si_sa = TRUE;
+                                        $base_si_factor = $bpRow['si_factor'];
+                                    } else {
+                                        $bpsa = (int)$sa;
+                                        $is_sa = TRUE;
+                                    }
+                                }
+                                // name of base policy
+                                $bpName = $bpRow['name'];
+                            @endphp
+                            <tr>
+                                <td scope="row">{{ $bpRow['subcategory']['categories']['name'] }}</td>
+                                <td>{{ $bpRow['subcategory']['name'] }}</td>
+                                <td>{{ $bpRow['name'] }}</td>
+                                <td>{{ $bpsa }}</td>
+                            </tr>
+                            @endforeach
+                            
+                        </table>
+                    </li>
                     <li>Sequentially navigate through each of these sections to explore and select from 
                     the various available benefits. It's important to note that a positive point balance 
                     is required for the selection of Flexi Cash Benefits
@@ -345,8 +387,8 @@ function checkPoints(planId){
 
 function triggerInitialClick() {
     // trigger click for plan which is marked as selected
-    $('[id^=planId]').each(function(){
-        if ($(this).attr('data-default-select') == 1) {
+    $('[id^=planId]:radio').each(function(){
+        if ($(this).attr('data-default-select') == 1 || $(this).is(':checked')) {
             $(this).click();
         }
     });    
