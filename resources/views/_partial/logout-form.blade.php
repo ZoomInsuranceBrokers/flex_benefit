@@ -28,7 +28,7 @@
             </button>
         </div>
         <div class="modal-body text-center">
-            <p id="finalSubmissionModalBody" class="bg-secondary text-white">Do you really want to submit, as this step is <b class="bg-dark text-uppercase">irreversible</b>.
+            <p id="finalSubmissionModalBody" class="bg-light text-dark">Do you really want to submit, as this step is <b class="text-uppercase">irreversible</b>.
             Once submission is done, no furhter modification possible till next year!!</p>
         </div>
         <div class="modal-footer">
