@@ -75,7 +75,7 @@
             data-ptf="{{ $item['policy']['price_tag'] }}"
             data-bpName="{{ $bpName }}"
             data-pt="{{ $formatter->formatCurrency($item['policy']['points'], 'INR') }}"
-            {{-- data-osa="{{ $currenySymbol . $item['policy']['sum_insured'] }}" --}}
+            data-name="{{ $item['policy']['name'] }}"
             data-osa="{{ $formatter->formatCurrency($item['policy']['sum_insured'], 'INR') }}"
             data-allo="0" data-currs="4324" data-avail="675343"
             data-tots="{{ $item['policy']['price_tag'] }}"

@@ -34,7 +34,7 @@
                     </label>
                 </td>
                 <td>{{ $formatter->formatCurrency($item['policy']["sum_insured"], 'INR') }}</td>
-                <td>{{ $formatter->formatCurrency($item['policy']["points"], 'INR') }}</td>
+                <td id="policyCalcPoints{{ $item['policy']['id'] }}">{{ $formatter->formatCurrency($item['policy']["points"], 'INR') }}</td>
             </tr>
         @endforeach                        
     </table>
@@ -86,7 +86,7 @@
             <div class="fp-numbers col-10 offset-1" id="fp-numbers-premiumcalc{{ $subCatId }}">                                                         
                 <div class="row fs-12">
                     <div class="col-12">
-                        <dl id="ptfContainer{{ $subCatId }}" style="display:none;">
+                        {{-- <dl id="ptfContainer{{ $subCatId }}" style="display:none;">
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top">Price Tag Factor</dt>
                             <dd class="col">Price tag per thousand of sum assured : <label id="ptf{{ $subCatId }}"></label></dd>
@@ -95,7 +95,12 @@
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top">Flex Points</dt>
                             <dd class="col">Fixed flex points: <label id="pt{{ $subCatId }}"></label></dd>
-                        </dl>
+                        </dl> --}}                        
+                        <dl>
+                            <dt class="col" data-toggle="tooltip"
+                                data-placement="top">Plan Name</dt>
+                            <dd class="col"><label id="planName{{ $subCatId }}"></label></dd>
+                        </dl> 
                     </div>
                     <div class="col-12">
                         <dl>

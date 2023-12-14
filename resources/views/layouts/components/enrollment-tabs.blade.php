@@ -299,7 +299,7 @@ function planBindEvents() {
             if ($(this).is(':checked')) {
                 var subCatId = $(this).attr('data-sc-id');
                 var planId = $(this).attr('data-plan-id');
-                let planDetailArr = ['bpName', 'ptf','pt','osa','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
+                let planDetailArr = ['bpName', 'ptf','pt','name','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
                 'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa','is_grade_based','isvp', 'isvbsd'];
 
                 planDetailArr.forEach(function (item,index) {
@@ -307,13 +307,9 @@ function planBindEvents() {
                 });
 
                 // price tag vs points
-                if ($('#planDetails' + planId).attr('data-ptf') > 0) {
-                    $('#ptfContainer'+subCatId).show();
-                    $('#ptsContainer'+subCatId).hide();
-                } else {
-                    $('#ptfContainer'+subCatId).hide();
-                    $('#ptsContainer'+subCatId).show();
-                }
+                //$('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
+                //$('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));
+                
                 // Conditional UI
                 $('#coresumRow' + subCatId).hide();
                 $('#coreSum' + subCatId).hide();
@@ -363,7 +359,16 @@ function planBindEvents() {
                 //countNumber('allPlanValue', allPlanValue);
                 //countNumber('remainingPlanValue', balancePlanValue);
         }
-        
+
+        $('[id^=planId]').each(function(){
+            var subCatId = $(this).attr('data-sc-id');
+            var planId = $(this).attr('data-plan-id');
+
+            // price tag vs points
+            $('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
+            $('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));    
+        });
+
         // toggle disable of point based policy
         $('[id^=chkValuePlanId]').on('change', function(){
             var polId = $(this).attr('data-plan-id');
