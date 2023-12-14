@@ -25,7 +25,9 @@
         </div>
         
         <div class="col-12 text-center">
-                <button onclick="saveEnrollment('{{ $subCatId }}')" class="col-3 my-2 p-3 fs-15 btn-primary text-uppercase"> Save Selection  </button>
+                @if(!session('is_submitted'))
+                    <button onclick="saveEnrollment('{{ $subCatId }}')" class="col-3 my-2 p-3 fs-15 btn-primary text-uppercase"> Save Selection  </button>
+                @endif
                 <button name="closeSubCategory" class="col-3 closeSubCategory my-2 p-3 fs-15 btn-info  text-uppercase" style="color:#FFF"> Close Sub Category</button>
         </div>
     @foreach($activePolicyForSubCategoryFY as $key => $item)

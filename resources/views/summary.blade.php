@@ -89,9 +89,7 @@
     </table>
     <br>
     @php //if (Auth::users()->points_available > 0) { 
-        @endphp
-    <h5 class="text-secondary" style="text-align:right;">Make your decision <em>FINAL</em> by clicking <button class="btn btn-primary">Final Submission</button>
-    </h5>
+    @endphp
     @php //} 
     @endphp
 

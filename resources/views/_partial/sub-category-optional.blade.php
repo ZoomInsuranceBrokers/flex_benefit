@@ -1,11 +1,12 @@
 @php
     //dd($userPolData[0]->ip_id);
 @endphp
-<div class="col-3 offset-1">
+<div class="col-4">
     <form id="subCategoryForm{{ $subCatId }}">
     <table class="tab-content-table table-responsive mb-3 fs-11 col-3">
         <th>Additional Coverage</th>
         <th>TopUp Value</th>
+        <th>Points</th>
         @foreach($activePolicyForSubCategoryFY as $key => $item)
             @php //$subCatId = $item['ins_subcategory_id_fk']; 
                 $currenySymbol = html_entity_decode($item['policy']['currency']['symbol']);
@@ -33,6 +34,7 @@
                     </label>
                 </td>
                 <td>{{ $formatter->formatCurrency($item['policy']["sum_insured"], 'INR') }}</td>
+                <td>{{ $formatter->formatCurrency($item['policy']["points"], 'INR') }}</td>
             </tr>
         @endforeach                        
     </table>

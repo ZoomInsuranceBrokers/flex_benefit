@@ -17,3 +17,24 @@
     </div>
   </div>
 </div>
+<!-- FINAL SUMBIT ENROLLMENT MODAL -->
+<div class="modal" id="finalSubmissionModal" style="display:none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 id="finalSubmissionModalTitle" class="modal-title">Ready for final Step?</h5>
+            <button type="button" class="modal_close close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body text-center">
+            <p id="finalSubmissionModalBody" class="bg-secondary text-white">Do you really want to submit, as this step is <b class="bg-dark text-uppercase">irreversible</b>.
+            Once submission is done, no furhter modification possible till next year!!</p>
+        </div>
+        <div class="modal-footer">
+            <button id="enrollmentSubmit" class="btn-primary btn-small">Yes, Made my Mind</button>
+            <button id="finalSubmissionModalClose" class="btn-success btn-small modal_close" data-dismiss="modal">No, some changes left!</button>
+        </div>
+        </div>
+    </div>
+</div>

@@ -30,6 +30,15 @@ class EnrollmentController extends Controller
         $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
         $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
 
+        // check if data already final submission made
+        $is_submitted = MapUserFYPolicy::where('user_id_fk', Auth::user()->id)->where('is_submitted', true)->get();
+        if ($is_submitted->count()) {
+            $is_submitted = TRUE;
+        } else{
+            $is_submitted = FALSE;
+        }
+        session(['is_submitted' => $is_submitted]);
+
         if ($todayDate >= $enrollmentDateBegin && $todayDate < $enrollmentDateEnd) {
             // is in between
                 // category data
@@ -112,10 +121,10 @@ class EnrollmentController extends Controller
         ->where('mufyp.user_id_fk', '=', Auth::user()->id)
         ->where('ip.ins_subcategory_id_fk', '=', $request->subCatId)
         ->where('ip.is_base_plan', '<>', config('constant.$_YES'))
-        ->where('mufyp.is_active', '=', true)
-        ->where('mfyp.is_active', '=', true)
-        ->where('fy.is_active', '=', true)
-        ->where('ip.is_active', '=', true)
+        ->where('mufyp.is_active', '=', config('constant.$_YES'))
+        ->where('mfyp.is_active', '=', config('constant.$_YES'))
+        ->where('fy.is_active', '=', config('constant.$_YES'))
+        ->where('ip.is_active', '=', config('constant.$_YES'))
         ->select('mufyp.id as mufypId','mfyp.id as mfypId','mufyp.points_used','fy.name as fy_name','fy.start_date','fy.end_date', 'ip.id as ip_id')
         ->get()->toArray();
 
@@ -270,7 +279,6 @@ class EnrollmentController extends Controller
 
         $summary = array_map("json_encode",$summary);
         $summary = array_map("base64_encode",$summary);
-//dd(json_decode(base64_decode($request->savePoints)));
         foreach (json_decode(base64_decode($request->savePoints)) as $spItem) {
             $spRow = explode(':', $spItem);
             $savePoints[$spRow[0]] = (int)$spRow[1];
@@ -368,5 +376,14 @@ class EnrollmentController extends Controller
 
         // Output the generated PDF to Browser
         $dompdf->stream();
+    }
+
+    public function submitEnrollment(Request $request) {
+        if($request->session()->has('is_submitted') && !session('is_submitted')) {
+            MapUserFYPolicy::where('user_id_fk', Auth::user()->id)
+            ->where('is_active', config('constant.$_YES'))
+            ->update(['is_submitted' => config('constant.$_YES'), 'modified_by'=> Auth::user()->id]);
+            return json_encode(['status' => true, 'msg'=> 'Submission Successfull!!']);
+        }
     }
 }

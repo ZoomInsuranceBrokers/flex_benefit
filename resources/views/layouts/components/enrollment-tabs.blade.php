@@ -141,7 +141,13 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
          @endif
          <div id="summary" class="tabcontent">
             <h3>Summary</h3>
+            
             <div id="summary_content"></div>
+            @if(!session('is_submitted'))
+                <h5 class="text-secondary" style="text-align:right;">Make your decision <em>FINAL</em> by clicking 
+                    <a href="#finalSubmissionModal" class="btn btn-primary" id="finalSubmit_trigger">Final Submission</a>
+                </h5>
+            @endif
          </div>
          <div id="enrollment-history" class="tabcontent">
             <h3>Enrollment History</h3>
@@ -548,8 +554,6 @@ function saveEnrollment(catId){
         });
     }
 }
-
-
 </script>
 <script src="/assets/js/number-rush.js"></script>
 
@@ -557,13 +561,29 @@ function saveEnrollment(catId){
 @endsection
 
 @section('document_ready')
-$('[id^=header_]').removeClass('active');
-$('#header_enrollment').addClass('active');
 $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
         }
-});  
+}); 
+$('[id^=header_]').removeClass('active');
+$('#header_enrollment').addClass('active'); 
+$('#enrollmentSubmit').on('click', function() {
+    $(this).hide();
+    $.ajax({
+        url: '/enrollment/finalSubmit',
+        type:'POST',
+        success: function(response){
+            response = JSON.parse(response);
+            console.log(response);
+            if (response.status) {
+                $('#finalSubmissionModalBody').html(response.msg);
+                $('#finalSubmissionModalTitle').html('<b>Success</b>').addClass('text-success');
+                $('#finalSubmissionModalClose').html('Close');
+            }
+        }
+    });
+});
 
 $('[id^=enrollmentSubCategory]').click(function() {
     $('[id^=subCtgryDetail]').hide();
