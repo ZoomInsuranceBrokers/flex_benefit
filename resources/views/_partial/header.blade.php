@@ -63,6 +63,9 @@
                           <a href="/user/ecard" target="_blank">Download Ecard</a>
                         </li>
                         <li>
+                          <a href="{{ asset('assets/documents/MyBenefits@Zoom.pdf')}}" target="_blank">User Manual</a>
+                        </li>
+                        <li>
                           <a id="logoutModal_trigger" href="#launchLogout">Logout</a>
                         </li>
                       </ul>

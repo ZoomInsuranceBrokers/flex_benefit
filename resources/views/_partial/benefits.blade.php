@@ -1,5 +1,5 @@
 <div class="benefits section">
-    <div class="container">
+    <div class="container" style="display: none;">
       <div class="row">
         <div class="col-lg-8 offset-lg-2">
           <div class="section-heading  wow fadeInDown" data-wow-duration="1s" data-wow-delay="0.5s">
