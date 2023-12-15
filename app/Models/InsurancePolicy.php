@@ -11,7 +11,7 @@ class InsurancePolicy extends Model
     protected $table = 'insurance_policy';
 
     protected $fillable = [
-        'sfdc_id','name','sum_insured','ins_subcategory_id_fk','description','price_tag','points','extra_assured_amount',
+        'external_id','name','sum_insured','ins_subcategory_id_fk','description','price_tag','points','extra_assured_amount',
         'dependent_structure','is_parent_sublimit','parent_sublimit_amount','insurer_cost','lumpsum_amount',
         'replacement_of_policy_id','replacement_of_policy_sfdc_id','currency_id_fk','is_active','created_by','modified_by',
         'si_factor', 'is_base_plan', 'is_default_selection', 'base_plan_id',

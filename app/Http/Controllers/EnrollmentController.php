@@ -24,6 +24,33 @@ class EnrollmentController extends Controller
 {
     public function home()
     {
+        // function encryptData($data, $key, $iv) {
+        //     $cipher = "aes-256-cbc";
+        //     $options = 0;
+        //     $encryptedData = openssl_encrypt($data, $cipher, $key, $options, $iv);
+        //     return base64_encode($encryptedData);
+        // }
+        
+        // function decryptData($encryptedData, $key, $iv) {
+        //     $cipher = "aes-256-cbc";
+        //     $options = 0;
+        //     $decryptedData = openssl_decrypt(base64_decode($encryptedData), $cipher, $key, $options, $iv);
+        //     return $decryptedData;
+        // }
+        
+        // // Example usage:
+        // $key = "your_secret_key"; // Replace with a secure key
+        // $key = "QCsmMqMwEE+Iqfv0IIXDjAqrK4SOSp3tZfCadq1KlI4="; // Replace with a secure key
+        // $iv = openssl_random_pseudo_bytes(16); // Initialization Vector
+        // $iv = 'G4bfDHjL3gXiq5NCFFGnqQ==';
+        // $dataToEncrypt = "Hello, Salesforce!";
+        // $encryptedData = encryptData($dataToEncrypt, $key, $iv);
+        
+        // echo "Encrypted Data: " . $encryptedData . PHP_EOL;
+        // $encryptedData = 'x0BhTs/2d4TR7NaEaCTJXG8hI1+jJ+OSg29ueuWZC/g=';
+        // $decryptedData = decryptData($encryptedData, $key, $iv);
+        // echo "Decrypted Data: " . $decryptedData . PHP_EOL;
+        // exit;
         // get enrollment window and if it is open then only extract further data from db
         $accountData = Account::all()->toArray();
         $todayDate       = new DateTime(); // Today
@@ -59,7 +86,6 @@ class EnrollmentController extends Controller
             //->whereRelation('policy', 'ins_subcategory_id_fk',$request->subCatId)
             ->get()->toArray();
 
-            //dd($fypmapData);
             $currentSelectedData = $basePlan = [];
             if (count($fypmapData)) {
                 foreach ($fypmapData as $fypRow) {
@@ -71,6 +97,7 @@ class EnrollmentController extends Controller
             }
 
             $basePlan = InsurancePolicy::where('is_base_plan', 1)
+                    ->orWhere('is_default_selection', 1)
                     ->where('is_active',1)
                     ->with('subcategory')
                     ->get()->toArray();
@@ -203,6 +230,7 @@ class EnrollmentController extends Controller
         $fypmap = $request->fypmap;
         $catId = $request->catId;
         $policyId = $request->policyId;
+        $selDep = $request->sd;     // selected dependents
         $userId = Auth::user()->id;
         $summary = $request->summary;
         $points = $request->points;
@@ -226,11 +254,13 @@ class EnrollmentController extends Controller
         $data = [
             'user_id_fk' => $userId,
             'fypolicy_id_fk' => $fypmap,
+            'selected_dependent' => $selDep,
             'encoded_summary' => $summary,
             'points_used' => $points,
             'created_by' => $userId,
             'modified_by' => $userId,
         ];
+        //dd($data);
         $whereConditionData = ['id' => -1, 'user_id_fk' => -1];
         $mapUserFYPolicyRow = $message = null;
         $savedPoints = 0;
@@ -249,6 +279,7 @@ class EnrollmentController extends Controller
             }
             
             $mapUserFYPolicyRow = MapUserFYPolicy::updateOrCreate($whereConditionData,$data);
+            //dd($mapUserFYPolicyRow);
             // update existing points in case policy is changed
             $userData = [
                 'points_available'=> $user[0]['points_available'] + $savedPoints - $points,

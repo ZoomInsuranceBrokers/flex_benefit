@@ -14,12 +14,13 @@
                 <tr>
                     <td>
                         <input @php 
-                        if ($item['policy']["points"] <= Auth::user()->points_available ) { @endphp
+                        //if ($item['policy']["points"] <= Auth::user()->points_available ) { 
+                            @endphp
                             name="plan{{ $subCatId }}" data-sc-id="{{ $subCatId }}" data-plan-id="{{  $item['policy']["id"] }}"
                             id='planId{{ $item['policy']["id"] }}' value="{{ $item['policy']['id'] }}"
-                        @php } else {
-                            echo 'disabled';
-                        }
+                        @php //} else {
+                            //echo 'disabled';
+                        //}
                         @endphp 
                         type="checkbox"
                         @php
@@ -33,18 +34,20 @@
                                 echo 'checked';
                             }
                         @endphp 
-                         />
+                         ///>
                         <label @php 
-                        if ($item['policy']["points"] > Auth::user()->points_available ) {
-                            echo 'class="text-danger"';
-                        } else { @endphp
+                        //if ($item['policy']["points"] > Auth::user()->points_available ) {
+                            //echo 'class="text-danger"';
+                        //} else { @endphp
                             for='planId{{ $item['policy']["id"] }}'
-                        @php } @endphp >
+                        @php// } 
+                        @endphp 
+                        
                             {{ $item['policy']["name"] }}
                         </label>
                     </td>
-                    <td @php echo $item['policy']["points"] <= Auth::user()->points_available ? 
-                     '' : 'class="text-danger"'; @endphp >{{ $formatter->formatCurrency($item['policy']["points"], 'INR') }}</td>
+                    <td @php /* echo $item['policy']["points"] <= Auth::user()->points_available ? 
+                     '' : 'class="text-danger"'; */ @endphp >{{ $formatter->formatCurrency($item['policy']["points"], 'INR') }}</td>
                 </tr>
                 @php
                     }

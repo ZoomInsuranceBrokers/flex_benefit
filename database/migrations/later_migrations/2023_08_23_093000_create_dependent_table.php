@@ -15,7 +15,7 @@ class CreateDependentTable extends Migration
     {
         Schema::create('dependent', function (Blueprint $table) {
             $table->id()->from(1000);
-            $table->string('sfdc_id')->nullable();        // sfdc ID
+            $table->string('external_id')->nullable();        // sfdc ID
             $table->string('dependent_name', 128);
             $table->foreignId('user_id_fk')->constrained('users');
             $table->char('dependent_code',4);  // id from array in env file

@@ -17,7 +17,7 @@ class InsuranceCategory extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'sfdc_id',
+        'external_id',
         'name',
         'contact_id_fk',
         'tagline',

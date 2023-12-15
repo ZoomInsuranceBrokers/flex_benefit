@@ -248,11 +248,11 @@ function generateDependentItems(subCatId, depList) {
     var memCvrdStr = '';
     var parentRadio = false;
     if (depList.length > 0) {
-        if (depList[0] == '/') {
+        {{-- if (depList[0] == '/') {
             parentRadio = true;
             depList.splice(0,1); 
-        }
-        $('[id^=dependent-list]').each(function(){
+        } --}}
+        {{-- $('[id^=dependent-list]').each(function(){
             var dCode = $(this).attr('data-depcode');
             var depId = $(this).attr('data-depId');
             var depName = $(this).attr('data-name');
@@ -270,7 +270,7 @@ function generateDependentItems(subCatId, depList) {
                     }
                 }  
             });
-        });
+        }); --}}
         var existingDependent = [];
         var i = 0;
         $('[id^=dependent-list]').each(function(){
@@ -287,6 +287,25 @@ function generateDependentItems(subCatId, depList) {
             }
         });
         //console.log(existingDependent);
+        for(depCode in existingDependent) {
+            depId = [];
+            depName = [];
+            depCodeFullName = getMemberFullNames(depCode);
+            existingDependent[depCode].forEach(function(depRow){
+                //console.log(depRow);
+                depId.push(depRow[0]);
+                depName.push('(' + depRow[1] + ':' + depRow[2] + ')');
+            });
+            //console.log(dep);
+            memCvrdStr += '<input id="depMemCrvd_' + depId.join('_')  + 
+                '" type="checkbox" name="depMemCrvd[]" value="' + depId.join(',') + 
+                '" /><label for="depMemCrvd_' + depId.join('_')  + 
+                '">' + depCodeFullName + '[' + depName.join(',') + ']' + '</label>';
+        }
+        {{-- existingDependent.forEach(function(dep, index, currArr){
+            console.log(dep);
+        }); --}}
+        //console.log(existingDependent);
         $('#memcvrd' + subCatId).html(memCvrdStr);
         //return memCvrdStr;
     }
@@ -294,80 +313,65 @@ function generateDependentItems(subCatId, depList) {
 }
 
 function planBindEvents() {
-        // trigger for radio button 
-        $('[id^=planId]').click(function(){ 
-            if ($(this).is(':checked')) {
-                var subCatId = $(this).attr('data-sc-id');
-                var planId = $(this).attr('data-plan-id');
-                let planDetailArr = ['bpName', 'ptf','pt','name','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
-                'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa','is_grade_based','isvp', 'isvbsd'];
-
-                planDetailArr.forEach(function (item,index) {
-                    itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));
-                });
-
-                // price tag vs points
-                //$('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
-                //$('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));
-                
-                // Conditional UI
-                $('#coresumRow' + subCatId).hide();
-                $('#coreSum' + subCatId).hide();
-                $('#coreMultiple' + subCatId).hide();
-                //console.log($('#planDetails' + planId).attr('data-bpsa'));
-                // summary core row having base plan
-                if ($('#planDetails' + planId).attr('data-bpsa') != '') {
-                    $('#coresumRow' + subCatId).show();
-                    $('#coreSum' + subCatId).show();
-                }
-                //core-lumpsum or core-sa
-                /* if ($('#planDetails' + planId).attr('data-bpsa') != '' && 
-                ($('#planDetails' + planId).attr('data-is-lupsm') == '1' || 
-                    $('#planDetails' + planId).attr('data-is-sa') == '1' || 
-                    $('#planDetails' + planId).attr('data-is-si-sa') == '1')) {
-                    $('#coreSum' + subCatId).show();
-                }  */               
-                //core-multiple
-                if ($('#planDetails' + planId).attr('data-is-si-sa') == '1') {
-                    $('#coreMultiple' + subCatId).show();
-                }
-
-                // dependent structure
-                var depList = getDependentList($('#planDetails' + planId).attr('data-memcvrd'));
-
-                //membersCovered = depList.flatMap((x) => getMemberFullNames(x));
-                //$('#memcvrd' + subCatId).html(membersCovered.join(','));
-                //$('#memcvrd' + subCatId).html(generateDependentItems(depList));
-                generateDependentItems(subCatId, depList);
-                //$('#fp-numbers-mcoverage' + subCatId).show();
-
-                $('#parentSubLimit' + subCatId).hide();
-                let parent_sublimit_amount = $('#planDetails' + planId).attr('data-prntSbLim');
-                if( parent_sublimit_amount != '0') {
-                    console.log('#planDetails' + planId + '----' +parent_sublimit_amount);
-                    $('#parentSubLimit' + subCatId).show();
-                    $('#prntSbLim' + subCatId).html(parent_sublimit_amount);
-                }
-
-                // ***** Hide Current Selection if PV policy ***** //
-                {{-- if ($('#planDetails' + planId).attr('data-isvp') == '1') {
-                    console.log('is_vp:' + $('#planDetails' + planId).attr('data-isvp') + ':' + subCatId);
-                    $('#currSelectionHeadCol' + subCatId + ',#currSelectionDataCol' + subCatId).remove();
-                } --}}
-
-                //countNumber('currentPlanValue', currPlanValue);        
-                //countNumber('allPlanValue', allPlanValue);
-                //countNumber('remainingPlanValue', balancePlanValue);
-        }
-
-        $('[id^=planId]').each(function(){
+    // trigger for radio button 
+    $('[id^=planId]').click(function(){ 
+        if ($(this).is(':checked')) {
             var subCatId = $(this).attr('data-sc-id');
             var planId = $(this).attr('data-plan-id');
+            let planDetailArr = ['bpName', 'ptf','pt','name','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
+            'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa','is_grade_based','isvp', 'isvbsd'];
+
+            planDetailArr.forEach(function (item,index) {
+                itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));
+            });
 
             // price tag vs points
-            $('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
-            $('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));    
-        });
+            //$('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
+            $('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));
+            
+            // Conditional UI
+            $('#coresumRow' + subCatId).hide();
+            $('#coreSum' + subCatId).hide();
+            $('#coreMultiple' + subCatId).hide();
+            //console.log($('#planDetails' + planId).attr('data-bpsa'));
+            // summary core row having base plan
+            if ($('#planDetails' + planId).attr('data-bpsa') != '') {
+                $('#coresumRow' + subCatId).show();
+                $('#coreSum' + subCatId).show();
+            }
+            //core-lumpsum or core-sa
+            /* if ($('#planDetails' + planId).attr('data-bpsa') != '' && 
+            ($('#planDetails' + planId).attr('data-is-lupsm') == '1' || 
+                $('#planDetails' + planId).attr('data-is-sa') == '1' || 
+                $('#planDetails' + planId).attr('data-is-si-sa') == '1')) {
+                $('#coreSum' + subCatId).show();
+            }  */               
+            //core-multiple
+            if ($('#planDetails' + planId).attr('data-is-si-sa') == '1') {
+                $('#coreMultiple' + subCatId).show();
+            }
+
+            // dependent structure
+            var depList = getDependentList($('#planDetails' + planId).attr('data-memcvrd'));
+
+            //membersCovered = depList.flatMap((x) => getMemberFullNames(x));
+            //$('#memcvrd' + subCatId).html(membersCovered.join(','));
+            //$('#memcvrd' + subCatId).html(generateDependentItems(depList));
+            generateDependentItems(subCatId, depList);
+            //$('#fp-numbers-mcoverage' + subCatId).show();
+
+            $('#parentSubLimit' + subCatId).hide();
+            let parent_sublimit_amount = $('#planDetails' + planId).attr('data-prntSbLim');
+            if( parent_sublimit_amount != '0') {
+                console.log('#planDetails' + planId + '----' +parent_sublimit_amount);
+                $('#parentSubLimit' + subCatId).show();
+                $('#prntSbLim' + subCatId).html(parent_sublimit_amount);
+            }
+
+            //countNumber('currentPlanValue', currPlanValue);        
+            //countNumber('allPlanValue', allPlanValue);
+            //countNumber('remainingPlanValue', balancePlanValue);
+        }
 
         // toggle disable of point based policy
         $('[id^=chkValuePlanId]').on('change', function(){
@@ -423,8 +427,16 @@ function policyDetailsforSubCategory(subCatId) {
             success: function(response){
                 $('#policySubCategoryList' + subCatId).html(response.html);
                 planBindEvents();
-                triggerInitialClick();
                 
+                $('[id^=planId]').each(function(){
+                    var subCatId = $(this).attr('data-sc-id');
+                    var planId = $(this).attr('data-plan-id');
+
+                    // price tag vs points
+                    $('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
+                    $('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));    
+                });
+                triggerInitialClick();
             },
             error: function(error){
 
@@ -443,7 +455,7 @@ function saveEnrollment(catId){
             checkboxCounter++;
             policySelected.push($(this).val());
         });
-        console.log(policySelected); 
+        //console.log(policySelected); 
         if (checkboxCounter && policySelected.length) {
             let savePoints = [];
             let isvbsd = 0;
@@ -475,7 +487,8 @@ function saveEnrollment(catId){
                         "_token": '{{ csrf_token() }}',
                         'savePoints':btoa(unescape(encodeURIComponent(JSON.stringify(savePoints)))),
                         'catId': catId,
-                        'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(summary))))
+                        'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(summary)))),
+                        'dependents': 1
                     },
                     success:function(response) {
                         if (response.status) {
@@ -504,6 +517,7 @@ function saveEnrollment(catId){
             let policyID = $(this).val();
             polDet = $('#planDetails' + policyID);
             let points = 0;
+            let depSelected = [];
             
             var polDet = document.getElementById('planDetails' + policyID);
             // iterate each attribute
@@ -525,7 +539,11 @@ function saveEnrollment(catId){
                             points = attr.nodeValue;
                         }
                     }
-                }            
+                }
+                // members saved
+                $('#memcvrd'+catId).find('input[type="checkbox"]:checked').each(function(){
+                    depSelected.push($(this).val())
+                });          
                 if (fypmapId) {
                     $.ajax({
                         url: "/enrollment/save",
@@ -536,6 +554,7 @@ function saveEnrollment(catId){
                             'catId': catId,
                             'policyId' : policyID,
                             'points': points,
+                            'sd': depSelected.join('###'),
                             'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(polData))))
                         },
                         success:function(response) {

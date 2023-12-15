@@ -16,7 +16,7 @@ class MapFYPolicy extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'sfdc_id','map_name','map_description', 'fy_id_fk', 'ins_policy_id_fk','is_active','created_by','modified_by'
+        'external_id','map_name','map_description', 'fy_id_fk', 'ins_policy_id_fk','is_active','created_by','modified_by'
     ];
 
     public function financialYears()

@@ -15,7 +15,7 @@ class CreateFinancialYearsTable extends Migration
     {
         Schema::create('financial_years', function (Blueprint $table) {
             $table->id()->from(1000);
-            $table->string('sfdc_id')->nullable();        // sfdc ID
+            $table->string('external_id')->nullable();        // sfdc ID
             $table->string('name', 64);
             $table->date('start_date');
             $table->date('end_date');

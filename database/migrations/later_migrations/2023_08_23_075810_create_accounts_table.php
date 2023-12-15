@@ -15,7 +15,7 @@ class CreateAccountsTable extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id()->from(100);
-            $table->string('sfdc_id');
+            $table->string('external_id')->nullable();
             $table->string('name', 256);
             $table->string('address');
             $table->foreignId('country_id_fk')->contrained('country_currency'); // zipcode ??

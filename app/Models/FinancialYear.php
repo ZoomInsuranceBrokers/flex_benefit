@@ -16,7 +16,7 @@ class FinancialYear extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'sfdc_id','name','start_date','end_date','future_fy_year_fk','prev_fy_year_fk','is_active','created_by','modified_by'
+        'external_id','name','start_date','end_date','future_fy_year_fk','prev_fy_year_fk','is_active','created_by','modified_by'
     ];
 
     //'sfdc_id','name','start_date','end_date','future_fy_year_fk','prev_fy_year_fk','is_active','created_by','modified_by'

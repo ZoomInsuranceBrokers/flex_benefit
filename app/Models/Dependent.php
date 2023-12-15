@@ -17,7 +17,7 @@ class Dependent extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'sfdc_id',
+        'external_id',
         'dependent_name',
         'user_id_fk',
         'dependent_code',

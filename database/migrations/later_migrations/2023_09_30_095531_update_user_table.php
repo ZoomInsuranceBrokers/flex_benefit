@@ -15,7 +15,7 @@ class UpdateUserTable extends Migration
     {
         //
         Schema::table('users', function (Blueprint $table) {            
-            $table->string('sfdc_id')->after('id');
+            $table->string('external_id')->after('id');
             $table->string('modified_by')->nullable()->after('sfdc_id');
             $table->string('created_by')->nullable()->after('sfdc_id');
             $table->float('nominee_percentage')->nullable()->after('sfdc_id');

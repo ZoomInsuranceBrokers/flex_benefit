@@ -15,7 +15,7 @@ class CreateInsuranceCategoryTable extends Migration
     {
         Schema::create('insurance_category', function (Blueprint $table) {
             $table->id()->from(1000);
-            $table->string('sfdc_id')->nullable();
+            $table->string('external_id')->nullable();
             $table->string('name', 64);
             $table->string('tagline', 255)->nullable();
             $table->string('created_by')->nullable();

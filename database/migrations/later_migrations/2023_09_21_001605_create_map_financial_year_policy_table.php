@@ -15,7 +15,7 @@ class CreateMapFinancialYearPolicyTable extends Migration
     {
         Schema::create('map_financial_year_policy', function (Blueprint $table) {
             $table->id()->from(1000);
-            $table->string('sfdc_id')->nullable();        // sfdc ID
+            $table->string('external_id')->nullable();        // sfdc ID
             $table->string('map_name', 128)->nullable();
             $table->string('map_description', 255)->nullable();
             $table->foreignId('fy_id_fk')->constrained('financial_years');

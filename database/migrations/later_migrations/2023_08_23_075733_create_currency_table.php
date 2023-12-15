@@ -15,7 +15,6 @@ class CreateCurrencyTable extends Migration
     {
         Schema::create('currency', function (Blueprint $table) {
             $table->id();
-            //$table->string('sfdc_id')->unique();        // any entry in SFDC
             $table->string('name', 64);
             $table->string('symbol', 8)->nullable();
             $table->string('short_name', 8)->unique();
