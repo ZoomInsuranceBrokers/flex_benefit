@@ -170,12 +170,11 @@ class UserController extends Controller
             return redirect()->route('password.request')->with('message', 'Invalid email');
         }
 
-
         $token = Str::random(60);
 
         DB::table('users')->where('email', $email)->update(['remember_token' => $token]);
 
-        // Mail::to($email)->send(new PasswordResetMail($token));
+        Mail::to($email)->send(new PasswordResetMail($token, $user));
 
         return redirect()->route('password.request')->with('message', 'Password reset link sent!');
     }
