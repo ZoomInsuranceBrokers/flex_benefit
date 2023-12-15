@@ -143,7 +143,7 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
             <h3>Summary</h3>
             
             <div id="summary_content"></div>
-            @if(!session('is_submitted'))
+            @if(!session('is_submitted') && count($data['currentSelectedData']))
                 <h5 class="text-secondary" style="text-align:right;">Make your decision <em>FINAL</em> by clicking 
                     <a href="#finalSubmissionModal" class="btn btn-primary" id="finalSubmit_trigger">Final Submission</a>
                 </h5>

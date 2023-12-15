@@ -1,5 +1,6 @@
 @php //dd(Auth::user());
-$formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);  
+$formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY); 
+//dd(Auth::user()); 
 @endphp
 
 <div class="modal" id="userProfile" style="display:none;">
@@ -20,7 +21,7 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
                     class="rounded-circle img-fluid" style="width: 100px;" />
                 </div>
                 <h4>
-                  {{ config('constant.title')[Auth::user()->title] . ' ' . implode(' ',[Auth::user()->fname,Auth::user()->mname, Auth::user()->lname])}}
+                  {{ (!is_null(Auth::user()->title) ? config('constant.title')[Auth::user()->title] : '') . ' ' . implode(' ',[Auth::user()->fname,Auth::user()->mname, Auth::user()->lname])}}
                 </h4>
                 <span class="mb-2">({{ Auth::user()->employee_id }})</span>
                 <div class="mb-4">  

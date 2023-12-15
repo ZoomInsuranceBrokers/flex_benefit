@@ -24,6 +24,7 @@ class EnrollmentController extends Controller
 {
     public function home()
     {
+        //dd(config('constant.relationshipDep_type_jTable'));
         // function encryptData($data, $key, $iv) {
         //     $cipher = "aes-256-cbc";
         //     $options = 0;
@@ -89,12 +90,13 @@ class EnrollmentController extends Controller
             $currentSelectedData = $basePlan = [];
             if (count($fypmapData)) {
                 foreach ($fypmapData as $fypRow) {
-                    if (!$fypRow['fy_policy']['policy']['is_base_plan']) {
+                    if (!$fypRow['fy_policy']['policy']['is_base_plan'] && !$fypRow['fy_policy']['policy']['is_default_selection'] ) {
                         $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
                             'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']];
                     }
                 }
             }
+            //dd($currentSelectedData);
 
             $basePlan = InsurancePolicy::where('is_base_plan', 1)
                     ->orWhere('is_default_selection', 1)

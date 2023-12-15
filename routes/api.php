@@ -6,10 +6,12 @@ use App\Models\Currency;
 use Illuminate\Http\Request;
 // use Illuminate\Foundation\Auth\User;
 use App\Models\CountryCurrency;
+use App\Models\InsurancePolicy;
+use App\Models\MapUserFYPolicy;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -37,10 +39,45 @@ Route::get('/currency/create', function(Request $request){
         'description' => 'Currency of India','is_active' => true,
         'created_by' => 1,'modified_by' => 1
     ]);
-});Route::get('/country-currency/create', function(Request $request){
+});
+Route::get('/country-currency/create', function(Request $request){
     echo $contact = CountryCurrency::create([
         'name' => 'India','short_name' => 'IND','currency_id_fk' => 1,'is_active' => true
     ]);
+});
+Route::get('/user/defaultpolicymapping/', function(Request $request){
+    if(!MapUserFYPolicy::all()->count()){
+        $users = User::where('is_active',1)->get()->toArray();
+        $mapFYpolicyData = DB::table('map_financial_year_policy as mfyp')
+            ->select('mfyp.id')
+            ->leftJoin('financial_years as fy' ,'fy.id', '=', 'mfyp.fy_id_fk')
+            ->leftJoin('insurance_policy as ip' ,'ip.id', '=', 'mfyp.ins_policy_id_fk')
+            ->where('mfyp.is_active', '=', true)
+            ->where('fy.is_active', '=', true)
+            ->where('ip.is_active', '=', true)
+            ->where('ip.is_base_plan', true)
+            ->orWhere('ip.is_default_selection', true)
+            ->get()->toArray();
+
+        foreach($users as $user) {
+            foreach($mapFYpolicyData as $mfypRow) {
+                $data[] = [
+                    'user_id_fk' => $user['id'],
+                    'fypolicy_id_fk' => $mfypRow->id,
+                    'selected_dependent' => NULL,
+                    'encoded_summary' => NULL,
+                    'points_used' => 0,
+                    'created_by' => 0,
+                    'modified_by' => 0,
+                ];
+            }
+        }
+        MapUserFYPolicy::insert($data);
+        echo 'Data Inserted';
+    } else {
+        echo 'Map User FY Policy table already has data';
+    }
+
 });
 Route::get('/user/create/', function(Request $request){
     echo $contact = User::create([

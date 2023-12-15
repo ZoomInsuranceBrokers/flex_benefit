@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'sfdc_id','fname','mname','lname','employee_id','grade','hire_date','email','points_used', 'points_available',
+        'externl_id','fname','mname','lname','employee_id','grade','hire_date','email','points_used', 'points_available',
         'address','country_id_fk','mobile_number','salutation','title','suffix','gender','nominee_percentage','is_active',
         'created_by','modified_by', 'grade_id_fk'
     ];

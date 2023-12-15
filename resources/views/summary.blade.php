@@ -3,7 +3,7 @@
     $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
     $summaryData = [];
     foreach($mapUserFYPolicyData as $item) {
-        if(!$item['fy_policy']['policy']['is_base_plan']) {
+        if(!$item['fy_policy']['policy']['is_base_plan'] && !$item['fy_policy']['policy']['is_default_selection']) {
             $summaryData[$item['id']]['category'] = $item['fy_policy']['policy']['subcategory']['categories']['name'];
             $summaryData[$item['id']]['subcategory'] = $item['fy_policy']['policy']['subcategory']['name'];
             $summaryData[$item['id']]['policy'] = $item['fy_policy']['policy']['name'];
@@ -96,5 +96,5 @@
     
 
 @else
-    echo 'Enrollment details not found. Please select appropriate policies and submit before <Enrollment Date>';
+    <h4 class="mb-5 mt-5 text-center text-danger">Enrollment details not found.<br>Please select appropriate policies and submit before enrollment window ends</h4>
 @endif
