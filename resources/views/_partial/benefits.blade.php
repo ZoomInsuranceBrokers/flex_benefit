@@ -54,7 +54,7 @@
       <div class="row">
         <div class="col-lg-8 offset-lg-2">
           <div class="section-heading  wow fadeInDown" data-wow-duration="1s" data-wow-delay="0.5s">
-            <h4>Plan Categories under <em>MyBenefit@Zoom</em> program</h4>
+            <h4>Plan Categories under <em>MyBenefits@Zoom</em> program</h4>
           </div>
         </div>
       </div>
@@ -79,7 +79,6 @@
             <h4>Term Life Insurance Plans</h4>
             <ul class="service-item-list">
               <li>Option to select a basic Term Life Plan</li>
-              <li>Option to select Critical Illness rider</li>
               <li>24/7 worldwide coverage</li>
             </ul>
             <!-- <ul class="service-item-list">
@@ -109,7 +108,7 @@
         <div class="col-lg-3">
           <div class="service-item fourth-service">
             <div class="icon"></div>
-            <h4>Flexi Cash Benefits</h4>
+            <h4>Non Insured Benefits</h4>
             <ul class="service-item-list">
               <li>Leverage your FlexPoints for specific flexible cash advantage & wellness services</li>
               <li>These points can be used throughout the year</li>
@@ -148,7 +147,7 @@
             <h4>Term Life Insurance Plans</h4>
             <p>
               Ensuring your family's financial well-being in unforeseen circumstances is a crucial aspect of financial planning. Employees have the option to opt for a basic Term Life Plan, covering both themselves and their spouses. This plan serves as a financial safety net for the family in the event of an unfortunate incident resulting in the loss of the insured employee or spouse.
-              Furthermore, employees have the opportunity to select the Critical Illness rider, offering financial assistance to address their treatment expenses. Both the term and critical illness plans provide continuous, worldwide coverage 24 hours a day, seven days a week.
+              
             </p>
             <div class="text-button float-right">
               <a href="#">Show Less<i class="fa fa-arrow-left"></i></a>

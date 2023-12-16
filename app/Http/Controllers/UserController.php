@@ -226,4 +226,36 @@ class UserController extends Controller
             return response()->json(['error' => 'Invalid credentials!'], 401);
         }
     }
+
+    public function passworReset()
+    {
+
+        return view('auth.reset-password-auth');
+
+    }
+
+    public function updatePassword(Request $request)
+    {
+       
+        $request->validate([
+            'old-password' => 'required',
+            'password' => ['required', 'confirmed', Password::defaults(), 'min:6'],
+            'password_confirmation' => 'required',
+        ], [
+            'password.min' => 'The password must be at least 6 characters.',
+            'password.confirmed' => 'The password confirmation does not match.',
+        ]);
+      
+        $user = auth()->user();
+
+        if (!Hash::check($request->input('old-password'), $user->password)) {
+            return redirect()->back()->withErrors(['old-password' => 'The provided old password does not match your current password.']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->input('password')),
+        ]);
+
+        return redirect()->route('previous.form.route')->with('status', 'Password updated successfully.');
+    }
 }

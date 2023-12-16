@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Auth;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Client\Response as ClientResponse;
+use App\Mail\SubmitEnrollment;
+use Illuminate\Support\Facades\Mail;
 
 class EnrollmentController extends Controller
 {
@@ -414,7 +416,14 @@ class EnrollmentController extends Controller
             MapUserFYPolicy::where('user_id_fk', Auth::user()->id)
             ->where('is_active', config('constant.$_YES'))
             ->update(['is_submitted' => config('constant.$_YES'), 'modified_by'=> Auth::user()->id]);
+            $email =  Auth::user()->email;
+            $user = DB::table('users')->where('email', $email)->first();
+            Mail::to($email)->send(new SubmitEnrollment($user));
+            
             return json_encode(['status' => true, 'msg'=> 'Submission Successfull!!']);
+
+           
+
         }
     }
 }
