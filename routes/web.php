@@ -35,6 +35,9 @@ Route::post('reset-password', [UserController::class,'reset'])->name('password.u
 // DEPENDENT CONTROLLER ROUTES
 Route::group(['middleware' => 'auth'], function() {
     // lots of routes that require auth middleware
+    
+    Route::get('password-reset', [UserController::class,'passworReset'])->name('previous.form.route');
+    Route::post('/password/authupdate', [UserController::class, 'updatePassword'])->name('password.authupdate');
     Route::post('/dependents/create', [DependentController::class, 'create']);
     Route::post('/dependents/update', [DependentController::class, 'update']);
     Route::post('/dependents/delete', [DependentController::class, 'delete']);

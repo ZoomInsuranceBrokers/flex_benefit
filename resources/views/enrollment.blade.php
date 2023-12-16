@@ -59,7 +59,7 @@
 
 }
 
-.enrollmentSubCategory .row:first-child 
+.enrollmentSubCategory .row:first-child {
     background-color: aliceblue;
     margin-right:0;
     margin-left:0;
