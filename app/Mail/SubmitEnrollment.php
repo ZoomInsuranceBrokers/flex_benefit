@@ -13,14 +13,17 @@ class SubmitEnrollment extends Mailable
 
     public $user;
 
+    public $mapUserFYPolicyData;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($user)
+    public function __construct($user,  $mapUserFYPolicyData)
     {
         $this->user = $user;
+        $this->mapUserFYPolicyData =  $mapUserFYPolicyData;
     }
 
     /**
@@ -31,9 +34,8 @@ class SubmitEnrollment extends Mailable
     public function build()
     {
 
-
         return $this->view('emails.submit_enrollment')
-            ->with(['user' => $this->user])
+            ->with(['user' => $this->user, 'mapUserFYPolicyData' => $this->mapUserFYPolicyData])
             ->subject('Enrollment Submission');
     }
 }

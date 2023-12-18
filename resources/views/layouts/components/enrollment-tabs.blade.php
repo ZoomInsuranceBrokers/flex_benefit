@@ -4,10 +4,11 @@
 
 @php
 //dd($data['currentSelectedData']);
-$formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);  
+$formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
 //dd($data['sub_categories_data']);
-    /* foreach($data['category'] as $key => $value) {
-        echo '<pre>';
+/* foreach($data['category'] as $key => $value) {
+echo '
+<pre>';
         print_r($value);
     }
     die; */
@@ -73,9 +74,29 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
                                     $bpsa = (int)$data['gradeAmtData'][$bpRow['subcategory']['categories']['id']];
                                     $is_grade_based = TRUE;
                                 } else {
+                              
+                                    // Provided values
+                                    $encryptedData =  Auth::user()->salary;
+                                    $encryptionKey = 'QCsmMqMwEE+Iqfv0IIXDjAqrK4SOSp3tZfCadq1KlI4=';
+                                    $initializationVector = 'G4bfDHjL3gXiq5NCFFGnqQ==';
+
+                                    // Decrypt the data
+                                    $cipher = "aes-256-cbc";
+                                        $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
+
+                                        $decryptedData = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
+
+                                        if ($decryptedData === false) {
+                                            echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
+                                        } else {
+                                            $decryptedData = floatval(rtrim($decryptedData, "\0"));
+                                        }
+
+
+                                    
                                     $sa = !is_null($bpRow['sum_insured']) ? $bpRow['sum_insured'] : 0;
                                     $sa_si = !is_null($bpRow['si_factor']) ?
-                                            $sa_si = $bpRow['si_factor'] * Auth::user()->salary : 0;
+                                            $sa_si = $bpRow['si_factor'] * $decryptedData : 0;
                                     if($sa_si > $sa) {
                                         $bpsa = (int)$sa_si;
                                         $is_si_sa = TRUE;

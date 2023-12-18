@@ -64,7 +64,7 @@ class DependentController extends Controller {
             
             if (!$validator->fails()) {
                 $dependent = new Dependent();
-                $dependent->sfdc_id = 'sfdc_' . time();
+                $dependent->external_id = 'sfdc_' . time();
                 $dependent->dependent_name = $input['dependent_name'];
                 $dependent->user_id_fk = Auth::user()->id;
                 // find dependent code from relationship type
@@ -266,7 +266,7 @@ class DependentController extends Controller {
             
             if (!$validator->fails()) {
                 $dependent = new Dependent();
-                $dependent->sfdc_id = 'sfdc_' . time();
+                $dependent->external_id = 'sfdc_' . time();
                 $dependent->dependent_name = $input['dependent_name'];
                 $dependent->user_id_fk = Auth::user()->id;
                 // find dependent code from relationship type
