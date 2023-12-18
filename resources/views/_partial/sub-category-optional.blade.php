@@ -53,7 +53,7 @@
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top" title="">
                                     @php
-                                        $fyStartDate = '2023-04-01';        // @todo replace with account FY start date
+                                        $fyStartDate = session('fy')['start_date'];        // @todo replace with account FY start date
                                         $joiningDate = Auth::user()->hire_date;
                                         echo ($joiningDate > $fyStartDate) ? 'Joining /' : '';
                                     @endphp

@@ -20,6 +20,7 @@ use Facade\FlareClient\Http\Response;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Client\Response as ClientResponse;
 use App\Mail\SubmitEnrollment;
+use App\Models\FinancialYear;
 use Illuminate\Support\Facades\Mail;
 
 class EnrollmentController extends Controller
@@ -60,6 +61,10 @@ class EnrollmentController extends Controller
         $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
         $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
 
+        // financial year start and end date
+        $fyData = FinancialYear::where('is_active',true)->select('start_date', 'end_date')->get()->toArray();
+        session(['fy' => $fyData[0]]);
+        
         // check if data already final submission made
         $is_submitted = MapUserFYPolicy::where('user_id_fk', Auth::user()->id)->where('is_submitted', true)->get();
         if ($is_submitted->count()) {
@@ -158,7 +163,7 @@ class EnrollmentController extends Controller
             ->where('mfyp.is_active', '=', config('constant.$_YES'))
             ->where('fy.is_active', '=', config('constant.$_YES'))
             ->where('ip.is_active', '=', config('constant.$_YES'))
-            ->select('mufyp.id as mufypId', 'mfyp.id as mfypId', 'mufyp.points_used', 'fy.name as fy_name', 'fy.start_date', 'fy.end_date', 'ip.id as ip_id')
+            ->select('mufyp.id as mufypId', 'mfyp.id as mfypId', 'mufyp.points_used', /*'fy.name as fy_name', 'fy.start_date', 'fy.end_date',*/ 'ip.id as ip_id')
             ->get()->toArray();
 
         //if(count($userPolData)) {            
@@ -174,19 +179,6 @@ class EnrollmentController extends Controller
             ->whereRelation('policy', 'ins_subcategory_id_fk', $request->subCatId)
             ->get()->toArray();
         //dd($activePolicyForSubCategoryFY);
-
-
-
-        // $activePolicyForSubCategory = DB::table('insurance_policy as ip')
-        //     ->leftJoin('map_financial_year_policy as mfyp' ,'ip.id', '=', 'mfyp.id')
-        //     ->leftJoin('financial_years as fy' ,'fy.id', '=', 'mfyp.fy_id_fk')
-        //     ->leftJoin('insurance_policy as ip' ,'ip.id', '=', 'mfyp.ins_policy_id_fk')
-        //     ->where('mufyp.user_id_fk', '=', 1) // @todo: change logic to acutal logged in user
-        //     ->where('mufyp.is_active', '=', true)
-        //     ->where('mfyp.is_active', '=', true)
-        //     ->where('fy.is_active', '=', true)
-        //     ->where('ins_subcategory_id_fk',$request->subCatId)
-        //     ->get()->toArray();
 
         //get subcategory and category for user grade
         $gradeData = session('gradeData');

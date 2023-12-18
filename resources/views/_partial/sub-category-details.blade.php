@@ -38,7 +38,7 @@
         $base_si_factor = 0;
         if($item['policy']['is_base_plan']) {
             // first priority will be given to lumpsum value
-            /* $lumpsum = $item['policy']['lumpsum_amount']; //@todo check Data and verify logic of SA --}}
+            /* $lumpsum = $item['policy']['lumpsum_amount'];  --}}
              if (!is_null($lumpsum)) {
                 $bpsa = (int)$lumpsum;
                 $is_lumpsum = TRUE;
@@ -102,13 +102,13 @@
                 echo $item['policy']['points'];
                 @endphp"                
             data-psd="@php
-                    $fyStartDate = '2023-04-01';    // @todo replace with account FY start date
+                    $fyStartDate = session('fy')['start_date'];    // @todo replace with account FY start date
                     $joiningDate = Auth::user()->hire_date;
                     $policyStartDate = $joiningDate > $fyStartDate ? $joiningDate : $fyStartDate;
                     echo date_format(date_create($policyStartDate), 'd-M-Y');
                 @endphp"
             data-ped="@php
-                    $fyEndDate = '2024-03-31';    // @todo replace with account FY end date
+                    $fyEndDate = session('fy')['end_date'];    // @todo replace with account FY end date
                     echo date_format(date_create($fyEndDate), 'd-M-Y');
                 @endphp"
             data-totdc="@php

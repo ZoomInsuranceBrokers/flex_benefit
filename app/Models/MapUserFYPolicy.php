@@ -22,4 +22,9 @@ class MapUserFYPolicy extends Model
     {
         return $this->hasOne(MapFYPolicy::class, 'id', 'fypolicy_id_fk')->with('policy');
     }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id_fk')->with('dependents');
+    }
 }

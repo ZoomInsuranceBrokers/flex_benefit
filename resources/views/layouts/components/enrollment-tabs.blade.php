@@ -4,11 +4,10 @@
 
 @php
 //dd($data['currentSelectedData']);
-$formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
+$formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY); 
 //dd($data['sub_categories_data']);
-/* foreach($data['category'] as $key => $value) {
-echo '
-<pre>';
+    /* foreach($data['category'] as $key => $value) {
+        echo '<pre>';
         print_r($value);
     }
     die; */
@@ -74,7 +73,7 @@ echo '
                                     $bpsa = (int)$data['gradeAmtData'][$bpRow['subcategory']['categories']['id']];
                                     $is_grade_based = TRUE;
                                 } else {
-                              
+
                                     // Provided values
                                     $encryptedData =  Auth::user()->salary;
                                     $encryptionKey = 'QCsmMqMwEE+Iqfv0IIXDjAqrK4SOSp3tZfCadq1KlI4=';
@@ -345,12 +344,7 @@ function planBindEvents() {
             planDetailArr.forEach(function (item,index) {
                 itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));
             });
-            
-            // $('#psd' + subCatId).text('17-Dec-2023');
-            // $('#ped' + subCatId).text('16-Dec-2024');
-            // $('#totdc' + subCatId).text('365 days');
 
-            
             // price tag vs points
             //$('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
             $('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));

@@ -50,4 +50,9 @@ class User extends Authenticatable
         return $this->hasOne(Grade::class, 'id', 'grade_id_fk')->with('categoryMapping');
     }
 
+    public function dependent()
+    {
+        return $this->hasMany(Dependent::class, 'id', 'user_id_fk');
+    }
+
 }
