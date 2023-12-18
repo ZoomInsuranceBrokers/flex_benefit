@@ -45,8 +45,8 @@ class InsurancePolicy extends Model
         return $this->hasOne(InsuranceSubCategory::class, 'id', 'ins_subcategory_id_fk')->with('categories');
     }
     
-    public function map_fy_policies() {
-        return $this->hasManyThrough(MapFYPolicy::class, 'ins_policy_id_fk', 'id');
+    public function mapfyPolicies() {
+        return $this->hasMany(MapFYPolicy::class, 'ins_policy_id_fk', 'id');
     }
     
 }

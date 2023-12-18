@@ -152,10 +152,10 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
          @if($data['is_enrollment_window'] )
             @if(count($data['category']))
                 @foreach($data['category'] as $item)
-                    @include('_partial.category-tab') 
+                    @include('_partial.category-tab')
                 @endforeach 
             @else
-                NoCATGEORY FOUND. WRONG SETUP.
+                No CATGEORY FOUND. WRONG SETUP.
                 {{-- @todo: Error to show on no category list available --}}
             @endif 
          @endif
@@ -597,6 +597,24 @@ function saveEnrollment(catId){
             }        
         });
     }
+}
+
+function resetSelection(catId, buttonObj){
+    $(buttonObj).hide();
+    $.ajax({
+        url: "/enrollment/resetCategory",
+        type:"POST",
+        data:{
+            "_token": '{{ csrf_token() }}',
+            'catId': catId,
+        },
+        success:function(response) {
+            response = JSON.parse(response);
+            if (response.status) {
+                location.reload();
+            }
+        }
+    });
 }
 </script>
 <script src="/assets/js/number-rush.js"></script>

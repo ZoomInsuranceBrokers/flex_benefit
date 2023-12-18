@@ -52,6 +52,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
     Route::post('/enrollment/savePV', [EnrollmentController::class, 'saveEnrollmentPV']);
     Route::post('/enrollment/finalSubmit', [EnrollmentController::class, 'submitEnrollment']);
+    Route::post('/enrollment/resetCategory', [EnrollmentController::class, 'resetCategory']);
     Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
     Route::get('/enrollment/summaryDownload', [EnrollmentController::class, 'downloadSummary']);
     Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);

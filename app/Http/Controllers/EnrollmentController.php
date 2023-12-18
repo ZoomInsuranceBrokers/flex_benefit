@@ -433,4 +433,78 @@ class EnrollmentController extends Controller
             return json_encode(['status' => true, 'msg' => 'Submission Successfull!!']);
         }
     }
+
+    public function resetCategory(Request $request){
+        $userPolData = DB::table('map_user_fypolicy as mufyp')
+            ->leftJoin('map_financial_year_policy as mfyp', 'mufyp.fypolicy_id_fk', '=', 'mfyp.id')
+            ->leftJoin('financial_years as fy', 'fy.id', '=', 'mfyp.fy_id_fk')
+            ->leftJoin('insurance_policy as ip', 'ip.id', '=', 'mfyp.ins_policy_id_fk')
+            ->where('mufyp.user_id_fk', '=', Auth::user()->id)
+            ->where('ip.ins_subcategory_id_fk', '=', $request->catId)
+            ->where('mufyp.is_active', '=', config('constant.$_YES'))
+            ->where('mfyp.is_active', '=', config('constant.$_YES'))
+            ->where('fy.is_active', '=', config('constant.$_YES'))
+            ->where('ip.is_active', '=', config('constant.$_YES'))
+            ->where('ip.is_base_plan', '', config('constant.$_YES'))
+            ->where('ip.is_default_selection', '<>', config('constant.$_YES'))
+            ->select('mufyp.id as mufypId', 'mfyp.id as mfypId', 'mufyp.points_used', 'ip.id as ip_id')
+            ->get()->toArray();
+            //->toSql();
+        //dd($userPolData);
+        $pointsCounter = 0;
+        $ids = [];
+
+        if(count($userPolData)){    // means other policy saved apart from base_plan+default_selection
+            foreach ($userPolData as $polRow) {
+                $pointsCounter += $polRow->points_used;
+                $ids[] = $polRow->mufypId;
+            }
+        }
+
+        // make entries in_active in mapUserFYPolciyTable
+        MapUserFYPolicy::whereIn('id',$ids)->update([
+            'is_active' => false,
+            'modified_by' => Auth::user()->id
+        ]);
+
+        // update user points
+        $user = User::where('id', Auth::user()->id)->get()->toArray();
+        $userData = [
+            'points_available' => $user[0]['points_available'] + $pointsCounter,
+            'points_used' => $user[0]['points_used'] - $pointsCounter,
+        ];
+        User::where('id', Auth::user()->id)->update($userData);
+
+        $insurancePolicyDefault = InsurancePolicy::where('is_active', true)
+            ->with(['mapFyPolicies'])
+            ->where('ins_subcategory_id_fk', $request->catId)
+            ->where('is_base_plan','<>',true)
+            ->where('is_default_selection',true)
+            ->get()->toArray();
+
+        $fyPolId = 0;
+        if (count($insurancePolicyDefault)) {
+            foreach($insurancePolicyDefault as $polDefRow) {
+                if ($polDefRow['is_default_selection']) {
+                    foreach($polDefRow['map_fy_policies'] as $polfyPol) {
+                        if ($polfyPol['is_active']) {
+                            $fyPolId = $polfyPol['id'];
+                            break;
+                        }
+                    }
+                }
+            }
+            $mapUserFYPolicyData = [
+                'user_id_fk' => Auth::user()->id,
+                'fypolicy_id_fk' => $fyPolId,
+                'created_by' => Auth::user()->id,
+            ];
+            //dd([$pointsCounter, $ids,$userData, $mapUserFYPolicyData]);
+            MapUserFYPolicy::insert($mapUserFYPolicyData);
+            $response = ['status' => true, 'msg' => 'Reset Done. Default entries added!!!'];
+        } else {
+            $response = ['status' => true, 'msg' => 'Reset Done. No default entries present!!!'];
+        }
+        return json_encode($response);
+    }
 }

@@ -36,7 +36,8 @@
       }
   });
   
-  $("#modal_trigger,#logoutModal_trigger,#enrollmentModal_trigger,#userProfile_trigger,#depError_trigger,#finalSubmit_trigger").leanModal({
+  $("#modal_trigger,#logoutModal_trigger,#enrollmentModal_trigger," + 
+    "#userProfile_trigger,#depError_trigger,#finalSubmit_trigger,#resetSelection_trigger").leanModal({
 		top: 100,
 		overlay: 0.6,
 		closeButton: ".modal_close"

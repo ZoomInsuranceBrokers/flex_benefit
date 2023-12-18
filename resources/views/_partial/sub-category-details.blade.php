@@ -26,7 +26,44 @@
         
         <div class="col-12 text-center">
                 @if(!session('is_submitted'))
+                    <script type="text/javascript">
+                     $("#resetSelection_trigger" + {{ $subCatId }}).leanModal({
+                            top: 100,
+                            left: 0,
+                            overlay: 0.6,
+                            closeButton: ".modal_close"
+                    });
+                    </script>
+                    <style>
+                    .modal-content{
+                        left:-30% !important;
+                    }
+                    </style>
                     <button onclick="saveEnrollment('{{ $subCatId }}')" class="col-3 my-2 p-3 fs-15 btn-primary text-uppercase"> Save Selection  </button>
+                    <a id="resetSelection_trigger{{ $subCatId }}" href="#resetSelectionModal{{ $subCatId }}" class="col-3 p-3 btn btn-secondary text-uppercase fs-15"> Reset Selection  </a>
+                    <!-- FINAL SUMBIT ENROLLMENT MODAL -->
+                    <div class="modal" id="resetSelectionModal{{ $subCatId }}" style="display:none;left:40%;">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 id="resetSelectionModalTitle" class="modal-title">Confirm before "Reset"</h5>
+                                <button type="button" class="modal_close close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <p id="resetSelectionModalBody" class="bg-light text-dark">
+                                Do you really want to rollback to step zero for current policy type, as this step will 
+                                <b class="text-uppercase">clear</b> your current selection</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="resetSelection('{{ $subCatId }}',this)" class="btn-primary btn-small">Yes, Clear Selection </button>
+                                <button id="resetSelectionModalClose" class="btn-success btn-small modal_close"
+                                data-dismiss="modal">No, Changed Mind</button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
                 @endif
                 <button name="closeSubCategory" class="col-3 closeSubCategory my-2 p-3 fs-15 btn-info  text-uppercase" style="color:#FFF"> Close Sub Category</button>
         </div>
