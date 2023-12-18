@@ -8,6 +8,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="_token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('assets/images/favicon.png') }}" type="image/png">
+
     
     @include('_partial.css-includes')
     @yield('link_rel')

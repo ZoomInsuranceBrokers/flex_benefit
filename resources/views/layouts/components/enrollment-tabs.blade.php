@@ -64,7 +64,7 @@ echo '
                         <table class="table table-bordered table-info">
                             <tr>
                                 <th scope="col">Category</th>
-                                <th scope="col">Sub-Category</th>
+                                <!-- <th scope="col">Sub-Category</th> -->
                                 <th scope="col">Core Benefit</th>
                                 <th scope="col">Sum Insured</th>
                             </tr>
@@ -111,7 +111,7 @@ echo '
                             @endphp
                             <tr>
                                 <td scope="row">{{ $bpRow['subcategory']['categories']['name'] }}</td>
-                                <td>{{ $bpRow['subcategory']['name'] }}</td>
+                                <!-- <td>{{ $bpRow['subcategory']['name'] }}</td> -->
                                 <td>{{ $bpRow['name'] }}</td>
                                 <td>{{ $formatter->formatCurrency(round($bpsa), 'INR') }}</td>
                             </tr>
@@ -345,7 +345,12 @@ function planBindEvents() {
             planDetailArr.forEach(function (item,index) {
                 itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));
             });
+            
+            // $('#psd' + subCatId).text('17-Dec-2023');
+            // $('#ped' + subCatId).text('16-Dec-2024');
+            // $('#totdc' + subCatId).text('365 days');
 
+            
             // price tag vs points
             //$('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
             $('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));
