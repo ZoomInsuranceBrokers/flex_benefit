@@ -45,6 +45,10 @@ Route::get('/country-currency/create', function(Request $request){
         'name' => 'India','short_name' => 'IND','currency_id_fk' => 1,'is_active' => true
     ]);
 });
+
+Route::get('/test-hardeep', function(Request $request){
+    echo json_encode(['textMsg' => 'Hello Hardeep']);
+});
 Route::get('/user/defaultpolicymapping/', function(Request $request){
     if(!MapUserFYPolicy::all()->count()){
         $users = User::where('is_active',1)->get()->toArray();
