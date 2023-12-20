@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use DateTime;
 use Dompdf\Dompdf;
 use App\Models\User;
+use NumberFormatter;
 use App\Models\Account;
 use App\Models\Dependent;
 use App\Models\MapFYPolicy;
 use Illuminate\Http\Request;
+use App\Models\FinancialYear;
+use App\Mail\SubmitEnrollment;
 use App\Models\InsurancePolicy;
 use App\Models\MapUserFYPolicy;
 use App\Models\MapGradeCategory;
@@ -16,12 +19,10 @@ use App\Models\InsuranceCategory;
 use Illuminate\Support\Facades\DB;
 use App\Models\InsuranceSubCategory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Client\Response as ClientResponse;
-use App\Mail\SubmitEnrollment;
-use App\Models\FinancialYear;
-use Illuminate\Support\Facades\Mail;
 
 class EnrollmentController extends Controller
 {
@@ -111,6 +112,8 @@ class EnrollmentController extends Controller
                 ->where('is_active', 1)
                 ->with('subcategory')
                 ->get()->toArray();
+
+            session(['base_default_plans' => $basePlan]);
             //dd($basePlan);
 
 
@@ -197,6 +200,7 @@ class EnrollmentController extends Controller
                 }
             }
         }
+        session(['gradeAmount' => [$gradeCatId => $gradeAmount]]);
 
         //dd($userPolData);
         //if (count($userPolData) && count($activePolicyForSubCategory) ) {
@@ -234,6 +238,10 @@ class EnrollmentController extends Controller
         $summary = $request->summary;
         $points = $request->points;
 
+        // get policy detail for generating encoded summary
+        $policyDetail = MapFYPolicy::where('id',$fypmap)->with(['policy'])->get()->toArray();
+        //dd($policyDetail);
+
         $userPolDataForCatId = DB::table('map_user_fypolicy as mufyp')
             ->select(
                 'mufyp.points_used',
@@ -259,6 +267,7 @@ class EnrollmentController extends Controller
             'user_id_fk' => $userId,
             'fypolicy_id_fk' => $fypmap,
             'selected_dependent' => $selDep,
+            //'encoded_summary' => $this->_generateEncodedSummary($catId,$policyDetail), //$summary,
             'encoded_summary' => $summary,
             'points_used' => $points,
             'created_by' => $userId,
@@ -386,9 +395,154 @@ class EnrollmentController extends Controller
         }
     }
 
+    private function _generateEncodedSummary($catId, $fymapDet){
+        $fypmap = $fymapDet[0]['id'];
+        $polDet = $fymapDet[0]['policy'];
+        $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
+        $basePlans = session('base_default_plans');
+        $gradeAmount = session('gradeAmount')[$catId];
+        dd($basePlans);
+        $bpsa = 0;
+        $bpName = '';
+        $is_lumpsum = $is_si_sa = $is_sa = $is_grade_based = FALSE;
+        $base_si_factor = 0;
+        foreach ($basePlans as $bpRow) {
+            if ($bpRow['ins_subcategory_id_fk'] == $catId && $bpRow['is_base_plan']){
+                if ($gradeAmount) {
+                    $bpsa = (int)$gradeAmount;
+                    $is_grade_based = TRUE;
+                } else {
+                    $sa = !is_null($bpRow['policy']['sum_insured']) ? $bpRow['policy']['sum_insured'] : 0;
+                    $sa_si = !is_null($bpRow['policy']['si_factor']) ?
+                            $sa_si = $bpRow['policy']['si_factor'] * Auth::user()->salary : 0;
+                    if($sa_si > $sa) {
+                        $bpsa = (int)$sa_si;
+                        $is_si_sa = TRUE;
+                        $base_si_factor = $bpRow['policy']['si_factor'];
+                    } else {
+                        $bpsa = (int)$sa;
+                        $is_sa = TRUE;
+                    }
+                }
+                // name of base policy
+                $bpName = $bpRow['policy']['name'];
+                break;
+            }
+        }
+
+
+
+        $dataArr = [];
+        $dataArr['extId'] = $polDet['external_id'];
+        $dataArr['ptf'] = $polDet['price_tag'];
+        $dataArr['bpName'] = $bpName;
+        $dataArr['pt'] = $formatter->formatCurrency($polDet['points'], 'INR');
+        $dataArr['name'] = $polDet['name'];
+        $dataArr['osa'] = $formatter->formatCurrency($polDet['sum_insured'], 'INR');
+        $dataArr['is-sa'] = $is_sa;
+        $dataArr['is-si-sa'] = $is_si_sa;
+        $dataArr['grdbsd'] = $is_grade_based;
+        $dataArr['fypmap'] = $fypmap;
+        $dataArr['isbp'] = $polDet['is_base_plan'];
+        $dataArr['bpsa'] = $bpsa > 0 ? $formatter->formatCurrency($bpsa, 'INR') : '';
+        $dataArr['opplsa'] = !$polDet['policy']['is_base_plan'] ? $formatter->formatCurrency($polDet['sum_insured'], 'INR') : 0;
+        $dataArr['totsa'] = $formatter->formatCurrency(($bpsa + (!$polDet['is_base_plan']) ? (int)$polDet['sum_insured'] : 0), 'INR');
+        $dataArr['isvp'] = $polDet['is_point_value_based'];
+        $dataArr['isvbsd'] = $polDet['show_value_column'];
+        $dataArr['annup'] = $formatter->formatCurrency($polDet['points'], 'INR');
+        $dataArr['annupwocurr'] = $polDet['points'];
+        $dataArr['psd'] =  date_format(date_create(Auth::user()->hire_date > session('fy')['start_date'] ?
+                Auth::user()->hire_date : session('fy')['start_date']), 'd-M-Y');
+        $dataArr['ped'] = date_format(date_create(session('fy')['end_date']), 'd-M-Y');
+        $dataArr['totdc'] = '';
+        $dataArr['prorf'] = '';
+        $dataArr['opplpt'] = '';
+        $dataArr['effecp'] = '';
+        $dataArr['totpt'] = '';
+        $dataArr['totptwocurr'] = '';
+        $dataArr['memcvrd'] = '';
+        $dataArr['prntSbLim'] = '';
+        $dataArr['corem'] = '';
+        $dataArr['coresa'] = '';
+        $dataArr['jongDate'] = '';
+            /*               
+            data-psd="@php
+                    $fyStartDate = session('fy')['start_date'];    // @todo replace with account FY start date
+                    $joiningDate = Auth::user()->hire_date;
+                    $policyStartDate = $joiningDate > $fyStartDate ? $joiningDate : $fyStartDate;
+                    echo date_format(date_create($policyStartDate), 'd-M-Y');
+                @endphp"
+            data-ped="@php
+                    $fyEndDate = session('fy')['end_date'];    // @todo replace with account FY end date
+                    echo date_format(date_create($fyEndDate), 'd-M-Y');
+                @endphp"
+            data-totdc="@php
+                    $totalDays = date_diff(date_create($policyStartDate), date_create($fyEndDate));
+                    echo $totalDays->days . ' Days';
+                @endphp"                
+            data-prorf="@php
+                $prorationfactor = number_format(($totalDays->days/date_diff(date_create($fyStartDate), 
+                date_create($fyEndDate))->days) * 100, '2', '.', '');
+                echo $prorationfactor;
+            @endphp"
+            data-opplpt="@php
+                $pts =0;
+                if (!is_null($polDet['price_tag']) && $polDet['price_tag'] > 0) {
+                    $pts = ($polDet['sum_insured']) * $polDet['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($polDet['points'])){
+                    $pts = $polDet['points'] * ($prorationfactor/100);
+                }
+                echo !$polDet['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;
+                @endphp"
+            data-effecp="@php // Sum Insured * price_tag * (proration_factor/100)
+                $pts = 0;
+                if (!is_null($polDet['price_tag']) && $polDet['price_tag'] > 0) {
+                    $pts = ($polDet['sum_insured']) * $polDet['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($polDet['points'])){
+                    $pts = $polDet['points'] * ($prorationfactor/100);
+                }
+                echo !$polDet['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;
+                @endphp"                
+            data-totpt="@php    
+                $pts = 0;
+                if (!is_null($polDet['price_tag']) && $polDet['price_tag'] > 0) {
+                    $pts = ($polDet['sum_insured']) * $polDet['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($polDet['points'])){
+                    $pts = $polDet['points'] * ($prorationfactor/100);
+                }
+                echo !$polDet['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;
+                @endphp"
+            data-totptwocurr="@php    
+                $pts = 0;
+                if (!is_null($polDet['price_tag']) && $polDet['price_tag'] > 0) {
+                    $pts = ($polDet['sum_insured']) * $polDet['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($polDet['points'])){
+                    $pts = $polDet['points'] * ($prorationfactor/100);
+                }
+                echo !$polDet['is_base_plan'] ? round($pts) : 0;
+                @endphp"
+            data-memcvrd="@php
+                echo ($polDet['dependent_structure'])
+                @endphp"
+            data-prntSbLim="@php
+                echo $polDet['is_parent_sublimit'] ? $formatter->formatCurrency($polDet['parent_sublimit_amount'], 'INR') : 0;
+                @endphp"
+            data-corem="@php
+                echo $base_si_factor . 'X of CTC';
+                @endphp"
+            data-coresa="@php
+                echo $formatter->formatCurrency($bpsa, 'INR');
+                @endphp"
+            data-jongDate="@php
+                echo 1;
+                @endphp" */
+    }
+
     public function loadSummary()
     {
-        $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy'])
+        $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)
+        ->where('is_active', true)
+        ->with(['fyPolicy'])
             ->get()->toArray();
         $html = view('summary')
             ->with('mapUserFYPolicyData', $mapUserFYPolicyData)->render();

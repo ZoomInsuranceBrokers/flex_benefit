@@ -338,8 +338,8 @@ function planBindEvents() {
         if ($(this).is(':checked')) {
             var subCatId = $(this).attr('data-sc-id');
             var planId = $(this).attr('data-plan-id');
-            let planDetailArr = ['bpName', 'ptf','pt','name','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
-            'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa','is-lupsm','is-si-sa','is-sa','is_grade_based','isvp', 'isvbsd'];
+            let planDetailArr = ['bpName', 'ptf','pt','name',/*'allo','currs','avail',*/'tots','effecp','prorf','annup','totdc','psd','ped','bpsa',
+            'opplpt', 'opplsa', 'totpt', 'totsa', 'corem', 'coresa',/*'is-lupsm',*/'is-si-sa','is-sa','is_grade_based','isvp', 'isvbsd'];
 
             planDetailArr.forEach(function (item,index) {
                 itemVal = $('#' + item + subCatId).html($('#planDetails' + planId).attr('data-' + item));

@@ -1,7 +1,7 @@
 @if(isset($activePolicyForSubCategoryFY) && count($activePolicyForSubCategoryFY))
     @php
     
-        $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);  
+        $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
         //dd($userPolData);
         $subCatId = array_key_exists('policy', $activePolicyForSubCategoryFY[0]) ? 
             $activePolicyForSubCategoryFY[0]['policy']['ins_subcategory_id_fk'] : 0;
@@ -114,11 +114,11 @@
             data-pt="{{ $formatter->formatCurrency($item['policy']['points'], 'INR') }}"
             data-name="{{ $item['policy']['name'] }}"
             data-osa="{{ $formatter->formatCurrency($item['policy']['sum_insured'], 'INR') }}"
-            data-allo="0" data-currs="4324" data-avail="675343"
-            data-tots="{{ $item['policy']['price_tag'] }}"
+            {{-- data-allo="0" data-currs="4324" data-avail="675343"
+            data-tots="{{ $item['policy']['price_tag'] }}" --}}
             data-is-sa="{{ $is_sa }}"
             data-is-si-sa="{{ $is_si_sa }}"
-            data-is-lupsm="{{ $is_lumpsum }}"
+            {{-- data-is-lupsm="{{ $is_lumpsum }}" --}}
             data-is-grdbsd="{{ $is_grade_based }}"
             data-fypmap="{{ $item['id'] }}"
             data-isbp ="{{ $item['policy']['is_base_plan'] ? 1 : 0 }}"
