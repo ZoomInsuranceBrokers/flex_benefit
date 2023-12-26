@@ -8,7 +8,6 @@
 .ui-widget-overlay{opacity:0.4}
 </style>
 @stop
-
 <section class="tab-wrapper">
    <div class="tab-content">
       <!-- Tab links -->
@@ -130,6 +129,8 @@ function checkNominationAllocation(field, rules, i, options){
         }
     });
 
+    @if ($result !== null)
+
     $('#dependent_list').jtable({
         title: 'Existing Dependents',
         toolbar:{
@@ -218,6 +219,97 @@ function checkNominationAllocation(field, rules, i, options){
             data.form.validationEngine('detach');
         }
     });
+
+    @else 
+
+    $('#dependent_list').jtable({
+        title: 'Existing Dependents',
+        toolbar:{
+            show:true
+        },
+        dialogShowEffect:'scale',
+        actions: {
+            listAction: '/dependents/list',
+            
+        },
+        fields: {
+            id: {
+                title: 'Id',
+                width: 'auto',
+                create: false,
+                edit: false,
+                list: false,
+                key:true
+            },
+
+            dependent_name: {
+                title: 'Dependent Name',
+                width: 'auto'
+            },
+            relationship_type: {
+                title: 'Relation Type',
+                width: 'auto',
+                edit: false,
+                options: [@php echo config('constant.relationshipDep_type_jTable') @endphp]
+                //options: '/dependents/getRelationshipTypes'
+            },
+            gender: {
+                title: 'Gender',
+                dependsOn: 'relationship_type',
+                width: 'auto',
+                edit: false,
+                options: [@php echo config('constant.gender_jTable') @endphp]
+                {{-- options: function (data){
+                    if (data.source == 'list') {
+                        //Return url all options for optimization. 
+                        return [@php echo config('constant.gender_jTable') @endphp];
+                    }
+                    return '/dependents/getGender?rltntype=' + data.dependedValues.relationship_type;
+                } --}}
+            },
+            dob: {
+                title: 'Date of Birth',
+                width: 'auto',
+                type: 'date',
+                displayFormat: 'dd-mm-yy',
+                changeMonth: true,
+                changeYear: true,
+                maxDate: "+0D"
+            },
+            nominee_percentage: {
+                title: 'Nomination Percentage',
+                width: 'auto',
+            },
+            approval_status: {
+                title: 'Approval Status',
+                width: 'auto',
+                options: [@php echo config('constant.approval_status_jTable') @endphp],
+                create: false,
+                edit: false,
+                list: true
+            }
+        },
+        //Initialize validation logic when a form is created
+        formCreated: function (event, data) {
+            data.form.find('input[name="nominee_percentage"]').addClass('validate[required,min[0],max[100],funcCall[checkNominationAllocation]]');
+            data.form.find('input[name="dob"]').addClass('validate[required]');
+            {{-- data.form.find('input[name="gender"]').addClass('validate[required]');
+            data.form.find('input[name="relationship_type"]').addClass('validate[required]'); --}}
+            //data.form.find('input[name="dependent_name"]').addClass('validate[required]');
+            data.form.validationEngine({promptPosition:"topLeft", focusFirstField : false, autoHidePrompt: true,  autoHideDelay: 4000});
+        },
+        //Validate form when it is being submitted
+        formSubmitting: function (event, data) {
+            return data.form.validationEngine('validate');
+        },
+        //Dispose validation logic when form is closed
+        formClosed: function (event, data) {
+            data.form.validationEngine('hide');
+            data.form.validationEngine('detach');
+        }
+    });
+
+    @endif
     	
     $('#dependent_list').jtable('load');
 

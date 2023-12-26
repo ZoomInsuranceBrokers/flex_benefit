@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Hash;
+use App\Models\MapUserFYPolicy;
+
 
 
 class UserController extends Controller
@@ -115,7 +117,7 @@ class UserController extends Controller
             );
 
             $response = json_decode($response);
-            
+
             if ($response->GetFamilyECardResult[0]->STATUS == 'SUCCESS') {
 
                 $url = $response->GetFamilyECardResult[0]->E_Card;
@@ -231,12 +233,11 @@ class UserController extends Controller
     {
 
         return view('auth.reset-password-auth');
-
     }
 
     public function updatePassword(Request $request)
     {
-       
+
         $request->validate([
             'old-password' => 'required',
             'password' => ['required', 'confirmed', Password::defaults(), 'min:6'],
@@ -245,7 +246,7 @@ class UserController extends Controller
             'password.min' => 'The password must be at least 6 characters.',
             'password.confirmed' => 'The password confirmation does not match.',
         ]);
-      
+
         $user = auth()->user();
 
         if (!Hash::check($request->input('old-password'), $user->password)) {
@@ -257,5 +258,21 @@ class UserController extends Controller
         ]);
 
         return redirect()->route('previous.form.route')->with('status', 'Password updated successfully.');
+    }
+
+    public function viewSummary()
+    {
+        if (Auth::check()) {
+
+            $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)
+                ->where('is_active', true)
+                ->with(['fyPolicy'])
+                ->get()->toArray();
+
+           
+            return view('view-summary',['mapUserFYPolicyData' => $mapUserFYPolicyData ]);
+        } else {
+            return view('auth.forgot-password');
+        }
     }
 }

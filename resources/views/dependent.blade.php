@@ -45,7 +45,7 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            @component('layouts.components.dependent-tabs') @endcomponent
+                            @component('layouts.components.dependent-tabs', ['result' => $result]) @endcomponent
                         </div>
                     </div>
                 @endif                    
