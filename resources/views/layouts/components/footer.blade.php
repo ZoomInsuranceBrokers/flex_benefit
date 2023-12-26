@@ -2,7 +2,7 @@
   <footer id="newsletter">
     <div class="container">
       <div class="row">
-        <div class="col-lg-8 offset-lg-2">
+        <!-- <div class="col-lg-8 offset-lg-2">
           <div class="section-heading">
             <h4>Join our mailing list to receive the news &amp; latest trends</h4>
           </div>
@@ -75,11 +75,15 @@
             </div>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.</p>
           </div>
-        </div>
+        </div> -->
         <div class="col-lg-12">
           <div class="copyright-text">
-            <p>Copyright © 2022 Chain App Dev Company. All Rights Reserved. 
-          <br>Design: <a href="https://templatemo.com/" target="_blank" title="css templates">TemplateMo</a></p>
+            <p>Zoom Insurance Brokers Private Limited 
+          <br>Registered & Corporate Office: D-104, Udyog Vihar Phase V, Sector-19, Gurugram, Haryana-122016
+          <br>CIN: U66000HR2008PTC065899, IRDAI Licence No.: 389, Licence Category: Composite, Licence Expiry: 1st January 2027
+          <br>Insurance is a subject matter of solicitation. Kindly read all policy related documents and take expert advice before taking any insurance or investment decisions.
+          <br>© Copyright 2023 mybenefits.co.in All Rights Reserved.
+        </p>
           </div>
         </div>
       </div>
