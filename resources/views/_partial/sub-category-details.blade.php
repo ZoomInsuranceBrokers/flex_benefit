@@ -206,7 +206,7 @@
                 echo $formatter->formatCurrency($bpsa, 'INR');
                 @endphp"
             data-jongDate="@php
-                echo 1;
+                echo Auth::user()->hire_Date;
                 @endphp"
         >&nbsp;</span>
         @php

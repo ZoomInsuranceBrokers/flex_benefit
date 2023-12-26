@@ -81,21 +81,21 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
 
                                     // Decrypt the data
                                     $cipher = "aes-256-cbc";
-                                        $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
+                                    $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
 
-                                        $decryptedData = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
+                                    $salary = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
 
-                                        if ($decryptedData === false) {
-                                            echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
-                                        } else {
-                                            $decryptedData = floatval(rtrim($decryptedData, "\0"));
-                                        }
+                                    if ($salary === false) {
+                                        echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
+                                    } else {
+                                        $salary = floatval(rtrim($salary, "\0"));
+                                    }
 
 
                                     
                                     $sa = !is_null($bpRow['sum_insured']) ? $bpRow['sum_insured'] : 0;
                                     $sa_si = !is_null($bpRow['si_factor']) ?
-                                            $sa_si = $bpRow['si_factor'] * $decryptedData : 0;
+                                            $sa_si = $bpRow['si_factor'] * $salary : 0;
                                     if($sa_si > $sa) {
                                         $bpsa = (int)$sa_si;
                                         $is_si_sa = TRUE;
@@ -507,7 +507,7 @@ function saveEnrollment(catId){
                         "_token": '{{ csrf_token() }}',
                         'savePoints':btoa(unescape(encodeURIComponent(JSON.stringify(savePoints)))),
                         'catId': catId,
-                        'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(summary)))),
+                        //'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(summary)))),
                         'dependents': 1
                     },
                     success:function(response) {

@@ -34,46 +34,7 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
                 
                 <div>
                   <button class="btn btn-primary" onclick="window.location.href='/password-reset/'">Reset Password</button>
-                </div>
-                {{-- <div class="mb-4 pb-2">
-                  <button type="button" class="btn btn-outline-primary btn-floating">
-                    <i class="fab fa-facebook-f fa-lg"></i>
-                  </button>
-                  <button type="button" class="btn btn-outline-primary btn-floating">
-                    <i class="fab fa-twitter fa-lg"></i>
-                  </button>
-                  <button type="button" class="btn btn-outline-primary btn-floating">
-                    <i class="fab fa-skype fa-lg"></i>
-                  </button>
-                </div> --}}
-                {{-- <button type="button" class="btn btn-primary btn-rounded btn-lg">
-                  Message now
-                </button> --}}
-                {{-- <div class="d-flex justify-content-between text-center mt-5 mb-2">
-                  <div>
-                    <h4 class="mb-2">{{ Auth::user()->points_used + Auth::user()->points_available }}</h4>
-                    <p class="text-muted mb-0">Total Points</p>
-                  </div>
-                  <div class="px-3">
-                    <h4 class="mb-2">{{ Auth::user()->points_used }}</h4>
-                    <p class="text-muted mb-0">Points Used</p>
-                  </div>
-                  <div>
-                    <h4 class="mb-2">{{ Auth::user()->points_available }}</h4>
-                    <p class="text-muted mb-0">Points Available</p>
-                  </div>
-                </div>
-                <div class="d-flex justify-content-between text-center mt-5 mb-2">
-                  <div>
-                    <h4 class="mb-2 h5">{{ $formatter->formatCurrency(Auth::user()->salary, 'INR') }}</h4>
-                    <p class="text-muted mb-0">Salary</p>
-                  </div>
-                  <div class="px-3">
-                    <h4 class="mb-2 h5">{{ date('d-M-Y', strtotime(Auth::user()->hire_date)) }}</h4>
-                    <p class="text-muted mb-0">Joining Date</p>
-                  </div>
-                </div> --}}
-                
+                </div>               
               </div>
             </div>
 

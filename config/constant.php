@@ -120,6 +120,25 @@ $dependent_code_ui = [ // these values are indexes/keys of relationship_types
 ];
 /******* Dependent Code *******/
 
+/******* Salary ********/
+// $salary = Auth::user()->salary;
+// $encryptedData =  Auth::user()->salary;
+// $encryptionKey = 'QCsmMqMwEE+Iqfv0IIXDjAqrK4SOSp3tZfCadq1KlI4=';
+// $initializationVector = 'G4bfDHjL3gXiq5NCFFGnqQ==';
+
+// // Decrypt the data
+// $cipher = "aes-256-cbc";
+// $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
+
+// $salary = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
+
+// if ($salary === false) {
+//     echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
+// } else {
+//     $salary = floatval(rtrim($salary, "\0"));
+// }
+/***********************/
+
 return [
     // relationship array
     'relationship_type' => $relationship_types,
@@ -133,7 +152,7 @@ return [
     'relationshipLE_type_jTable' => generateJtableOptions($selectLabel,$relationship_typesLE),
     'title' => $titleName,
     'gender' => $gender,
-    
+
     '$_YES' => $_YES,
     '$_NO' => $_NO,
 

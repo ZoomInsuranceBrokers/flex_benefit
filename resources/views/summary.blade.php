@@ -90,15 +90,15 @@
 
                                     // Decrypt the data
                                     $cipher = "aes-256-cbc";
-                                        $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
+                                    $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
 
-                                        $decryptedData = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
+                                    $salary = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
 
-                                        if ($decryptedData === false) {
-                                            echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
-                                        } else {
-                                            $decryptedData = floatval(rtrim($decryptedData, "\0"));
-                                        }
+                                    if ($salary === false) {
+                                        echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
+                                    } else {
+                                        $salary = floatval(rtrim($salary, "\0"));
+                                    }
 
     
                             if (!$item['is_base_default']) {
@@ -110,7 +110,7 @@
                                 } else {
                                     $sa = !is_null($item['policyDetail']['sum_insured']) ? $item['policyDetail']['sum_insured'] : 0;
                                     $sa_si = !is_null($item['policyDetail']['si_factor']) ?
-                                            $sa_si = $item['policyDetail']['si_factor'] * $decryptedData : 0;
+                                            $sa_si = $item['policyDetail']['si_factor'] * $salary : 0;
                                     if($sa_si > $sa) {
                                         $bpsa = (int)$sa_si;
                                         $is_si_sa = TRUE;
