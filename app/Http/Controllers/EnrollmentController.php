@@ -316,19 +316,31 @@ class EnrollmentController extends Controller
         $catId = $request->catId;
         $savePoints = [];
         $userId = Auth::user()->id;
-        $summary = [];
         $ids = [];
-        foreach (json_decode(base64_decode($request->summary)) as $summItem) {
-            $summRow = explode(':', $summItem);
-            $summary[$summRow[0]][$summRow[1]] = $summRow[2];
-        }
-
-        $summary = array_map("json_encode", $summary);
-        $summary = array_map("base64_encode", $summary);
         foreach (json_decode(base64_decode($request->savePoints)) as $spItem) {
             $spRow = explode(':', $spItem);
-            $savePoints[$spRow[0]] = (int)$spRow[1];
+            if ((int)$spRow[1]) {
+                $savePoints[$spRow[0]] = (int)$spRow[1];
+            }            
         }
+        //dd($savePoints);
+        if (!count($savePoints)) {
+            return response()->json([
+                'status' => NULL,
+                'message' => 'No plans selected or invalid points entered'
+            ]);
+        }
+
+        // get policy details for each flexicash plans generating encoded summary
+        $policyDetail = MapFYPolicy::whereIn('id',array_keys($savePoints))->with(['policy'])->get()->toArray();
+        $policyDetailArr = [];
+        foreach($policyDetail as $polDetRow) {
+            if ($polDetRow['policy']['is_point_value_based']) { // in case of point/value plan, update points
+                $polDetRow['policy']['points'] = $savePoints[$polDetRow['id']];
+            }
+            $policyDetailArr[$polDetRow['id']] = $polDetRow;
+        }            
+        $policyDetail = $policyDetailArr;
 
         $userPolDataForCatId = DB::table('map_user_fypolicy as mufyp')
             ->select('mufyp.points_used', 'mufyp.id')
@@ -342,10 +354,7 @@ class EnrollmentController extends Controller
             ->where('ip.is_active', '=', true)
             ->where('ip.ins_subcategory_id_fk', '=', (int)$catId)
             ->get()->toArray();
-        //->toSql();
-        //print '<pre>';
 
-        //dd($userPolDataForCatId);
         $totalPointsSaved = 0;
         $user = User::where('id', Auth::user()->id)->get()->toArray();
         if (count($userPolDataForCatId)) {
@@ -353,7 +362,7 @@ class EnrollmentController extends Controller
                 $ids[] = $fypmapEntry->id;
                 $totalPointsSaved += $fypmapEntry->points_used;
             }
-            MapUserFYPolicy::whereIn('id', $ids)->delete();       // deleting existing record on every save as updating existing ones may cause corrupted data
+            MapUserFYPolicy::whereIn('id', $ids)->delete();// deleting existing record on every save as updating existing ones may cause corrupted data
         }
         $finalData = [];
         $pointsCounter = 0;
@@ -362,7 +371,8 @@ class EnrollmentController extends Controller
                 'user_id_fk' => $userId,
                 'fypolicy_id_fk' => $fypmap,
                 'points_used' => $points,
-                'encoded_summary' => $summary[$fypmap],
+                //'encoded_summary' => $summary[$fypmap],
+                'encoded_summary' => $this->_generateEncodedSummary($catId,$policyDetail[$fypmap]),
                 'created_by' => $userId,
                 'modified_by' => $userId
             ];
@@ -476,12 +486,15 @@ class EnrollmentController extends Controller
             date_create($fyEndDate))->days) * 100, '2', '.', '');
         $dataArr['prorf'] = $prorationfactor;
             $pts = 0;
-            if (!is_null($polDet['price_tag']) && $polDet['price_tag'] > 0) {
-                $pts = ($polDet['sum_insured']) * $polDet['price_tag'] * ($prorationfactor/100);
-            } else if (!is_null($polDet['points'])){
-                $pts = $polDet['points'] * ($prorationfactor/100);
+            if ($polDet['is_point_value_based']) {
+                $pts = $polDet['points'];
+            } else {
+                if (!is_null($polDet['price_tag']) && $polDet['price_tag'] > 0) {
+                    $pts = ($polDet['sum_insured']) * $polDet['price_tag'] * ($prorationfactor/100);
+                } else if (!is_null($polDet['points'])){
+                    $pts = $polDet['points'] * ($prorationfactor/100);
+                }
             }
-                ;
         $dataArr['opplpt'] = !$polDet['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;
         $dataArr['effecp'] = !$polDet['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;
         $dataArr['totpt'] = !$polDet['is_base_plan'] ? $formatter->formatCurrency(round($pts), 'INR') : 0;

@@ -25,6 +25,6 @@ class MapUserFYPolicy extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, 'id', 'user_id_fk')->with('dependents');
+        return $this->hasOne(User::class, 'id', 'user_id_fk')->with('dependent');
     }
 }

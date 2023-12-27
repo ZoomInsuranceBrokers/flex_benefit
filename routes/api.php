@@ -108,8 +108,6 @@ Route::get('/user/create/', function(Request $request){
     ]);
 });
 
-Route::get('/enrollment/getSubmissionData', function(Request $request){
-
-});
+Route::get('/enrollment/getSubmissionData', [ApiController::class, 'getUserEnrollmentData']);
 
 

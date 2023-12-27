@@ -52,7 +52,7 @@ class User extends Authenticatable
 
     public function dependent()
     {
-        return $this->hasMany(Dependent::class, 'id', 'user_id_fk');
+        return $this->hasMany(Dependent::class, 'user_id_fk', 'id');
     }
 
 }

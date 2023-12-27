@@ -508,7 +508,7 @@ function saveEnrollment(catId){
                         'savePoints':btoa(unescape(encodeURIComponent(JSON.stringify(savePoints)))),
                         'catId': catId,
                         //'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(summary)))),
-                        'dependents': 1
+                        'dependents': 'N.A.'
                     },
                     success:function(response) {
                         if (response.status) {
@@ -574,8 +574,8 @@ function saveEnrollment(catId){
                             'catId': catId,
                             'policyId' : policyID,
                             'points': points,
-                            'sd': depSelected.join('###'),
-                            'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(polData))))
+                            'sd': depSelected.join('###'),  // selected dependents
+                            //'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(polData))))
                         },
                         success:function(response) {
                             if (response.status) {
