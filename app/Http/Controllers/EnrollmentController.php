@@ -58,10 +58,10 @@ class EnrollmentController extends Controller
         // echo "Decrypted Data: " . $decryptedData . PHP_EOL;
         // exit;
         // get enrollment window and if it is open then only extract further data from db
-        $accountData = Account::all()->toArray();
-        $todayDate       = new DateTime(); // Today
-        $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
-        $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
+        // $accountData = Account::all()->toArray();
+        // $todayDate       = new DateTime(); // Today
+        // $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
+        // $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
 
         // financial year start and end date
         $fyData = FinancialYear::where('is_active',true)->select('start_date', 'end_date')->get()->toArray();
@@ -76,7 +76,7 @@ class EnrollmentController extends Controller
         }
         session(['is_submitted' => $is_submitted]);
 
-        if ($todayDate >= $enrollmentDateBegin && $todayDate < $enrollmentDateEnd) {
+        if (session('is_enrollment_window')) {
             // is in between
             // category data
             $category = InsuranceCategory::where('is_active', true)->orderBy('sequence')->get();
@@ -149,7 +149,7 @@ class EnrollmentController extends Controller
                 'is_enrollment_window' => true
             ];
         } else {
-            $viewArray = ['is_enrollment_window' => false];
+            $viewArray = ['is_enrollment_window' => session('is_enrollment_window')];
         }
         return view('enrollment')->with('data', $viewArray);
     }

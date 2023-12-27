@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use App\Models\User;
+use App\Models\Account;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Mail\PasswordResetMail;
+use App\Models\MapUserFYPolicy;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use App\Mail\PasswordResetMail;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Hash;
-use App\Models\MapUserFYPolicy;
+use Illuminate\Validation\Rules\Password;
 
 
 
@@ -60,6 +62,14 @@ class UserController extends Controller
     {
         //echo bcrypt('1234567890');
         //dd(Crypt::decryptString('$2y$10$2OhRE\/zTnRX3OJIfUcBrAuySK375QJf0F2WarzkB3bRor7TYWRdj2'));
+        $accountData = Account::all()->toArray();
+        $todayDate       = new DateTime(); // Today
+        $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
+        $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
+        session(['is_enrollment_window' => false]);
+        if ($todayDate >= $enrollmentDateBegin && $todayDate < $enrollmentDateEnd) {
+            session(['is_enrollment_window' => true]);
+        }
 
         if (Auth::check()) {
             return view('home')->with('user', Auth::user());

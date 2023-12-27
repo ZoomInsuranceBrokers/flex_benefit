@@ -36,8 +36,11 @@
                     </ul>
                 </li>
                 &nbsp;
+                @if(!session('is_enrollment_window'))
                 <li class="nav-item scroll-to-section bg-light">
-                    <a id="header_dependentsLE" href="/dependents/life-events">Life Events</a></li>
+                    <a id="header_dependentsLE" href="/dependents/life-events">Life Events</a>
+                </li>
+                @endif
                 &nbsp;
                 {{-- <li class="nav-item scroll-to-section bg-light">
                     <a id="header_hradmin" href="#hradmin">HR Admin</a></li>
