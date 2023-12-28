@@ -5,7 +5,7 @@
           <nav class="main-nav">
             <!-- ***** Logo Start ***** -->
             <a href="/" class="logo">
-              <img src="{{ asset('assets/images/zoom-logo.svg') }}" alt="Chain App Dev">
+              <img src="{{ asset('assets/images/flex-logo.png') }}" alt="Chain App Dev" style="width: 280px;">
             </a>
             <!-- ***** Logo End ***** -->
             <!-- ***** Menu Start ***** -->            
