@@ -274,12 +274,11 @@ class UserController extends Controller
     {
         if (Auth::check()) {
 
-            $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)
-                ->where('is_active', true)
+            $mapUserFYPolicyData = MapUserFYPolicy::where('is_active', true)
                 ->with(['fyPolicy'])
                 ->get()->toArray();
 
-           
+            dd($mapUserFYPolicyData);
             return view('view-summary',['mapUserFYPolicyData' => $mapUserFYPolicyData ]);
         } else {
             return view('auth.forgot-password');
