@@ -298,6 +298,7 @@ class EnrollmentController extends Controller
         $userData = [
             'points_available' => $user[0]['points_available'] + $savedPoints - $points,
             'points_used' => $user[0]['points_used'] - $savedPoints + $points,
+            'updated_at' => 'NOW()'
         ];
 
         $status = true;
@@ -374,7 +375,9 @@ class EnrollmentController extends Controller
                 //'encoded_summary' => $summary[$fypmap],
                 'encoded_summary' => $this->_generateEncodedSummary($catId,$policyDetail[$fypmap]),
                 'created_by' => $userId,
-                'modified_by' => $userId
+                'modified_by' => $userId,
+                'created_at' => 'NOW()',
+                'updated_at' => 'NOW()'
             ];
             $pointsCounter += $points;
         }
@@ -389,6 +392,7 @@ class EnrollmentController extends Controller
             $userData = [
                 'points_available' => $user[0]['points_available'] - $pointsCounter  + $totalPointsSaved,
                 'points_used' => $user[0]['points_used'] + $pointsCounter  - $totalPointsSaved,
+                'updated_at' => 'NOW()'
             ];
             User::where('id', Auth::user()->id)->update($userData);
 
@@ -543,8 +547,8 @@ class EnrollmentController extends Controller
     {
         if ($request->session()->has('is_submitted') && !session('is_submitted')) {
             MapUserFYPolicy::where('user_id_fk', Auth::user()->id)
-                ->where('is_active', config('constant.$_YES'))
-                ->update(['is_submitted' => config('constant.$_YES'), 'modified_by' => Auth::user()->id]);
+                ->where('is_active', true)
+                ->update(['is_submitted' => true, 'modified_by' => Auth::user()->id,'updated_at' => 'NOW()']);
             $email =  Auth::user()->email;
             $user = DB::table('users')->where('email', $email)->first();
             $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)
@@ -565,12 +569,12 @@ class EnrollmentController extends Controller
             ->leftJoin('insurance_policy as ip', 'ip.id', '=', 'mfyp.ins_policy_id_fk')
             ->where('mufyp.user_id_fk', '=', Auth::user()->id)
             ->where('ip.ins_subcategory_id_fk', '=', $request->catId)
-            ->where('mufyp.is_active', '=', config('constant.$_YES'))
-            ->where('mfyp.is_active', '=', config('constant.$_YES'))
-            ->where('fy.is_active', '=', config('constant.$_YES'))
-            ->where('ip.is_active', '=', config('constant.$_YES'))
-            ->where('ip.is_base_plan', '', config('constant.$_YES'))
-            ->where('ip.is_default_selection', '<>', config('constant.$_YES'))
+            ->where('mufyp.is_active', '=', true)
+            ->where('mfyp.is_active', '=', true)
+            ->where('fy.is_active', '=', true)
+            ->where('ip.is_active', '=', true)
+            //->where('ip.is_base_plan', '<>', true)
+            ->where('ip.is_default_selection', '<>', true)
             ->select('mufyp.id as mufypId', 'mfyp.id as mfypId', 'mufyp.points_used', 'ip.id as ip_id')
             ->get()->toArray();
             //->toSql();
@@ -585,10 +589,11 @@ class EnrollmentController extends Controller
             }
         }
 
-        // make entries in_active in mapUserFYPolciyTable
+        // make entries in_active in mapUserFYPolicyTable
         MapUserFYPolicy::whereIn('id',$ids)->update([
             'is_active' => false,
-            'modified_by' => Auth::user()->id
+            'modified_by' => Auth::user()->id,
+            'updated_at' => 'NOW()'
         ]);
 
         // update user points
@@ -596,9 +601,11 @@ class EnrollmentController extends Controller
         $userData = [
             'points_available' => $user[0]['points_available'] + $pointsCounter,
             'points_used' => $user[0]['points_used'] - $pointsCounter,
+            'updated_at' => 'NOW()'
         ];
         User::where('id', Auth::user()->id)->update($userData);
 
+        // non-base is_default_selection re-entry 
         $insurancePolicyDefault = InsurancePolicy::where('is_active', true)
             ->with(['mapFyPolicies'])
             ->where('ins_subcategory_id_fk', $request->catId)
@@ -612,7 +619,7 @@ class EnrollmentController extends Controller
                 if ($polDefRow['is_default_selection']) {
                     foreach($polDefRow['map_fy_policies'] as $polfyPol) {
                         if ($polfyPol['is_active']) {
-                            $fyPolId = $polfyPol['id'];
+                            $fyPolId = $polfyPol['id']; // Map_FY_Policy ID for entry in MapUserFYPol table
                             break;
                         }
                     }
@@ -622,6 +629,9 @@ class EnrollmentController extends Controller
                 'user_id_fk' => Auth::user()->id,
                 'fypolicy_id_fk' => $fyPolId,
                 'created_by' => Auth::user()->id,
+                'modified_by' => Auth::user()->id,
+                'created_at' => 'NOW()',
+                'updated_at' => 'NOW()'
             ];
             //dd([$pointsCounter, $ids,$userData, $mapUserFYPolicyData]);
             MapUserFYPolicy::insert($mapUserFYPolicyData);

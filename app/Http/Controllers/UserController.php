@@ -184,7 +184,10 @@ class UserController extends Controller
 
         $token = Str::random(60);
 
-        DB::table('users')->where('email', $email)->update(['remember_token' => $token]);
+        DB::table('users')->where('email', $email)->update([
+            'remember_token' => $token,
+            'updated_at' => 'NOW()'
+        ]);
 
         Mail::to($email)->send(new PasswordResetMail($token, $user));
 
@@ -225,7 +228,9 @@ class UserController extends Controller
 
         DB::table('users')
             ->where('remember_token', $token)
-            ->update(['password' => Hash::make($password), 'remember_token' => null]);
+            ->update(['password' => Hash::make($password),
+            'remember_token' => null,
+            'updated_at' => 'NOW()']);
 
         $user_data = array(
             'email' => $user->email,
@@ -265,6 +270,7 @@ class UserController extends Controller
 
         $user->update([
             'password' => Hash::make($request->input('password')),
+            'updated_at' => 'NOW()'
         ]);
 
         return redirect()->route('previous.form.route')->with('status', 'Password updated successfully.');

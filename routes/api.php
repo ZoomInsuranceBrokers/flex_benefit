@@ -73,6 +73,8 @@ Route::get('/user/defaultpolicymapping/', function(Request $request){
                     'points_used' => 0,
                     'created_by' => 0,
                     'modified_by' => 0,
+                    'created_at' => 'NOW()',
+                    'updated_at' => 'NOW()'
                 ];
             }
         }
