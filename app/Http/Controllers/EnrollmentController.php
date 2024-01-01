@@ -76,7 +76,7 @@ class EnrollmentController extends Controller
         }
         session(['is_submitted' => $is_submitted]);
 
-        if (session('is_enrollment_window')) {
+        //if (session('is_enrollment_window')) {
             // is in between
             // category data
             $category = InsuranceCategory::where('is_active', true)->orderBy('sequence')->get();
@@ -146,11 +146,13 @@ class EnrollmentController extends Controller
                 'basePlan' => $basePlan,
                 'gradeAmtData' => $gradeData,
                 'dependent' => $dependents->toArray(),
-                'is_enrollment_window' => true
+                'is_enrollment_window' => session('is_enrollment_window')
             ];
-        } else {
-            $viewArray = ['is_enrollment_window' => session('is_enrollment_window')];
-        }
+        //} else {
+        //    $viewArray = ['is_enrollment_window' => session('is_enrollment_window')];
+        //}
+
+        
         return view('enrollment')->with('data', $viewArray);
     }
 
@@ -589,13 +591,6 @@ class EnrollmentController extends Controller
             }
         }
 
-        // make entries in_active in mapUserFYPolicyTable
-        MapUserFYPolicy::whereIn('id',$ids)->update([
-            'is_active' => false,
-            'modified_by' => Auth::user()->id,
-            'updated_at' => 'NOW()'
-        ]);
-
         // update user points
         $user = User::where('id', Auth::user()->id)->get()->toArray();
         $userData = [
@@ -633,8 +628,16 @@ class EnrollmentController extends Controller
                 'created_at' => 'NOW()',
                 'updated_at' => 'NOW()'
             ];
-            //dd([$pointsCounter, $ids,$userData, $mapUserFYPolicyData]);
             MapUserFYPolicy::insert($mapUserFYPolicyData);
+            
+            // make entries in_active in mapUserFYPolicyTable
+            // MapUserFYPolicy::whereIn('id',$ids)->update([
+            //     'is_active' => false,
+            //     'modified_by' => Auth::user()->id,
+            //     'updated_at' => 'NOW()'
+            // ]);
+            MapUserFYPolicy::whereIn('id', $ids)->delete();// deleting existing record on every reset as soft deleting existing ones may cause corrupted data
+
             $response = ['status' => true, 'msg' => 'Reset Done. Default entries added!!!'];
         } else {
             $response = ['status' => true, 'msg' => 'Reset Done. No default entries present!!!'];

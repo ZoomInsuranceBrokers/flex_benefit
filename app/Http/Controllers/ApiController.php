@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Account;
+use DateTime;
 use Exception;
 use App\Models\User;
+use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Models\MapUserFYPolicy;
 use Illuminate\Support\Facades\Http;
@@ -200,5 +201,79 @@ class ApiController extends Controller
         } else {
             return json_encode(['status'=> false, 'Message'=> 'Invalid Request']);
         }
+    }
+
+    public function autoSubmitEnrollment(Request $request) {
+        $todayDate = new DateTime(); // Today
+        $dates = Account::select(['enrollment_end_date'])->get()->toArray();
+        if ($todayDate > $dates[0]['enrollment_end_date']) {
+            $nonSubmittedEnrollmentEntries = MapUserFYPolicy::where('is_active',true)
+            ->where('is_submitted', false)
+            ->select(['id as MapId', 'user_id_fk'])
+            ->with(['user:id,fname,lname,employee_id,email']);
+            
+            // emp only submission
+            $request->has('eid') && $request['eid'] > 0 ? 
+                $nonSubmittedEnrollmentEntries->where('user_id_fk', $request['eid']) : '';
+
+            $nonSubmittedEnrollmentEntries = $nonSubmittedEnrollmentEntries->get()->toArray();
+            //dd($nonSubmittedEnrollmentEntries);
+            $ids = $userData =  [];       // ids which will be auto submitted in map_user_fypolicy table
+            $userDataCount = 0;
+            if ($nonSubmittedEnrollmentEntries) {
+                foreach ($nonSubmittedEnrollmentEntries as $enrolRow) {
+                    $ids[] = $enrolRow['MapId'];
+                    if (!array_key_exists($enrolRow['user_id_fk'], $userData)) {
+                        $userDataCount++;
+                        if ($request->has('output') && $request['output'] == 'html') {
+                            $userData[$enrolRow['user_id_fk']] = '<tr>
+                            <td>' . $userDataCount . '</td>
+                            <td>' . $enrolRow['user']['employee_id'] . '</td>
+                            <td>' . $enrolRow['user']['fname']  . ' '. $enrolRow['user']['lname'] . '</td>
+                            <td>' . $enrolRow['user']['email'] . '</td>
+                            </tr>';
+                        } else {
+                            $userData[$enrolRow['user_id_fk']] =  implode('###', [
+                                $userDataCount,$enrolRow['user']['employee_id'],
+                                $enrolRow['user']['fname'] . ' ' . $enrolRow['user']['lname'],
+                                $enrolRow['user']['email']
+                            ]);
+                        }
+                    }
+                }
+                if (count($ids)) {
+                    $updateData = [
+                        'is_submitted' => true,
+                        'modified_by' => 'ADMIN', 
+                        'updated_at' => 'NOW()'
+                    ];
+                    $request->has('confirmUpdate') && $request['confirmUpdate'] == 1 ? 
+                    MapUserFYPolicy::whereIn('id',$ids)->update($updateData) : '';
+                }
+                if($request->has('output') && $request['output'] == 'html') {
+                    echo '<style>table th,tr,td {
+                        border:1px solid #222;
+                        padding:0 10px;
+                    }</style><table style="border:1px solid #000;">
+                        <thead>
+                            <th>S. No.</th>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </thead>
+                        <tbody>
+                        ' . implode('', $userData) . '
+                        </tbody>
+                    </table>';
+                } else {
+                    return json_encode(['status' => true, 'message' => json_encode($userData)]);
+                }
+            } else {
+                return json_encode(['message' => 'No entries present for auto submission!!']);
+            }
+        } else {
+            return json_encode(['message' => 'Auto Submission not possible before enrollment window end date']);
+        }
+        
     }
 }

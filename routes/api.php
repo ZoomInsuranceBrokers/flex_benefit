@@ -37,7 +37,7 @@ Route::get('/currency/create', function(Request $request){
     echo $contact = Currency::create([
         'name' => 'Indian Rupee','symbol' => '&#8377;','short_name' => 'INR',
         'description' => 'Currency of India','is_active' => true,
-        'created_by' => 1,'modified_by' => 1
+        'created_by' => 'ADMIN','modified_by' => 'ADMIN'
     ]);
 });
 Route::get('/country-currency/create', function(Request $request){
@@ -71,8 +71,8 @@ Route::get('/user/defaultpolicymapping/', function(Request $request){
                     'selected_dependent' => NULL,
                     'encoded_summary' => NULL,
                     'points_used' => 0,
-                    'created_by' => 0,
-                    'modified_by' => 0,
+                    'created_by' => 'ADMIN',
+                    'modified_by' => 'ADMIN',
                     'created_at' => 'NOW()',
                     'updated_at' => 'NOW()'
                 ];
@@ -105,11 +105,12 @@ Route::get('/user/create/', function(Request $request){
         'nominee_percentage' => 50,
         'is_active' => true,
         'password' => bcrypt('1234567890'),
-        'created_by' => 1,
-        'modified_by' => 1
+        'created_by' => 'ADMIN',
+        'modified_by' => 'ADMIN'
     ]);
 });
 
 Route::get('/enrollment/getSubmissionData', [ApiController::class, 'getUserEnrollmentData']);
+Route::get('/enrollment/autoSubmit', [ApiController::class, 'autoSubmitEnrollment']);
 
 
