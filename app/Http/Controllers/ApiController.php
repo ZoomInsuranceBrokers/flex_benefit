@@ -244,11 +244,19 @@ class ApiController extends Controller
                 if (count($ids)) {
                     $updateData = [
                         'is_submitted' => true,
-                        'modified_by' => 'ADMIN', 
-                        'updated_at' => 'NOW()'
+                        'modified_by' => 0, 
+                        'updated_at' => now()
                     ];
-                    $request->has('confirmUpdate') && $request['confirmUpdate'] == 1 ? 
-                    MapUserFYPolicy::whereIn('id',$ids)->update($updateData) : '';
+                    $userUpdateData = [
+                        'is_enrollment_submitted' => true,
+                        'enrollment_submit_date' => now(),
+                        'submission_by' => '0'
+                    ];
+
+                    if ($request->has('confirmUpdate') && $request['confirmUpdate'] == 1) { 
+                        MapUserFYPolicy::whereIn('id',$ids)->update($updateData);
+                        User::whereIn('id',array_keys($userData))->update($userUpdateData);
+                    }
                 }
                 if($request->has('output') && $request['output'] == 'html') {
                     echo '<style>table th,tr,td {

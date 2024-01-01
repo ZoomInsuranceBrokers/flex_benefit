@@ -300,7 +300,7 @@ class EnrollmentController extends Controller
         $userData = [
             'points_available' => $user[0]['points_available'] + $savedPoints - $points,
             'points_used' => $user[0]['points_used'] - $savedPoints + $points,
-            'updated_at' => 'NOW()'
+            'updated_at' => now()
         ];
 
         $status = true;
@@ -378,8 +378,8 @@ class EnrollmentController extends Controller
                 'encoded_summary' => $this->_generateEncodedSummary($catId,$policyDetail[$fypmap]),
                 'created_by' => $userId,
                 'modified_by' => $userId,
-                'created_at' => 'NOW()',
-                'updated_at' => 'NOW()'
+                'created_at' => now(),
+                'updated_at' => now()
             ];
             $pointsCounter += $points;
         }
@@ -394,7 +394,7 @@ class EnrollmentController extends Controller
             $userData = [
                 'points_available' => $user[0]['points_available'] - $pointsCounter  + $totalPointsSaved,
                 'points_used' => $user[0]['points_used'] + $pointsCounter  - $totalPointsSaved,
-                'updated_at' => 'NOW()'
+                'updated_at' => now()
             ];
             User::where('id', Auth::user()->id)->update($userData);
 
@@ -550,7 +550,16 @@ class EnrollmentController extends Controller
         if ($request->session()->has('is_submitted') && !session('is_submitted')) {
             MapUserFYPolicy::where('user_id_fk', Auth::user()->id)
                 ->where('is_active', true)
-                ->update(['is_submitted' => true, 'modified_by' => Auth::user()->id,'updated_at' => 'NOW()']);
+                ->update(['is_submitted' => true, 'modified_by' => Auth::user()->id,'updated_at' => now()]);
+            
+            // update user submission columns
+            $userUpdateData = [
+                'is_enrollment_submitted' => true,
+                'enrollment_submit_date' => now(),
+                'submission_by' => Auth::user()->id
+            ];
+            User::whereIn('id',Auth::user()->id)->update($userUpdateData);
+            
             $email =  Auth::user()->email;
             $user = DB::table('users')->where('email', $email)->first();
             $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)
@@ -596,7 +605,7 @@ class EnrollmentController extends Controller
         $userData = [
             'points_available' => $user[0]['points_available'] + $pointsCounter,
             'points_used' => $user[0]['points_used'] - $pointsCounter,
-            'updated_at' => 'NOW()'
+            'updated_at' => now()
         ];
         User::where('id', Auth::user()->id)->update($userData);
 
@@ -625,8 +634,8 @@ class EnrollmentController extends Controller
                 'fypolicy_id_fk' => $fyPolId,
                 'created_by' => Auth::user()->id,
                 'modified_by' => Auth::user()->id,
-                'created_at' => 'NOW()',
-                'updated_at' => 'NOW()'
+                'created_at' => now(),
+                'updated_at' => now()
             ];
             MapUserFYPolicy::insert($mapUserFYPolicyData);
             
@@ -634,7 +643,7 @@ class EnrollmentController extends Controller
             // MapUserFYPolicy::whereIn('id',$ids)->update([
             //     'is_active' => false,
             //     'modified_by' => Auth::user()->id,
-            //     'updated_at' => 'NOW()'
+            //     'updated_at' => now()
             // ]);
             MapUserFYPolicy::whereIn('id', $ids)->delete();// deleting existing record on every reset as soft deleting existing ones may cause corrupted data
 
