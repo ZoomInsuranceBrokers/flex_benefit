@@ -31,7 +31,7 @@
                         <a href="/claim/track">Track Claim</a>
                       </li>
                       <li>
-                        <a href="/claim/loadHospital/phs">Network Hospital</a>
+                        <a href="/claim/loadHospital">Network Hospital</a>
                       </li>
                     </ul>
                 </li>

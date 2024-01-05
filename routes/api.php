@@ -30,32 +30,62 @@ use App\Http\Controllers\ApiController;
 // Route::post('/dependents/delete', 'delete');
 
 
-Route::post('/users', [ApiController::class, 'getAllUsers']);
+Route::post('/users', function (Request $request) {
+    // $api_key = trim($request->api_key);
+    // $secret_key = 'x409z636R3vFRPttwT26jkdwbdewidJN1bncwi2gpT';
+    // if (empty($api_key)) {
+    //     $response = [
+    //         'status' => 'not found',
+    //         'response' => 'Api Key not found',
+    //     ];
+
+    //     return response()->json($response);
+    // }
+
+    // if ($api_key != $secret_key) {
+    //     $response = [
+    //         'status' => 'invalid',
+    //         'response' => 'Api Key is invalid',
+    //     ];
+
+    //     return response()->json($response);
+    // }
+
+    $users = User::all();
+
+    $response = [
+        'status' => 'ok',
+        'response' => 'ok',
+        'data' => $users,
+    ];
+
+    return response()->json($response);
+});
 Route::post('/salesforce-data', [ApiController::class, 'getSalesforceData']);
 
-Route::get('/currency/create', function(Request $request){
+Route::get('/currency/create', function (Request $request) {
     echo $contact = Currency::create([
-        'name' => 'Indian Rupee','symbol' => '&#8377;','short_name' => 'INR',
-        'description' => 'Currency of India','is_active' => true,
-        'created_by' => '0','modified_by' => '0'
+        'name' => 'Indian Rupee', 'symbol' => '&#8377;', 'short_name' => 'INR',
+        'description' => 'Currency of India', 'is_active' => true,
+        'created_by' => '0', 'modified_by' => '0'
     ]);
 });
-Route::get('/country-currency/create', function(Request $request){
+Route::get('/country-currency/create', function (Request $request) {
     echo $contact = CountryCurrency::create([
-        'name' => 'India','short_name' => 'IND','currency_id_fk' => 1,'is_active' => true
+        'name' => 'India', 'short_name' => 'IND', 'currency_id_fk' => 1, 'is_active' => true
     ]);
 });
 
-Route::get('/test-hardeep', function(Request $request){
+Route::get('/test-hardeep', function (Request $request) {
     echo json_encode(['textMsg' => 'Hello Hardeep']);
 });
-Route::get('/user/defaultpolicymapping/', function(Request $request){
-    if(!MapUserFYPolicy::all()->count()){
-        $users = User::where('is_active',1)->get()->toArray();
+Route::get('/user/defaultpolicymapping/', function (Request $request) {
+    if (!MapUserFYPolicy::all()->count()) {
+        $users = User::where('is_active', 1)->get()->toArray();
         $mapFYpolicyData = DB::table('map_financial_year_policy as mfyp')
             ->select('mfyp.id')
-            ->leftJoin('financial_years as fy' ,'fy.id', '=', 'mfyp.fy_id_fk')
-            ->leftJoin('insurance_policy as ip' ,'ip.id', '=', 'mfyp.ins_policy_id_fk')
+            ->leftJoin('financial_years as fy', 'fy.id', '=', 'mfyp.fy_id_fk')
+            ->leftJoin('insurance_policy as ip', 'ip.id', '=', 'mfyp.ins_policy_id_fk')
             ->where('mfyp.is_active', '=', true)
             ->where('fy.is_active', '=', true)
             ->where('ip.is_active', '=', true)
@@ -63,8 +93,8 @@ Route::get('/user/defaultpolicymapping/', function(Request $request){
             ->orWhere('ip.is_default_selection', true)
             ->get()->toArray();
 
-        foreach($users as $user) {
-            foreach($mapFYpolicyData as $mfypRow) {
+        foreach ($users as $user) {
+            foreach ($mapFYpolicyData as $mfypRow) {
                 $data[] = [
                     'user_id_fk' => $user['id'],
                     'fypolicy_id_fk' => $mfypRow->id,
@@ -83,9 +113,8 @@ Route::get('/user/defaultpolicymapping/', function(Request $request){
     } else {
         echo 'Map User FY Policy table already has data';
     }
-
 });
-Route::get('/user/create/', function(Request $request){
+Route::get('/user/create/', function (Request $request) {
     echo $contact = User::create([
         'sfdc_id' => '2334efe3dad3rzszz',
         'fname' => 'Aakash',
@@ -112,5 +141,3 @@ Route::get('/user/create/', function(Request $request){
 
 Route::get('/enrollment/getSubmissionData', [ApiController::class, 'getUserEnrollmentData']);
 Route::get('/enrollment/autoSubmit', [ApiController::class, 'autoSubmitEnrollment']);
-
-

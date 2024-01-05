@@ -73,7 +73,8 @@
 
 
                             <input name="claim_type" type="hidden" value="CASHLESS">
-                            <input type="hidden" name="policy_no" value="H1263493">
+                            <input type="hidden" name="policy_no" value="{{$policy_details->policy_number}}">
+                            <input type="hidden" name="tpa_id" value="{{$policy_details->tpa_id}}">
 
                             <div class="row mb-3">
                                 <div class="col-md-6">

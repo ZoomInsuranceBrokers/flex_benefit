@@ -83,8 +83,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Route::post('/claim/create', [DependentController::class, 'create']);
     // Route::post('/claim/update', [DependentController::class, 'update']);
-    Route::any('/claim/loadHospital/{tpa}', [ClaimController::class, 'loadNetworkHospital']);
-    Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
+ 
     Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
     Route::post('/claim/initiate', [ClaimController::class, 'saveClaimIntimation']);
 

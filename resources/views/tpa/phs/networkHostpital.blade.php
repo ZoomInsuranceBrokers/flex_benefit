@@ -6,74 +6,78 @@
     <style>.ui-dialog{z-index:2 !important;}</style>
 @stop
 @section('document_ready')
-        $('[id^=header_]').removeClass('active');
-        $('#header_claim').addClass('active');
+    $('[id^=header_]').removeClass('active');
+    $('#header_claim').addClass('active');
 
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-            }
-        });
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+        }
+    });
 
-        $('#networkHos_list').jtable({
-            title: 'Network Hospitals',
-            toolbar:{
-                show:false
+    $('#networkHos_list').jtable({
+        title: 'Network Hospitals',
+        toolbar: {
+            show: false
+        },
+        paging: true,
+        sorting: true,
+        dialogShowEffect: 'scale',
+        actions: {
+            listAction: '/claim/searchHospital/',
+        },
+        fields: {
+            HOSPITAL_NAME: {
+                title: 'HOSPITAL NAME',
+                width: '200px',
+                create: false,
+                edit: false
             },
-            paging: true,
-            sorting: true,
-            {{-- defaultSorting: 'Name ASC', --}}
-            dialogShowEffect:'scale',
-            actions: {
-                listAction: '/claim/searchHospital/',
+            ADDRESS1: {
+                title: 'ADDRESS',
+                width: 'auto'
             },
-            fields: {
-                HOSPITAL_NAME: {
-                    title: 'HOSPITAL NAME',
-                    width: '200px',
-                    create: false,
-                    edit: false
-                },
-                ADDRESS1: {
-                    title: 'ADDRESS',
-                    width: 'auto'
-                },
-                CITY_NAME: {
-                    title: 'CITY',
-                    width: '100px',
-                },
-                STATE_NAME: {
-                    title: 'State',
-                    width: '70px',
-                },
-                PIN_CODE: {
-                    title: 'Pincode',
-                    width: '70px',
-                },
-                PHONE_NO: {
-                    title: 'Contact',
-                    width: '150px'
-                },
-                location: {
-                    title: 'Location',
-                    width: '70px',
-                }
+            CITY_NAME: {
+                title: 'CITY',
+                width: '100px',
+            },
+            STATE_NAME: {
+                title: 'State',
+                width: '70px',
+            },
+            PIN_CODE: {
+                title: 'Pincode',
+                width: '70px',
+            },
+            PHONE_NO: {
+                title: 'Contact',
+                width: '150px'
+            },
+            location: {
+                title: 'Location',
+                width: '70px',
             }
-        });
-            
-        //Re-load records when user click 'load records' button.
-        $('#LoadRecordsButton').click(function (e) {
-            e.preventDefault();
-            $('#networkHos_list').jtable('load', {
-                pincode: $('#pincode').val(),
-                tpa: $('#tpa').val(),
-            });
-        });
+        }
+    });
 
-        //Load all records when page is first shown
-        $('#LoadRecordsButton').click();
-    
+    // Re-load records when the user clicks 'Load records' button.
+    $('#LoadRecordsButton').click(function (e) {
+        e.preventDefault();
+        
+        // Move the relevant code here
+        $('#networkHos_list').jtable('load', {
+            pincode: $('#pincode').val(),
+            tpa: $('#tpa').val(),
+            policy_no: $('#policy_no').val(),
+        });
+    });
+
+    // Load all records when the page is first shown
+    // (This line might not be necessary if you want to load records only when the button is clicked)
+    // $('#LoadRecordsButton').click();
+
 @endsection
+
 
 @section('content')
     <div id="networkHospitals" class="pricing-tables">
@@ -134,7 +138,8 @@
                                             <form>
                                            
                                             <div class="col-3 pt-2 mb-3">pincode: <input type="number" name="pincode" id="pincode" /></div>
-                                             <input type="hidden" value="phs" name="tpa" id="tpa" />
+                                             <input type="hidden" value="62" name="tpa_id" id="tpa" />
+                                             <input type="hidden" name="policy_no" value="{{$policy_details->policy_number}}" id="policy_no">
 
                                             <div class="col-2">
                                                 <button type="submit"id="LoadRecordsButton" class="btn btn-secondary">Load records</button>
