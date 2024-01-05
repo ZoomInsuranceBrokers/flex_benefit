@@ -209,11 +209,8 @@ function openTabs(el) {
 }
 
 function countNumber(trgItem, countToNumber) {
-
     $('#' + trgItem).each(function() {
-
     var countTo = Number(countToNumber);
-
     $(this).prop('Counter', 0).animate({
         Counter: countTo - 1
     }, {
@@ -221,9 +218,16 @@ function countNumber(trgItem, countToNumber) {
         easing: 'swing',
         step: function(now) {
             var ceil = Math.floor(Math.random() * Math.floor(now))
-            if (ceil < countTo) {
-                $(this).text(ceil);
+            if(countTo > 0) {
+                if (ceil < countTo) {
+                    $(this).text(ceil);
+                }
             }
+            if(countTo < 0) {
+                if (ceil > countTo) {
+                    $(this).text(ceil);
+                }
+            }            
         },
         complete: function() {
             $(this).text(countTo);
@@ -387,10 +391,6 @@ function planBindEvents() {
                 $('#parentSubLimit' + subCatId).show();
                 $('#prntSbLim' + subCatId).html(parent_sublimit_amount);
             }
-
-            //countNumber('currentPlanValue', currPlanValue);        
-            //countNumber('allPlanValue', allPlanValue);
-            //countNumber('remainingPlanValue', balancePlanValue);
         }
 
         // toggle disable of point based policy
@@ -522,6 +522,7 @@ function saveEnrollment(catId){
                         }
                         $('#launchEnrollmentModal .modal-body>p').html(response.message);                        
                         $("#enrollmentModal_trigger").click();
+                        //updatePoints();
                     }
                 });
             }
@@ -589,6 +590,7 @@ function saveEnrollment(catId){
                             }
                             $('#launchEnrollmentModal .modal-body>p').html(response.message);                        
                             $("#enrollmentModal_trigger").click();
+                            //updatePoints();
                         }
                     });
                 } else {
@@ -609,10 +611,37 @@ function resetSelection(catId, buttonObj){
             'catId': catId,
         },
         success:function(response) {
+            $(buttonObj).show();
             response = JSON.parse(response);
             if (response.status) {
-                location.reload();
+                updatePoints();
+                $('#resetSelectionModalClose' + catId).click();                
             }
+        }
+    });
+}
+
+function updatePoints() {
+    $.ajax({
+        url: "/enrollment/updatePoints",
+        type:"POST",
+        data:{
+            "_token": '{{ csrf_token() }}',
+        },
+        success:function(response) {
+            response = JSON.parse(response);
+            ctpts = response.catpts;
+            for (const [key, value] of Object.entries(ctpts)) {
+                let catPointCount = 0;
+                ctpts[key].forEach(function(element){
+                    catPointCount += element['points'];
+                });
+                countNumber('currSelectionDataVal' + key, catPointCount); 
+            }
+            countNumber('points-head-tot', response.userpts[0]['points_used'] + response.userpts[0]['points_available']); 
+            countNumber('points-head-used', response.userpts[0]['points_used']); 
+            countNumber('points-head-avail', response.userpts[0]['points_available']); 
+
         }
     });
 }

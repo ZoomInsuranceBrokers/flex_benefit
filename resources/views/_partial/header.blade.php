@@ -104,14 +104,14 @@
       <div class="row pt-1" style="height:40px;">
           <div id="points-header-l" class="col-2 offset-3">
             Total Points:
-            <label>{{ Auth::user()->points_used + Auth::user()->points_available }}</label>
+            <label id="points-head-tot">{{ Auth::user()->points_used + Auth::user()->points_available }}</label>
           </div>
           <div id="points-header-m" class="col-2">
             Consumed Points:
-            <label>{{ Auth::user()->points_used }}</label></div>
+            <label id="points-head-used">{{ Auth::user()->points_used }}</label></div>
           <div id="points-header-r" class="col-2">
             Available Points:
-            <label>{{ Auth::user()->points_available }}</label></div>
+            <label id="points-head-avail">{{ Auth::user()->points_available }}</label></div>
       </div>
   </div>
   @endif

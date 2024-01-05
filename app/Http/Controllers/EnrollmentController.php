@@ -653,4 +653,27 @@ class EnrollmentController extends Controller
         }
         return json_encode($response);
     }
+
+    public function getPoints(Request $request) {
+        // get logged in user saved/selected policies
+        $fypmapData = MapUserFYPolicy::where('is_active', true)
+        ->with(['fyPolicy'])
+        ->where('user_id_fk', '=', Auth::user()->id)
+        ->get()->toArray();
+
+        $currentSelectedData = $basePlan = [];
+        if (count($fypmapData)) {
+            foreach ($fypmapData as $fypRow) {
+                if (!$fypRow['fy_policy']['policy']['is_base_plan'] && !$fypRow['fy_policy']['policy']['is_default_selection']) {
+                    $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
+                        'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']
+                    ];
+                }
+            }
+        }
+
+        $userPoints = User::where('id',Auth::user()->id)->select(['points_used', 'points_available'])->get()->toArray();
+
+        return json_encode(['userpts' => $userPoints, 'catpts' => $currentSelectedData ]);
+    }
 }

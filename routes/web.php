@@ -1,12 +1,14 @@
 <?php
 
-use App\Http\Controllers\ClaimController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DependentController;
 use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +59,7 @@ Route::group(['middleware' => 'auth'], function () {
         return view('dependent',compact('result'));
     });
 
+    Route::post('/enrollment/updatePoints', [EnrollmentController::class, 'getPoints']);
     Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
     Route::post('/enrollment/savePV', [EnrollmentController::class, 'saveEnrollmentPV']);
     Route::post('/enrollment/finalSubmit', [EnrollmentController::class, 'submitEnrollment']);
@@ -71,19 +74,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('/claim/loadHospital', [ClaimController::class, 'loadNetworkHospital']);
     Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
 
-
-    //});
-
-    // Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
-    // Route::post('/enrollment/savePV', [EnrollmentController::class, 'saveEnrollmentPV']);
-    // Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
-    // Route::get('/enrollment/summaryDownload', [EnrollmentController::class, 'downloadSummary']);
-    // Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);
-    // Route::get('/enrollment', [EnrollmentController::class, 'home']);
-
-    // Route::post('/claim/create', [DependentController::class, 'create']);
-    // Route::post('/claim/update', [DependentController::class, 'update']);
- 
     Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
     Route::post('/claim/initiate', [ClaimController::class, 'saveClaimIntimation']);
 
