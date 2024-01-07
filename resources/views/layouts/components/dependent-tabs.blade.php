@@ -109,10 +109,21 @@ function checkNominationAllocation(field, rules, i, options){
                 }
             }
         });
-        return returnVal;
-        
+        return returnVal;   
+    }    
+}
+
+function validateGender(field, rules, i, options){
+    let selectedOption = parseInt($(field).val());
+    if(selectedOption < 0 || selectedOption > 3){
+        return options.allrules.validate2fields.alertText = 'Invalid gender selected';
     }
-    
+}
+function validateRelationType(field, rules, i, options){
+    let selectedOption = parseInt($(field).val());
+    if(selectedOption < 2 || selectedOption > 12){
+        return options.allrules.validate2fields.alertText = 'Invalid relationship selected';
+    }
 }
 </script>
 
@@ -204,8 +215,8 @@ function checkNominationAllocation(field, rules, i, options){
         formCreated: function (event, data) {
             data.form.find('input[name="nominee_percentage"]').addClass('validate[required,min[0],max[100],funcCall[checkNominationAllocation]]');
             data.form.find('input[name="dob"]').addClass('validate[required]');
-            {{-- data.form.find('input[name="gender"]').addClass('validate[required]');
-            data.form.find('input[name="relationship_type"]').addClass('validate[required]'); --}}
+            data.form.find('select[name="gender"]').addClass('validate[funcCall[validateGender]]');
+            data.form.find('select[name="relationship_type"]').addClass('validate[funcCall[validateRelationType]]');
             //data.form.find('input[name="dependent_name"]').addClass('validate[required]');
             data.form.validationEngine({promptPosition:"topLeft", focusFirstField : false, autoHidePrompt: true,  autoHideDelay: 4000});
         },
