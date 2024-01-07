@@ -18,7 +18,7 @@
                 <div class="section-heading">
                     <h4><em>Claim</em> Intimation in case of <em>emergencies</em></h4>
                     <img src="{{asset('assets/images/heading-line-dec.png') }}" alt="">
-                    {{-- <h5>Ensure nominations add upto <em>100%</em> across elected dependents</h5> --}}
+                    {{-- <h5>Ensure nominations add upto <em>100%</em> across elected dependants</h5> --}}
                 </div>
             </div>
         </div>
@@ -33,11 +33,11 @@
 
                                 <li><b>Spouse</b> - Legally married to the employee. Spouse may include live-in partners of the opposite sex as per the corporate policy of Zoom. Spouse to also include legal guardian of adopted kids</li>
 
-                                <li><b>Children</b> – 2 children upto 25 years of age, unmarried and must be dependent on employee for financial support, are eligible. Children definition also covers legally adopted.</li>
+                                <li><b>Children</b> – 2 children upto 25 years of age, unmarried and must be dependant on employee for financial support, are eligible. Children definition also covers legally adopted.</li>
 
-                                <li><b>Parents</b> - Dependent parents or parents-in law. Cross selection of 1parent and 1 parent-in-law is not applicable under plans 5-10. This is possible if the employee has declared the other parent and parent-in-law as deceased on the tool. Employee can include both parents and parents-in-law together under plan 11-13</li>
+                                <li><b>Parents</b> - Dependant parents or parents-in law. Cross selection of 1parent and 1 parent-in-law is not applicable under plans 5-10. This is possible if the employee has declared the other parent and parent-in-law as deceased on the tool. Employee can include both parents and parents-in-law together under plan 11-13</li>
 
-                                <li><b>LGBTQIA+</b> - (Lesbian, Gay, Bi-sexual, Transgender, Queer, Agender) - Employees are eligible to cover their partners (married or unmarried) as dependents</li>
+                                <li><b>LGBTQIA+</b> - (Lesbian, Gay, Bi-sexual, Transgender, Queer, Agender) - Employees are eligible to cover their partners (married or unmarried) as dependants</li>
 
                                 <li><b>Live in Partners</b> - Employees are eligible to cover their live in partners as defined by Indian Law</li>
 
@@ -50,7 +50,7 @@
                         <div class="section-heading">
                             <h4>Select below values to get list of nearest hospitals nearby</h4>
                             <img src="{{ asset('assets/images/heading-line-dec.png') }}" alt="">
-            <h5>Manage your dependents by adding new ones, modify existing ones</h5>
+            <h5>Manage your dependants by adding new ones, modify existing ones</h5>
         </div>
     </div> --}}
     <div class="col-lg-12">
@@ -61,7 +61,7 @@
                     <button class="tablinks" data-country="network-hospitals">
                         <p data-title="Network Hospitals">Claim Intimation</p>
                     </button>
-                    {{-- <button class="tablinks active" data-country="add-new-dependent"><p data-title="Add New Dependent">Add New Dependent</p></button> --}}
+                    {{-- <button class="tablinks active" data-country="add-new-dependant"><p data-title="Add New Dependant">Add New Dependant</p></button> --}}
                 </div>
                 <!-- Tab content -->
                 <div class="wrapper_tabcontent">
@@ -79,7 +79,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="col-sm-12 control-label form-label">Dependent Name <span class="text-danger">*</span></label>
+                                        <label class="col-sm-12 control-label form-label">Dependant Name <span class="text-danger">*</span></label>
                                         <div class="col-sm-12">
                                             <input type="text" class="form-control" id="input4" name="dependent_name" placeholder="Enter Member Name">
                                         </div>

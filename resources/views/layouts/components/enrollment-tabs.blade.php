@@ -128,8 +128,8 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
                     relevant option
                     </li> 
                     <li>
-                    For insured benefits, the names of your dependents eligible for coverage will be 
-                    visible in tabular form. Ensure you select the dependents you wish to include in applicable
+                    For insured benefits, the names of your dependants eligible for coverage will be 
+                    visible in tabular form. Ensure you select the dependants you wish to include in applicable
                     benefits by checking against their names
                     </li>
                     <li>
@@ -238,33 +238,33 @@ function countNumber(trgItem, countToNumber) {
 
 function getMemberFullNames(code) {
     reltionshipArr = @php
-        $dependentTextArr = [];
+        $dependantTextArr = [];
         foreach(config('constant.dependent_code') as $dcode => $reltionshipTypes) {
             $relationText = [];
             foreach ($reltionshipTypes as $relationKey) {
                 $relationText[] = config('constant.relationship_type')[$relationKey];
             }
-            $dependentTextArr[$dcode] = implode(',', $relationText);
+            $dependantTextArr[$dcode] = implode(',', $relationText);
         }
 
-        echo json_encode($dependentTextArr);    
+        echo json_encode($dependantTextArr);    
     @endphp;
     return code + ': ' + reltionshipArr[code];
 }
 
-function getDependentList(dependentStructure){
+function getDependentList(dependantstructure){
     // search for / first and remove from original string
     let dsArr = [];
-    if (dependentStructure.search('/') > -1) {
+    if (dependantstructure.search('/') > -1) {
         dsArr.push('/');
-        dependentStructure = dependentStructure.replace('/', '');
+        dependantstructure = dependantstructure.replace('/', '');
     }
     //search for PIL and remove from original string
-    if (dependentStructure.search('PIL') > -1) {
+    if (dependantstructure.search('PIL') > -1) {
         dsArr.push('PIL');
-        dependentStructure = dependentStructure.replace('PIL', '');
+        dependantstructure = dependantstructure.replace('PIL', '');
     }
-    return dsArr.concat(dependentStructure.split(''));
+    return dsArr.concat(dependantstructure.split(''));
 }
 
 function generateDependentItems(subCatId, depList) {
@@ -276,14 +276,14 @@ function generateDependentItems(subCatId, depList) {
             parentRadio = true;
             depList.splice(0,1); 
         } --}}
-        {{-- $('[id^=dependent-list]').each(function(){
+        {{-- $('[id^=dependant-list]').each(function(){
             var dCode = $(this).attr('data-depcode');
             var depId = $(this).attr('data-depId');
             var depName = $(this).attr('data-name');
             var depNom = $(this).attr('data-depNom');
             depList.forEach(function(x) {
                 if(dCode.toLowerCase() == x.toLowerCase()) {
-                    if(['PIL','P'].includes(dCode)) {   // match if dependent added is PIL or P case
+                    if(['PIL','P'].includes(dCode)) {   // match if dependant added is PIL or P case
                         memCvrdStr += '<input id="depMemCrvd' + depId + '" name="depMemCrvd[]" type="' + (parentRadio ? 'radio' : 'checkbox')  + '" value="' 
                         + depId + '"/>&nbsp;<label for="depMemCrvd' + depId + '">' + depName + '[' + 
                         getMemberFullNames(dCode) + ',Nomination(%):' +  depNom + ']' + '</label>';
@@ -297,7 +297,7 @@ function generateDependentItems(subCatId, depList) {
         }); --}}
         var existingDependent = [];
         var i = 0;
-        $('[id^=dependent-list]').each(function(){
+        $('[id^=dependant-list]').each(function(){
             var dCode = $(this).attr('data-depcode');
             var depId = $(this).attr('data-depId');
             var depName = $(this).attr('data-name');
@@ -326,9 +326,9 @@ function generateDependentItems(subCatId, depList) {
                 '" /><label for="depMemCrvd_' + depId.join('_')  + 
                 '">' + depCodeFullName + '[' + depName.join(',') + ']' + '</label>';
         }
-        {{-- existingDependent.forEach(function(dep, index, currArr){
+        /* existingDependent.forEach(function(dep, index, currArr){
             console.log(dep);
-        }); --}}
+        }); */
         //console.log(existingDependent);
         $('#memcvrd' + subCatId).html(memCvrdStr);
         //return memCvrdStr;
@@ -375,7 +375,7 @@ function planBindEvents() {
                 $('#coreMultiple' + subCatId).show();
             }
 
-            // dependent structure
+            // dependant structure
             var depList = getDependentList($('#planDetails' + planId).attr('data-memcvrd'));
 
             //membersCovered = depList.flatMap((x) => getMemberFullNames(x));
@@ -387,7 +387,7 @@ function planBindEvents() {
             $('#parentSubLimit' + subCatId).hide();
             let parent_sublimit_amount = $('#planDetails' + planId).attr('data-prntSbLim');
             if( parent_sublimit_amount != '0') {
-                console.log('#planDetails' + planId + '----' +parent_sublimit_amount);
+                //console.log('#planDetails' + planId + '----' +parent_sublimit_amount);
                 $('#parentSubLimit' + subCatId).show();
                 $('#prntSbLim' + subCatId).html(parent_sublimit_amount);
             }
@@ -508,7 +508,7 @@ function saveEnrollment(catId){
                         'savePoints':btoa(unescape(encodeURIComponent(JSON.stringify(savePoints)))),
                         'catId': catId,
                         //'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(summary)))),
-                        'dependents': 'N.A.'
+                        'dependants': 'N.A.'
                     },
                     success:function(response) {
                         if (response.status) {
@@ -575,7 +575,7 @@ function saveEnrollment(catId){
                             'catId': catId,
                             'policyId' : policyID,
                             'points': points,
-                            'sd': depSelected.join('###'),  // selected dependents
+                            'sd': depSelected.join('###'),  // selected dependants
                             //'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(polData))))
                         },
                         success:function(response) {
@@ -666,7 +666,6 @@ $('#enrollmentSubmit').on('click', function() {
         type:'POST',
         success: function(response){
             response = JSON.parse(response);
-            console.log(response);
             if (response.status) {
                 $('#finalSubmissionModalBody').html(response.msg);
                 $('#finalSubmissionModalTitle').html('<b>Success</b>').addClass('text-success');

@@ -15,7 +15,7 @@
         </div>
         <div class="section-border">
             {{-- <div class="section-heading m-3">
-                <h6>Please note below points while reviewing your dependents</h6>
+                <h6>Please note below points while reviewing your dependants</h6>
             </div> --}}
             <table class="tab-content-table table-responsive">
                 <thead>

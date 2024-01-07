@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\DependentController;
+use App\Http\Controllers\DependantController;
 use App\Http\Controllers\EnrollmentController;
 
 /*
@@ -40,24 +40,17 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('password-reset', [UserController::class, 'passworReset'])->name('previous.form.route');
     Route::post('/password/authupdate', [UserController::class, 'updatePassword'])->name('password.authupdate');
-    Route::post('/dependents/create', [DependentController::class, 'create']);
-    Route::post('/dependents/update', [DependentController::class, 'update']);
-    Route::post('/dependents/delete', [DependentController::class, 'delete']);
-    Route::post('/dependents/getRelationshipTypes', [DependentController::class, 'getRelationshipTypes']);
-    Route::get('/dependents/nominationCount', [DependentController::class, 'getNominationAllocation']);
-    Route::post('/dependents/list', [DependentController::class, 'list']);
-    Route::post('/dependents/saveLifeEvent', [DependentController::class, 'createLE']);
-    Route::get('/dependents/listLE', [DependentController::class, 'listLifeEvents']);
-    Route::get('/dependents/life-events', [DependentController::class, 'loadDependentsLE']);
-    Route::get('/dependents', function () {
-        $result = DB::table('map_user_fypolicy')
-            ->where('user_id_fk', '=', Auth::user()->id)
-            ->where('is_submitted', '=', 0)
-            ->where('is_active', '=', 1)
-            ->first();
-
-        return view('dependent',compact('result'));
-    });
+    Route::post('/dependants/create', [DependantController::class, 'create']);
+    Route::post('/dependants/update', [DependantController::class, 'update']);
+    Route::post('/dependants/delete', [DependantController::class, 'delete']);
+    Route::post('/dependants/getRelationshipTypes', [DependantController::class, 'getRelationshipTypes']);
+    Route::get('/dependants/nominationCount', [DependantController::class, 'getNominationAllocation']);
+    Route::post('/dependants/list', [DependantController::class, 'listDependants']);
+    Route::post('/dependants/saveLifeEvent', [DependantController::class, 'createLE']);
+    Route::get('/dependants/listLE', [DependantController::class, 'listLifeEvents']);
+    Route::get('/dependants/life-events', [DependantController::class, 'loaddependantsLE']);
+    Route::get('/dependants/getRelations', [DependantController::class, 'getAvailableRelations']);
+    Route::get('/dependants', [DependantController::class, 'loaddependants']);
 
     Route::post('/enrollment/updatePoints', [EnrollmentController::class, 'getPoints']);
     Route::post('/enrollment/save', [EnrollmentController::class, 'saveEnrollment']);
@@ -69,8 +62,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);
     Route::get('/enrollment', [EnrollmentController::class, 'home']);
 
-    // Route::post('/claim/create', [DependentController::class, 'create']);
-    // Route::post('/claim/update', [DependentController::class, 'update']);
+    // Route::post('/claim/create', [DependantController::class, 'create']);
+    // Route::post('/claim/update', [DependantController::class, 'update']);
     Route::any('/claim/loadHospital', [ClaimController::class, 'loadNetworkHospital']);
     Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
 

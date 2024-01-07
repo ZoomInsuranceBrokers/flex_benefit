@@ -25,9 +25,9 @@ use App\Http\Controllers\ApiController;
 */
 
 
-// Route::post('/dependents/create', 'create');
-// Route::post('/dependents/update', 'update');
-// Route::post('/dependents/delete', 'delete');
+// Route::post('/dependants/create', 'create');
+// Route::post('/dependants/update', 'update');
+// Route::post('/dependants/delete', 'delete');
 
 
 Route::post('/users', function (Request $request) {
