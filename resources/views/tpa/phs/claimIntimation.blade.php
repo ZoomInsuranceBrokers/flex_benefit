@@ -90,7 +90,7 @@
                                     <div class="form-group">
                                         <label class="col-sm-12 control-label form-label">Select Relation <span class="text-danger">*</span></label>
                                         <div class="col-sm-12">
-                                            <select name="dependent_relation" class="selectpicker" id="slct_relation" required>
+                                            <select name="dependent_relation" class="form-control selectpicker" id="slct_relation" required>
                                                 <option value="SELF">SELF</option>
                                             </select>
                                         </div>
@@ -113,7 +113,7 @@
                                     <div class="form-group">
                                         <label class="w-100 col-sm-2 control-label form-label">Date of Admission <span class="text-danger">*</span></label>
                                         <div class="col-sm-10">
-                                            <input name="claim_date_of_admission" type="date" min='1910-01-01' value="<?php echo date("Y-m-d"); ?>" required />
+                                            <input name="claim_date_of_admission" type="date" class="form-control" min='1910-01-01' value="<?php echo date("Y-m-d"); ?>" required />
                                         </div>
                                     </div>
                                 </div>
@@ -124,7 +124,7 @@
                                     <div class="form-group">
                                         <label class="w-100 col-sm-2 control-label form-label">Date of Discharge:</label>
                                         <div class="col-sm-10">
-                                            <input name="claim_date_of_discharge" type="date" min='1910-01-01' value="<?php echo date("Y-m-d"); ?>" />
+                                            <input name="claim_date_of_discharge" type="date" class="form-control" min='1910-01-01' value="<?php echo date("Y-m-d"); ?>" />
                                         </div>
                                     </div>
                                 </div>
