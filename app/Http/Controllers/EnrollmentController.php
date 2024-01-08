@@ -7,7 +7,7 @@ use Dompdf\Dompdf;
 use App\Models\User;
 use NumberFormatter;
 use App\Models\Account;
-use App\Models\Dependent;
+use App\Models\Dependant;
 use App\Models\MapFYPolicy;
 use Illuminate\Http\Request;
 use App\Models\FinancialYear;
@@ -28,8 +28,6 @@ class EnrollmentController extends Controller
 {
     public function home()
     {
-        //dd(config('constant.salary'));
-        //dd(config('constant.relationshipDep_type_jTable'));
         // function encryptData($data, $key, $iv) {
         //     $cipher = "aes-256-cbc";
         //     $options = 0;
@@ -132,8 +130,8 @@ class EnrollmentController extends Controller
 
             session(['gradeData' => $gradeData]);
 
-            // dependent
-            $dependents = Dependent::where('is_active', config('constant.$_YES'))
+            // dependant
+            $dependants = Dependant::where('is_active', config('constant.$_YES'))
                 //->where('is_deceased',config('constant.$_NO'))
                 ->where('user_id_fk', Auth::user()->id)
                 ->where('is_deceased', config('constant.$_NO'))
@@ -145,7 +143,7 @@ class EnrollmentController extends Controller
                 'currentSelectedData' => $currentSelectedData,
                 'basePlan' => $basePlan,
                 'gradeAmtData' => $gradeData,
-                'dependent' => $dependents->toArray(),
+                'dependant' => $dependants->toArray(),
                 'is_enrollment_window' => session('is_enrollment_window')
             ];
         //} else {
@@ -236,7 +234,7 @@ class EnrollmentController extends Controller
         $fypmap = $request->fypmap;
         $catId = $request->catId;
         $policyId = $request->policyId;
-        $selDep = $request->sd;     // selected dependents
+        $selDep = $request->sd;     // selected dependants
         $userId = Auth::user()->id;
         $summary = $request->summary;
         $points = $request->points;
@@ -652,5 +650,28 @@ class EnrollmentController extends Controller
             $response = ['status' => true, 'msg' => 'Reset Done. No default entries present!!!'];
         }
         return json_encode($response);
+    }
+
+    public function getPoints(Request $request) {
+        // get logged in user saved/selected policies
+        $fypmapData = MapUserFYPolicy::where('is_active', true)
+        ->with(['fyPolicy'])
+        ->where('user_id_fk', '=', Auth::user()->id)
+        ->get()->toArray();
+
+        $currentSelectedData = $basePlan = [];
+        if (count($fypmapData)) {
+            foreach ($fypmapData as $fypRow) {
+                if (!$fypRow['fy_policy']['policy']['is_base_plan'] && !$fypRow['fy_policy']['policy']['is_default_selection']) {
+                    $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
+                        'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']
+                    ];
+                }
+            }
+        }
+
+        $userPoints = User::where('id',Auth::user()->id)->select(['points_used', 'points_available'])->get()->toArray();
+
+        return json_encode(['userpts' => $userPoints, 'catpts' => $currentSelectedData ]);
     }
 }

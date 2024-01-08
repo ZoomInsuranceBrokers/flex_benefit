@@ -1,5 +1,5 @@
 @php
-    //dd($data['dependent']);
+    //dd($data['dependant']);
     $tabCount = Auth::check() ? (($data['is_enrollment_window'] ? count($data['category']) : 0) + 3) : 1;
 @endphp
 
@@ -111,7 +111,7 @@ font-size:14px;
                             <div class="section-border">
                                 
                                 {{-- <div class="section-heading m-3">
-                                    <h6>Please note below points while reviewing your dependents</h6>
+                                    <h6>Please note below points while reviewing your dependants</h6>
                                 </div> --}}
                                 <ul class="ul-points">
                                     <li>Each employee is protected with a core benefit to avoid erroneous selection.</li>
@@ -135,10 +135,10 @@ font-size:14px;
     </div>
     
     @php
-        if ($data['is_enrollment_window'] && count($data['dependent'])) {
-            foreach ($data['dependent'] as $depItem) {
+        if ($data['is_enrollment_window'] && count($data['dependant'])) {
+            foreach ($data['dependant'] as $depItem) {
     @endphp
-            <span id="dependent-list{{ $depItem['id'] }}" style="display:none;" data-name="{{ $depItem['dependent_name'] }}"
+            <span id="dependant-list{{ $depItem['id'] }}" style="display:none;" data-name="{{ $depItem['dependent_name'] }}"
             data-depCode="{{ $depItem['dependent_code'] }}" data-depNom="{{ $depItem['nominee_percentage'] }}"
             data-depId = "{{ $depItem['id'] }}"></span>
     @php

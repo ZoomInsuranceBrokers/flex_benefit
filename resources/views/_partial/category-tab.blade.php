@@ -15,7 +15,7 @@
         </div>
         <div class="section-border">
             {{-- <div class="section-heading m-3">
-                <h6>Please note below points while reviewing your dependents</h6>
+                <h6>Please note below points while reviewing your dependants</h6>
             </div> --}}
             <table class="tab-content-table table-responsive">
                 <thead>
@@ -39,7 +39,7 @@
                                     <td><a id="enrollmentSubCategory{{ $subcat->id }}" data-cat-id="{{ $subcat->id }}" href="javascript:return false;">{{ $subcat->name }}</a></a></td>
                                     <td>{{ html_entity_decode(strlen($subcat->description) < 70 ? $subcat->description : substr($subcat->description, 0, 67) . '...') }}</td>
                                     <td id="currSelectionDataCol{{ $subcat->id }}">{{ array_key_exists($subcat->id, $data['currentSelectedData']) ? $data['currentSelectedData'][$subcat->id][0]['polName']  : 'N.A.' }}</td>
-                                    <td>@php $sum = 0;
+                                    <td id="currSelectionDataVal{{ $subcat->id }}">@php $sum = 0;
                                         if(array_key_exists($subcat->id, $data['currentSelectedData'])) {
                                             foreach($data['currentSelectedData'][$subcat->id] as $pointRow) {
                                                 $sum += $pointRow['points'];

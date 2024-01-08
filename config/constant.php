@@ -64,6 +64,17 @@ $relationship_typesLE = [
     $_RLTN_SON => 'Son',
     $_RLTN_DAUGHTER => 'Daughter',
 ];
+/******* NON-MULTIPLE RELATIONS ******/
+$relationshipNonDuplicate_types = [ 
+    $_RLTN_FATHER => 'Father',
+    $_RLTN_MOTHER => 'Mother',
+    $_RLTN_SPOUSE => 'Spouse',
+    $_RLTN_FATHERINLAW => 'Father-in-Law',
+    $_RLTN_MOTHERINLAW=> 'Mother-in-Law',
+    $_RLTN_LIVEINPARTNER => 'Live-In Partner',
+];
+/******* NON-MULTIPLE RELATIONS ******/
+
 
 $titleName = [ 
     $_TITLE_MR => 'Mr.',
@@ -93,8 +104,8 @@ $approval_status = [
     $_APPR_STATUS_REJECTED => 'Rejected'];
 /******* APPROVAL STATUS *******/
 
-/******* Dependent Code *******/
-$dependent_code = [ // these values are indexes/keys of relationship_types
+/******* Dependant Code *******/
+$dependant_code = [ // these values are indexes/keys of relationship_types
     'E' => [1],
     'S' => [6],
     'P' => [2,3],
@@ -104,10 +115,10 @@ $dependent_code = [ // these values are indexes/keys of relationship_types
     'O' => [12, 4,5]
     
 ];
-/******* Dependent Code *******/
+/******* Dependant Code *******/
 
-/******* Dependent Code UI *******/
-$dependent_code_ui = [ // these values are indexes/keys of relationship_types
+/******* Dependant Code UI *******/
+$dependant_code_ui = [ // these values are indexes/keys of relationship_types
     'E' => 'Employee',
     'S' => 'Spouse',
     'PIL' => 'Parent-In-Law',
@@ -118,7 +129,7 @@ $dependent_code_ui = [ // these values are indexes/keys of relationship_types
     '/' => 'OR'
     
 ];
-/******* Dependent Code *******/
+/******* Dependant Code *******/
 
 /******* Salary ********/
 // $salary = Auth::user()->salary;
@@ -142,14 +153,15 @@ $dependent_code_ui = [ // these values are indexes/keys of relationship_types
 return [
     // relationship array
     'relationship_type' => $relationship_types,
-    'dependent_code_ui' => $dependent_code_ui,
+    'dependant_code_ui' => $dependant_code_ui,
+    'relationshipNonDuplicate_types' => $relationshipNonDuplicate_types,
     'relationship_type_jTable' => implode(',', generateJtableOptions($selectLabel,$relationship_types)),
-    'relationshipDep_type_jTable' => implode(',', generateJtableOptions($selectLabel,$relationshipDep_types)),
+    'relationshipDep_type_jTable' => generateJtableOptions($selectLabel,$relationshipDep_types),
     'gender_jTable' => implode(',', generateJtableOptions($selectLabel,$gender)),
     'boolean_jTable' => implode(',', generateJtableOptions($selectLabel,$boolean)),
     'approval_status_jTable' => implode(',', generateJtableOptions($selectLabel,$approval_status)),
     'approval_status' => $approval_status,
-    'dependent_code' => $dependent_code,
+    'dependant_code' => $dependant_code,
     'relationshipLE_type_jTable' => generateJtableOptions($selectLabel,$relationship_typesLE),
     'title' => $titleName,
     'gender' => $gender,
