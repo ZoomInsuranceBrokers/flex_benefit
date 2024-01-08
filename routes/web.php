@@ -86,6 +86,8 @@ Route::group(['middleware' => 'auth'], function () {
  
     Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
     Route::post('/claim/initiate', [ClaimController::class, 'saveClaimIntimation']);
+    Route::get('/claim/track', [ClaimController::class, 'trackClaimStatus']);
+
 
 
     Route::get('/logout', [UserController::class, 'logout']);

@@ -15,7 +15,7 @@ class ClaimController extends Controller
     {
         // dd($request->method());
         if (Auth::check()) {
-            $currentDate = now(); 
+            $currentDate = now();
 
             $policy_details = DB::table('policy_master')
                 ->whereDate('policy_start_date', '<=', $currentDate)
@@ -90,6 +90,32 @@ class ClaimController extends Controller
                 case 62:
                     $this->phs_save_claim_intimation($request);
                     break;
+                default:
+                    echo "TPA INTEGRATION IS IN PROCESS";
+                    exit;
+                    break;
+            }
+        } else {
+            redirect('/');
+        }
+    }
+
+
+    public function trackClaimStatus()
+    {
+        if (Auth::check()) {
+            $currentDate = now(); // or \Carbon\Carbon::now() for more control
+
+            $policy_details = DB::table('policy_master')
+                ->whereDate('policy_start_date', '<=', $currentDate)
+                ->whereDate('policy_end_date', '>=', $currentDate)
+                ->first();
+
+            switch ($policy_details->tpa_id) {
+                case 62:
+                    $claims = $this->phs_claim_details($policy_details);
+
+                    return view('tpa.phs.claim-status', compact('claims'));
                 default:
                     echo "TPA INTEGRATION IS IN PROCESS";
                     exit;
@@ -199,12 +225,110 @@ class ClaimController extends Controller
                 'TotalRecordCount' => count($hospitalList),
                 'Records' => $hospitalList,
             ];
-         
+
             echo json_encode($jTableResult);
         }
     }
 
-    public function submitClaimReimbursement()
+
+    public function phs_claim_details($data)
     {
+
+        $gcld = 0;
+        gcld:
+
+        $curl = curl_init();
+
+        $data2 = json_encode(array(
+            'USERNAME' => 'ZOOM-ADMIN',
+            'PASSWORD' => 'ADMIN-USER@389',
+            'POLICY_NO' => $data->policy_number,
+            'EMPLOYEE_NO' => Auth::user()->employee_id,
+            'CLAIM_NO' => ""
+        ));
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://webintegrations.paramounttpa.com/ZoomBrokerAPI/Service1.svc/GetClaimStatus',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_HTTPHEADER => array('Content-Type:application/json'),
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $data2,
+        ));
+
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+        $response = json_decode($response);
+
+
+        if ((empty($response) || (gettype($response) == 'string')) || (trim($response->GetClaimStatusResult[0]->MESSAGE) == 'Invalid Policy Number')) {
+
+            $gcld++;
+
+            if ($gcld < 10) {
+                goto gcld;
+            } else {
+                echo 'Looks Like an Error Occured! Kindly Refresh Page';
+                exit;
+            }
+        } else {
+
+            if ((trim($response->GetClaimStatusResult[0]->MESSAGE) != 'Invalid Policy Number') && (trim($response->GetClaimStatusResult[0]->MESSAGE) != 'No data Found')) {
+
+                $claims = [];
+                foreach ($response->GetClaimStatusResult as $phs_claim) {
+
+
+                    $claim = array(
+                        'policy' => $data->policy_number,
+                        'insurance_company' => "",
+                        'tpa_company' => 'PHS',
+                        'policy_number' => $data->policy_number,
+                        'policy_name' => $data->policy_name,
+                        'employee_name' =>  Auth::user()->fname,
+                        'employee_id' =>  Auth::user()->employee_id,
+                        'patient_name' => $phs_claim->MEMBER_NAME,
+                        'patient_relation' => $phs_claim->RELATION,
+                        'date_of_birth' => '',
+                        'hospital_name' => $phs_claim->hospital_name ?? '',
+                        'ailment' => '',
+                        // 'date_of_admission' => date('M d, Y', strtotime($phs_claim->date_of_admission)) ?? '',
+                        'date_of_discharge' => '',
+                        'claim_amount' => $phs_claim->APPROVED_AMT ?? '',
+                        'message' => $phs_claim->MESSAGE ?? ''
+                    );
+
+                    // switch ($phs_claim->TYPE_OF_CLAIM) {
+                    // case 'REIMBURSEMENT':
+                    $claim['last_query_reason'] = '';
+                    $claim['query_letter'] = '';
+                    $claim['paid_amt'] = '';
+                    $claim['deduction_reasons'] = '';
+                    $claim['settlment_letter'] = '';
+                    $claim['tpa_claim_id'] = $phs_claim->UNIQUE_CLAIM_NO ?? '';
+                    $claim['claim_intimation_no'] = '';
+                    $claim['type_of_claim'] = $phs_claim->TYPE_OF_CLAIM ?? '';
+                    $claim['claim_mode'] = $phs_claim->TYPE_OF_CLAIM  ?? '';
+                    $claim['rejection_date'] = '';
+                    $claim['rejection_reason'] = '';
+                    $claim['claim_status'] = $phs_claim->CLAIM_STATUS;
+                    // break;
+                    // }
+                    // Push the claim only if UNIQUE_CLAIM_NO is not null
+                    if ($claim['tpa_claim_id'] !== null) {
+                        array_push($claims, $claim);
+                    }
+                }
+            }
+        }
+
+        return $claims;
     }
 }

@@ -103,10 +103,15 @@ class ApiController extends Controller
         return $response->json();
     }
 
-    public function getUserEnrollmentData (Request $request) {
-        if ($request->isMethod('get') && $request->has('authKey') && 
-            $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))) {
-            $filters = ['output' => 'json','active' => true];
+    public function getUserEnrollmentData(Request $request)
+    {
+        // dd(base64_encode('a9#Bc2$eDfGhIjK4LmNpQr6StUvWxYz' . date('d-m-Y')));
+        // dd($request->authKey);
+        if (
+            $request->isMethod('get') && $request->has('authKey') &&
+            $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
+        ) {
+            $filters = ['output' => 'json', 'active' => true];
             $request->has('sdte') ? $filters['sdate'] = $request->sdte : '';
             $request->has('edte') ? $filters['edate'] = $request->edte : '';
             $request->has('colName') ? $filters['colName'] = $request->colName : '';
@@ -118,38 +123,38 @@ class ApiController extends Controller
             $finalData = [];
             // Account Info
             if (array_key_exists('accId', $filters)) {
-                $finalData['account'] = Account::where('id',$filters['accId'])
-                ->whereOr('external_id',$filters['accId'])
-                ->select('id','external_id','name','enrollment_start_date','enrollment_end_date')
-                ->get()->toArray();
+                $finalData['account'] = Account::where('id', $filters['accId'])
+                    ->whereOr('external_id', $filters['accId'])
+                    ->select('id', 'external_id', 'name', 'enrollment_start_date', 'enrollment_end_date')
+                    ->get()->toArray();
             }
             // enrollment/submission date filter
-            $mapUserFYPolicyData = MapUserFYPolicy::with(['fyPolicy','user']);
+            $mapUserFYPolicyData = MapUserFYPolicy::with(['fyPolicy', 'user']);
             if (array_key_exists('colName', $filters)) {
-                if(array_key_exists('sdate', $filters) && array_key_exists('edate', $filters)){
-                    $mapUserFYPolicyData->whereBetween($request->has('colName'),[$filters['sdate'], $filters['edate']]);
-                } else if (array_key_exists('sdate', $filters)){
-                    $mapUserFYPolicyData->where($request->has('colName'), '>=',$filters['sdate']);
-                } else if (array_key_exists('edate', $filters)){
-                    $mapUserFYPolicyData->where($request->has('colName'), '<=',$filters['edate']);
+                if (array_key_exists('sdate', $filters) && array_key_exists('edate', $filters)) {
+                    $mapUserFYPolicyData->whereBetween($request->has('colName'), [$filters['sdate'], $filters['edate']]);
+                } else if (array_key_exists('sdate', $filters)) {
+                    $mapUserFYPolicyData->where($request->has('colName'), '>=', $filters['sdate']);
+                } else if (array_key_exists('edate', $filters)) {
+                    $mapUserFYPolicyData->where($request->has('colName'), '<=', $filters['edate']);
                 }
             }
 
             // record active status
-            if($filters['active'] != '*'){
-                $mapUserFYPolicyData->where('is_active',$filters['active']);
+            if ($filters['active'] != '*') {
+                $mapUserFYPolicyData->where('is_active', $filters['active']);
             }
 
             // user ids
             if (array_key_exists('empId', $filters) && $filters['empId'] != '*') {
-                $mapUserFYPolicyData->whereIn('user_id_fk',[$filters['empId']]);
+                $mapUserFYPolicyData->whereIn('user_id_fk', [$filters['empId']]);
             }
 
             $submissionData = $mapUserFYPolicyData->get()->toArray();
             //dd($submissionData);
             if (count($submissionData)) {
-                foreach($submissionData as $submissionRow) {
-                    //dd($submissionRow);
+                foreach ($submissionData as $submissionRow) {
+                    // dd($submissionRow);
                     // policy data
                     $policyData = $submissionRow['fy_policy']['policy'];
                     $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['policy_id'] = $policyData['id'];
@@ -161,6 +166,7 @@ class ApiController extends Controller
 
                     // user data
                     $userData = $submissionRow['user'];
+                    // dd($userData);
                     $finalData['user'][$submissionRow['user_id_fk']]['id'] = $userData['id'];
                     $finalData['user'][$submissionRow['user_id_fk']]['external_id'] = $userData['external_id'];
                     $finalData['user'][$submissionRow['user_id_fk']]['fname'] = $userData['fname'];
@@ -174,7 +180,7 @@ class ApiController extends Controller
                     // dependent data
                     $dependentData = $submissionRow['user']['dependent'];
                     if (count($dependentData)) {
-                        foreach ($dependentData as $depRow){
+                        foreach ($dependentData as $depRow) {
                             $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['external_id'] = $depRow['external_id'];
                             $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
                             $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['dependent_code'] = config('constant.dependent_code_ui')[$depRow['dependent_code']];
@@ -190,30 +196,31 @@ class ApiController extends Controller
                 }
             }
             //dd($finalData);
-            switch($filters['output']){
-                case 'json' : {
-                    return (json_encode($finalData));
-                    break;
-                }
+            switch ($filters['output']) {
+                case 'json': {
+                        return (json_encode($finalData));
+                        break;
+                    }
                 case 'html': {
-                }
+                    }
             }
         } else {
-            return json_encode(['status'=> false, 'Message'=> 'Invalid Request']);
+            return json_encode(['status' => false, 'Message' => 'Invalid Request']);
         }
     }
 
-    public function autoSubmitEnrollment(Request $request) {
+    public function autoSubmitEnrollment(Request $request)
+    {
         $todayDate = new DateTime(); // Today
         $dates = Account::select(['enrollment_end_date'])->get()->toArray();
         if ($todayDate > $dates[0]['enrollment_end_date']) {
-            $nonSubmittedEnrollmentEntries = MapUserFYPolicy::where('is_active',true)
-            ->where('is_submitted', false)
-            ->select(['id as MapId', 'user_id_fk'])
-            ->with(['user:id,fname,lname,employee_id,email']);
-            
+            $nonSubmittedEnrollmentEntries = MapUserFYPolicy::where('is_active', true)
+                ->where('is_submitted', false)
+                ->select(['id as MapId', 'user_id_fk'])
+                ->with(['user:id,fname,lname,employee_id,email']);
+
             // emp only submission
-            $request->has('eid') && $request['eid'] > 0 ? 
+            $request->has('eid') && $request['eid'] > 0 ?
                 $nonSubmittedEnrollmentEntries->where('user_id_fk', $request['eid']) : '';
 
             $nonSubmittedEnrollmentEntries = $nonSubmittedEnrollmentEntries->get()->toArray();
@@ -229,12 +236,12 @@ class ApiController extends Controller
                             $userData[$enrolRow['user_id_fk']] = '<tr>
                             <td>' . $userDataCount . '</td>
                             <td>' . $enrolRow['user']['employee_id'] . '</td>
-                            <td>' . $enrolRow['user']['fname']  . ' '. $enrolRow['user']['lname'] . '</td>
+                            <td>' . $enrolRow['user']['fname']  . ' ' . $enrolRow['user']['lname'] . '</td>
                             <td>' . $enrolRow['user']['email'] . '</td>
                             </tr>';
                         } else {
                             $userData[$enrolRow['user_id_fk']] =  implode('###', [
-                                $userDataCount,$enrolRow['user']['employee_id'],
+                                $userDataCount, $enrolRow['user']['employee_id'],
                                 $enrolRow['user']['fname'] . ' ' . $enrolRow['user']['lname'],
                                 $enrolRow['user']['email']
                             ]);
@@ -244,7 +251,7 @@ class ApiController extends Controller
                 if (count($ids)) {
                     $updateData = [
                         'is_submitted' => true,
-                        'modified_by' => 0, 
+                        'modified_by' => 0,
                         'updated_at' => now()
                     ];
                     $userUpdateData = [
@@ -253,12 +260,12 @@ class ApiController extends Controller
                         'submission_by' => '0'
                     ];
 
-                    if ($request->has('confirmUpdate') && $request['confirmUpdate'] == 1) { 
-                        MapUserFYPolicy::whereIn('id',$ids)->update($updateData);
-                        User::whereIn('id',array_keys($userData))->update($userUpdateData);
+                    if ($request->has('confirmUpdate') && $request['confirmUpdate'] == 1) {
+                        MapUserFYPolicy::whereIn('id', $ids)->update($updateData);
+                        User::whereIn('id', array_keys($userData))->update($userUpdateData);
                     }
                 }
-                if($request->has('output') && $request['output'] == 'html') {
+                if ($request->has('output') && $request['output'] == 'html') {
                     echo '<style>table th,tr,td {
                         border:1px solid #222;
                         padding:0 10px;
@@ -282,6 +289,5 @@ class ApiController extends Controller
         } else {
             return json_encode(['message' => 'Auto Submission not possible before enrollment window end date']);
         }
-        
     }
 }
