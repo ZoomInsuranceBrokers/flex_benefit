@@ -239,7 +239,7 @@ function countNumber(trgItem, countToNumber) {
 function getMemberFullNames(code) {
     reltionshipArr = @php
         $dependantTextArr = [];
-        foreach(config('constant.dependent_code') as $dcode => $reltionshipTypes) {
+        foreach(config('constant.dependant_code') as $dcode => $reltionshipTypes) {
             $relationText = [];
             foreach ($reltionshipTypes as $relationKey) {
                 $relationText[] = config('constant.relationship_type')[$relationKey];
