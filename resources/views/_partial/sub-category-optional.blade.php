@@ -240,8 +240,8 @@
                 <h4 class="mt-1 mb-1">Member Covered</h4>                                        
             </div>   
             <div>                                            
-                <div class="row fs-12 text-center">
-                    <div class="col-10 offset-1">
+                <div class="row fs-12">
+                    <div class="col-12">
                         <dl>
                             <dt data-toggle="tooltip"
                                 data-placement="top" >

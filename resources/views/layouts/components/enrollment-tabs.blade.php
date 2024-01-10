@@ -272,10 +272,10 @@ function generateDependentItems(subCatId, depList) {
     var memCvrdStr = '';
     var parentRadio = false;
     if (depList.length > 0) {
-        {{-- if (depList[0] == '/') {
+        if (depList[0] == '/') {
             parentRadio = true;
             depList.splice(0,1); 
-        } --}}
+        }
         {{-- $('[id^=dependant-list]').each(function(){
             var dCode = $(this).attr('data-depcode');
             var depId = $(this).attr('data-depId');
@@ -295,6 +295,7 @@ function generateDependentItems(subCatId, depList) {
                 }  
             });
         }); --}}
+        //console.log(parentRadio);
         var existingDependent = [];
         var i = 0;
         $('[id^=dependant-list]').each(function(){
@@ -318,13 +319,26 @@ function generateDependentItems(subCatId, depList) {
             existingDependent[depCode].forEach(function(depRow){
                 //console.log(depRow);
                 depId.push(depRow[0]);
-                depName.push('(' + depRow[1] + ':' + depRow[2] + ')');
+                depName.push('(' + depRow[1] + ':' + depRow[2] + '%)');
             });
-            //console.log(dep);
-            memCvrdStr += '<input id="depMemCrvd_' + depId.join('_')  + 
-                '" type="checkbox" name="depMemCrvd[]" value="' + depId.join(',') + 
-                '" /><label for="depMemCrvd_' + depId.join('_')  + 
-                '">' + depCodeFullName + '[' + depName.join(',') + ']' + '</label>';
+            //console.log('DepCode/:' + depCode);
+            depList.forEach(function(x) {
+                if(depCode.toLowerCase() == x.toLowerCase()) {
+                    //console.log(['PIL','P'].find(depList), depCode.toLowerCase(), x.toLowerCase(),depList);
+                    if(['PIL','P'].includes(x.toUpperCase())) {   // match if dependant added is PIL or P case
+                        memCvrdStr += '<div class="col-12 m-1 mt-2 mb-2"><input id="depMemCrvd_' + depId.join('_')  + 
+                            '" type="' + (parentRadio ? 'radio' : 'checkbox' ) + '" name="depMemCrvd[]" value="' + depId.join(',') + 
+                            '" /><label for="depMemCrvd_' + depId.join('_')  + 
+                            '">' + depCodeFullName + '[' + depName.join(',') + ']' + '</label></div>';
+                    } else {
+                        memCvrdStr += '<div class="col-12 m-1 mt-2 mb-2"><input id="depMemCrvd_' + depId.join('_') + '"' + 
+                            (x.toLowerCase() == 'e'? 'disabled checked' : '' )  +
+                            ' type="checkbox" name="depMemCrvd[]" value="' + depId.join(',') + 
+                            '" /><label for="depMemCrvd_' + depId.join('_')  + 
+                            '">' + depCodeFullName + '[' + depName.join(',') + ']' + '</label></div>';
+                    }
+                }
+            });
         }
         /* existingDependent.forEach(function(dep, index, currArr){
             console.log(dep);

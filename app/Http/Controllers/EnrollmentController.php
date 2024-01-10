@@ -135,6 +135,8 @@ class EnrollmentController extends Controller
                 //->where('is_deceased',config('constant.$_NO'))
                 ->where('user_id_fk', Auth::user()->id)
                 ->where('is_deceased', config('constant.$_NO'))
+                ->orderBy('relationship_type')
+                ->orderBy('dependent_code')
                 ->get();
 
             $viewArray = [

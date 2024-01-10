@@ -17,6 +17,7 @@ class DependantController extends Controller {
         // check logged in user's existing dependants
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
                                 ->where('user_id_fk',Auth::user()->id)
+                                ->where('relationship_type','<>',config('constant.$_RLTN_SELF'))
                                 ->get()->toArray();
         
         // if (count($dependants)){
@@ -57,6 +58,7 @@ class DependantController extends Controller {
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
                                 //->where('is_deceased',config('constant.$_NO'))
                                 ->where('user_id_fk',Auth::user()->id)
+                                ->where('relationship_type','<>',config('constant.$_RLTN_SELF'))
                                 ->orderBy('dependent_name', 'ASC')
                                 ->get();
         if(!count($dependants)) {       // no/zero dependant count
@@ -109,11 +111,11 @@ class DependantController extends Controller {
                 $dependant->gender = $input['gender'];
                 $dependant->nominee_percentage = $input['nominee_percentage'];
                 $dependant->relationship_type = $input['relationship_type'];
-                $dependant->approval_status = 1;      // hard coded
+                $dependant->approval_status = config('constant.$_APPR_STATUS_APPROVED');      
                 $dependant->is_active = config('constant.$_YES');
                 $dependant->is_deceased = config('constant.$_NO');
-                $dependant->created_by = 1;     // hard coded
-                $dependant->modified_by = 1;     // hard coded
+                $dependant->created_by = Auth::user()->id;     
+                $dependant->modified_by = Auth::user()->id;     
                 $dependant->save();
 
                 $jTableResult['Result'] = "OK";
@@ -176,10 +178,10 @@ class DependantController extends Controller {
                 //$dependant->gender = $input['gender'];
                 $dependant->nominee_percentage = $input['nominee_percentage'];
                 //$dependant->relationship_type = $input['relationship_type'];
-                //$dependant->approval_status = 1;      // hard coded
+                //$dependant->approval_status = 1;      
                 //$dependant->is_deceased = $input['is_deceased'];                
                 $dependant->is_active = config('constant.$_YES') ;
-                $dependant->modified_by = 1;     // hard coded
+                $dependant->modified_by = Auth::user()->id;     
                 $dependant->save();
 
                 $jTableResult['Result'] = "OK";
@@ -214,8 +216,8 @@ class DependantController extends Controller {
                 $input = $request->all();
 
                 $dependant = Dependant::find($input['id']);
-                $dependant->is_active = config('constant.$_NO');
-                $dependant->modified_by = 1;     // hard coded
+                $dependant->is_active = false;
+                $dependant->modified_by = Auth::user()->id;     
                 $dependant->save();
 
                 $jTableResult['Result'] = "OK";
@@ -312,11 +314,11 @@ class DependantController extends Controller {
                 $dependant->gender = $input['gender'];
                 $dependant->nominee_percentage = $input['nominee_percentage'];
                 $dependant->relationship_type = $input['relationship_type'];
-                $dependant->approval_status = config('constant.$_APPR_STATUS_INPROGRESS');      // hard coded
+                $dependant->approval_status = config('constant.$_APPR_STATUS_INPROGRESS');      
                 $dependant->is_active = config('constant.$_YES');
                 $dependant->is_deceased = config('constant.$_NO');
-                $dependant->created_by = 1;     // hard coded
-                $dependant->modified_by = 1;     // hard coded
+                $dependant->created_by = Auth::user()->id;     
+                $dependant->modified_by = Auth::user()->id;     
                 $dependant->save();
 
                 $jTableResult['Result'] = "OK";
