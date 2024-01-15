@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Models\MapUserFYPolicy;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 
@@ -291,5 +292,5 @@ class ApiController extends Controller
         } else {
             return json_encode(['message' => 'Auto Submission not possible before enrollment window end date']);
         }
-    }
+    }    
 }

@@ -3,7 +3,7 @@
 @stop
 
 @php
-//dd($data['currentSelectedData']);
+//dd($data['gradeAmtData']);
 $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY); 
 //dd($data['sub_categories_data']);
     /* foreach($data['category'] as $key => $value) {

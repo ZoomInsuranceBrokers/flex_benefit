@@ -164,7 +164,11 @@ return [
     'dependant_code' => $dependant_code,
     'relationshipLE_type_jTable' => generateJtableOptions($selectLabel,$relationship_typesLE),
     'title' => $titleName,
+
     'gender' => $gender,
+    '$_GENDER_MALE' => $_GENDER_MALE,
+    '$_GENDER_FEMALE' => $_GENDER_FEMALE,
+    '$_GENDER_OTHER' => $_GENDER_OTHER,
 
     '$_YES' => $_YES,
     '$_NO' => $_NO,

@@ -9,6 +9,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\PasswordResetMail;
+use App\Models\Grade;
 use App\Models\MapUserFYPolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -70,6 +71,8 @@ class UserController extends Controller
         if ($todayDate >= $enrollmentDateBegin && $todayDate < $enrollmentDateEnd) {
             session(['is_enrollment_window' => true]);
         }
+
+
 
         if (Auth::check()) {
             return view('home')->with('user', Auth::user());
@@ -244,6 +247,8 @@ class UserController extends Controller
     }
 
 
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////// DOWNLOAD E CARD INTEGRATION //////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,4 +305,71 @@ class UserController extends Controller
             }
 
     }
+
+    public function createUsers(Request $request) {
+        if (
+            $request->isMethod('get') && $request->has('authKey') &&
+            $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
+        ) {
+            $userJsonData = json_decode(base64_decode($request->uDJson));
+            if (count($userJsonData)) {
+                // pull all gradea and ID
+                $grades = Grade::where('is_active', true)->select('id', 'grade_name')->get()->toArray()[0];
+                foreach ($grades as $grdRow) {
+
+                }
+                
+
+                $userInsertData = [];
+                foreach ($userJsonData as $userData) {
+                    $userInsertData[$userData['external_id']]['external_id'] = htmlspecialchars($userData['external_id']); 
+                    $userInsertData[$userData['external_id']]['fname'] = htmlspecialchars($userData['fname']); 
+                    $userInsertData[$userData['external_id']]['mname'] = htmlspecialchars($userData['mname']); 
+                    $userInsertData[$userData['external_id']]['lname'] = htmlspecialchars($userData['lname']); 
+                    $userInsertData[$userData['external_id']]['employee_id'] = htmlspecialchars($userData['employee_id']); 
+                    $userInsertData[$userData['external_id']]['grade_id_fk'] = $this->_getGradeId($userData['grade'], $userData); 
+                    $userInsertData[$userData['external_id']]['dob'] = htmlspecialchars($userData['dob']); 
+                    $userInsertData[$userData['external_id']]['hire_date'] = htmlspecialchars($userData['hire_date']); 
+                    $userInsertData[$userData['external_id']]['salary'] = htmlspecialchars($userData['salary']); 
+                    $userInsertData[$userData['external_id']]['points_used'] = 0; 
+                    $userInsertData[$userData['external_id']]['points_available'] = base64_decode($request->pointsTotal); 
+                    $userInsertData[$userData['external_id']]['mobile_number'] = htmlspecialchars($userData['mobile_number']); 
+                    $userInsertData[$userData['external_id']]['title'] = htmlspecialchars($userData['title']);
+                    $userInsertData[$userData['external_id']]['suffix'] = htmlspecialchars($userData['suffix']);
+                    $userInsertData[$userData['external_id']]['gender'] = $this->_getGenderId(htmlspecialchars($userData['gender']), $userData);
+                    $userInsertData[$userData['external_id']]['email'] = htmlspecialchars($userData['email']);
+                    $userInsertData[$userData['external_id']]['password'] = bcrypt(htmlspecialchars($userData['employee_id']) . '@' . ($userData['dob']));
+                    $userInsertData[$userData['external_id']]['country_id_fk'] = 1;
+                    $userInsertData[$userData['external_id']]['created_by'] = 0;    // admin
+                    $userInsertData[$userData['external_id']]['modified_by'] = 0;    // admin
+                    $userInsertData[$userData['external_id']]['created_at'] = now();
+                    $userInsertData[$userData['external_id']]['updated_at'] = now();
+                }
+            } else {
+                echo 'Empty User Json Data, No User Created!!!';
+            }
+        }
+    }
+
+    private function _getGenderId($genderText, $userData) {
+        if (strlen($genderText)) {
+            $genderCode = config('constant.$_GENDER_OTHER');
+            switch(strtolower($genderText)) {
+                case 'm':
+                case 'male': {
+                    $genderCode = config('constant.$_GENDER_MALE');
+                    break;
+                }
+                case 'f':
+                case 'female': {
+                    $genderCode = config('constant.$_GENDER_FEMALE');
+                    break;
+                }
+            }
+            return $genderCode;            
+        } else {
+            die('Invalid Gender for user record: ' . $userData['fname'] . ' ' . $userData['lname'] . '[' . $userData['employee_id'] . ']');
+        }
+    }
+
 }
