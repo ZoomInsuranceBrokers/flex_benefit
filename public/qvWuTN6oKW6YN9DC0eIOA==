@@ -1,0 +1,19 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+
+</title></head>
+<body>
+    <form name="form1" method="post" action="./Generate_PDF_ByEmployeeNo.aspx?page=API&amp;EMPLOYEE_NO=E73JuPl1BIKHV9UPAQJY3A%3d%3d&amp;GROUP_CODE=ahxtYMuJ+dKOrcSwUDicFA%3d%3d&amp;INS_CODE=%2fqvWuTN6oKW6YN9DC0eIOA%3d%3d" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="WVnlTuOMl1wAyfVLohscLd4fk8PuXzfgAQh87aeFIyelfsc+ednZ7ZArLnwcQ7xcNAxhCG1xlsa13D3y/+oGlEVcYElLfvV21UcnYoxXR+NUJBQhFWVWUknzyBR+gh65/lVIeZ/D8f4EssxeIKtA0RgP0Uaa5zXHY0A9Ykfo2lC6za1TTkPCx6ZocXridpOz6rIuIyZbj6F0JNdSF8sk9UOXFGeCbXn9zFQrMuPqNyE=" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="1543F691" />
+<input type="hidden" name="__VIEWSTATEENCRYPTED" id="__VIEWSTATEENCRYPTED" value="" />
+    <div>
+  <iframe src="https://www.paramounttpa.com/GenerateEcard/ECardPdf.aspx?ida=WklCLzEwNDQ3LnBkZg==" id="iframView" style="display: none;" width="100%" height="500px "></iframe>
+    </div>
+    </form>
+</body>
+</html>
