@@ -25,7 +25,7 @@ class CreateDependentTable extends Migration
             $table->tinyInteger('relationship_type');   // id from array in env file
             $table->tinyInteger('approval_status');   // id from array in env file
             $table->boolean('is_active')->default(true);
-            $table->boolean('is_deceased')->default(false);
+            $table->boolean('is_deceased')->default(config('constant.$_NO'));
             $table->timestamps();
             $table->string('created_by')->nullable();
             $table->string('modified_by')->nullable();

@@ -58,7 +58,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button onclick="resetSelection('{{ $subCatId }}',this)" class="btn-primary btn-small">Yes, Clear Selection </button>
-                                <button id="resetSelectionModalClose" class="btn-success btn-small modal_close"
+                                <button id="resetSelectionModalClose{{ $subCatId }}" class="btn-success btn-small modal_close"
                                 data-dismiss="modal">No, Changed Mind</button>
                             </div>
                             </div>

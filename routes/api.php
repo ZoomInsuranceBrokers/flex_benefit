@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,9 +27,9 @@ use App\Http\Controllers\ApiController;
 */
 
 
-// Route::post('/dependents/create', 'create');
-// Route::post('/dependents/update', 'update');
-// Route::post('/dependents/delete', 'delete');
+// Route::post('/dependants/create', 'create');
+// Route::post('/dependants/update', 'update');
+// Route::post('/dependants/delete', 'delete');
 
 
 Route::post('/users', function (Request $request) {
@@ -141,3 +143,5 @@ Route::get('/user/create/', function (Request $request) {
 
 Route::get('/enrollment/getSubmissionData', [ApiController::class, 'getUserEnrollmentData']);
 Route::get('/enrollment/autoSubmit', [ApiController::class, 'autoSubmitEnrollment']);
+Route::get('/user/add', [UserController::class, 'createUsers']);
+Route::get('/enrollment/updateEncodedSummary', [EnrollmentController::class, 'updateBaseDefaultEncodedSummary']);

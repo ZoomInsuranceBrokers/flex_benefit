@@ -17,12 +17,12 @@
 
       <!-- Tab content -->
       <div class="wrapper_tabcontent">
-         <div id="existing-dependent" class="tabcontent active">
+         <div id="existing-dependant" class="tabcontent active">
             <h3>Existing</h3>
             <div id="dependentLE_list"></div>
          </div>
 {{-- 
-         <div id="add-new-dependent" class="tabcontent">
+         <div id="add-new-dependant" class="tabcontent">
             <h3>New</h3>
             <p>Paris is in the Paris department of the Paris-Isle-of-France region The French historic, political and economic capital, with a population of only 2.5 million is located in the northern part of France. One of the most beautiful cities in the world. Home to historical monuments such as Notre Dame, the Eiffel tower (320m), Bastille, Louvre and many more. </p>
          </div> --}}
@@ -65,7 +65,7 @@ function openTabs(el) {
 
 @section('document_ready')
     $('[id^=header_]').removeClass('active');
-    $('#header_dependentsLE').addClass('active');
+    $('#header_dependantsLE').addClass('active');
 
     $.ajaxSetup({
         headers: {
@@ -73,14 +73,14 @@ function openTabs(el) {
         }
     });
     $('#dependentLE_list').jtable({
-        title: 'Life Event Dependents',
+        title: 'Life Event dependants',
         toolbar:{
             show:true
         },
         dialogShowEffect:'scale',
         actions: {
-            listAction: '/dependents/list',
-            createAction: '/dependents/saveLifeEvent',
+            listAction: '/dependants/list',
+            createAction: '/dependants/saveLifeEvent',
         },
         fields: {
             id: {
@@ -93,7 +93,7 @@ function openTabs(el) {
             },
 
             dependent_name: {
-                title: 'Dependent Name',
+                title: 'Dependant Name',
                 width: 'auto'
             },
             relationship_type: {

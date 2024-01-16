@@ -18,7 +18,7 @@ class CreateMapUserdepTpaTable extends Migration
             $table->string('external_id')->nullable();        // sfdc ID
             $table->foreignId('user_id_fk')->constrained('users');
             $table->integer('userdep_id_fk')->nullable();
-            $table->string('type', 255)->nullable();    // users or dependent
+            $table->string('type', 255)->nullable();    // users or dependant
             $table->foreignId('tpa_id_fk')->constrained('tpa');
             $table->string('user_tpa_ext_id', 255)->nullable();    // external id provided by TPA
             $table->text('payload')->nullable();    // extra data json can be saved here
