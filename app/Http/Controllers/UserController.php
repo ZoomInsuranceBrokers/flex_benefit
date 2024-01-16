@@ -9,7 +9,6 @@ use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\PasswordResetMail;
-use App\Models\Grade;
 use App\Models\MapUserFYPolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +19,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules\Password;
-
+use App\Mail\NewJoiningCredentials;
 
 
 class UserController extends Controller
@@ -72,8 +71,6 @@ class UserController extends Controller
             session(['is_enrollment_window' => true]);
         }
 
-
-
         if (Auth::check()) {
             return view('home')->with('user', Auth::user());
         } else {
@@ -96,9 +93,95 @@ class UserController extends Controller
                 ->whereDate('policy_end_date', '>=', $currentDate)
                 ->first();
 
+            // $user = User::where('id',240)->first();
+
+            // Mail::to($user->email)->send(new NewJoiningCredentials($user));
+
+
             switch ($policy_details->tpa_id) {
                 case 62:
-                    $this->phs_download_e_card($policy_details);
+                    $policy_number = $policy_details->policy_number;
+                    $emp_id = Auth::user()->employee_id;
+
+                    $curl = curl_init();
+
+                    $data = json_encode(
+                        array(
+                            "USERNAME" => "ZOOM-ADMIN",
+                            "PASSWORD" => "ADMIN-USER@389",
+                            "POLICY_NUMBER" => $policy_number,
+                            "EMPLOYEE_NUMBER" => $emp_id,
+                        )
+                    );
+
+                    curl_setopt_array(
+                        $curl,
+                        array(
+                            CURLOPT_URL => 'https://webintegrations.paramounttpa.com/ZoomBrokerAPI/Service1.svc/GetFamilyECard',
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_ENCODING => '',
+                            CURLOPT_MAXREDIRS => 10,
+                            CURLOPT_HTTPHEADER => array('Content-Type:application/json'),
+                            CURLOPT_TIMEOUT => 0,
+                            CURLOPT_FOLLOWLOCATION => true,
+                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                            CURLOPT_CUSTOMREQUEST => 'POST',
+                            CURLOPT_POSTFIELDS => $data,
+                        )
+                    );
+
+                    $response = curl_exec($curl);
+
+                    curl_close($curl);
+
+                    $response = json_decode($response);
+                   
+                    if (isset($response->GetFamilyECardResult)  && $response->GetFamilyECardResult[0]->STATUS == 'SUCCESS') {
+                        $url = $response->GetFamilyECardResult[0]->E_Card;
+
+                        header('Content-Type: application/pdf');
+
+                        // Output the file content directly
+                        readfile($url);
+
+                        echo "
+                            <!DOCTYPE html>
+                            <html lang='en'>
+                            <head>
+                                <meta charset='UTF-8'>
+                                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                                <style>
+                                    body {
+                                        font-family: 'Arial', sans-serif;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        height: 100vh;
+                                        margin: 0;
+                                        background-color: #f4f4f4;
+                                    }
+
+                                    .message-box {
+                                        background-color: #4CAF50;
+                                        color: white;
+                                        padding: 20px;
+                                        text-align: center;
+                                        border-radius: 8px;
+                                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class='message-box'>
+                                    <h1>E Card Download successful!</h1>
+                                </div>
+                            </body>
+                            </html>
+                        ";
+                    } else {
+                        echo 'Something Went Wrong! Kindly Try again Later';
+                        exit;
+                    }
                     break;
                 default:
                     echo "TPA INTEGRATION IS IN PROCESS";
@@ -235,7 +318,7 @@ class UserController extends Controller
     {
         if (Auth::check()) {
 
-            $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk',Auth::user()->id)
+            $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', Auth::user()->id)
                 ->where('is_active', true)
                 ->with(['fyPolicy'])
                 ->get()->toArray();
@@ -244,66 +327,6 @@ class UserController extends Controller
         } else {
             return view('auth.forgot-password');
         }
-    }
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////// DOWNLOAD E CARD INTEGRATION //////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public function phs_download_e_card($policy_details)
-    {
-            $policy_number = $policy_details->policy_number;
-            $emp_id = Auth::user()->employee_id;
-
-            $curl = curl_init();
-
-            $data = json_encode(
-                array(
-                    "USERNAME" => "ZOOM-ADMIN",
-                    "PASSWORD" => "ADMIN-USER@389",
-                    "POLICY_NUMBER" => $policy_number,
-                    "EMPLOYEE_NUMBER" => $emp_id,
-                )
-            );
-
-            curl_setopt_array(
-                $curl,
-                array(
-                    CURLOPT_URL => 'https://webintegrations.paramounttpa.com/ZoomBrokerAPI/Service1.svc/GetFamilyECard',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_HTTPHEADER => array('Content-Type:application/json'),
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $data,
-                )
-            );
-
-            $response = curl_exec($curl);
-
-            curl_close($curl);
-
-            $response = json_decode($response);
-
-            if ($response->GetFamilyECardResult[0]->STATUS == 'SUCCESS') {
-
-                $url = $response->GetFamilyECardResult[0]->E_Card;
-                $headers = [
-                    'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'inline; filename="E_Card.pdf"',
-                ];
-                return Redirect::to($url, 302, $headers);
-            } else {
-                echo 'Something Went Wrong! Kindly Try again Later';
-                exit;
-            }
-
     }
 
     public function createUsers(Request $request) {
@@ -371,5 +394,6 @@ class UserController extends Controller
             die('Invalid Gender for user record: ' . $userData['fname'] . ' ' . $userData['lname'] . '[' . $userData['employee_id'] . ']');
         }
     }
+
 
 }
