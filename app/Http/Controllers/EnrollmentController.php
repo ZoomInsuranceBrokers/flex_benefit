@@ -688,8 +688,12 @@ class EnrollmentController extends Controller
             ->leftJoin('insurance_category as ic', 'ic.id', '=', 'isc.ins_category_id_fk')
             ->leftJoin('users as u', 'u.id', '=', 'mufyp.user_id_fk')
             ->leftJoin('map_grade_category as mgc', 'mgc.grade_id_fk', '=', 'u.grade_id_fk')
-            ->where('ip.is_base_plan', true)
-            ->orWhere('ip.is_default_selection', true)
+            ->where(function ($query) {
+                $query->where('ip.is_base_plan', true)
+                      ->orWhere('ip.is_default_selection', true);
+            })
+            // ->where('ip.is_base_plan', true)
+            // ->orWhere('ip.is_default_selection', true)
             //->where('u.id',75)
             //->where('ip.ins_subcategory_id_fk', '=', $request->catId)
             ->where('mufyp.is_active', true)
