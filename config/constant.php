@@ -159,6 +159,7 @@ return [
     'relationshipDep_type_jTable' => generateJtableOptions($selectLabel,$relationshipDep_types),
     'gender_jTable' => implode(',', generateJtableOptions($selectLabel,$gender)),
     'boolean_jTable' => implode(',', generateJtableOptions($selectLabel,$boolean)),
+    'booleanArr' => $boolean,
     'approval_status_jTable' => implode(',', generateJtableOptions($selectLabel,$approval_status)),
     'approval_status' => $approval_status,
     'dependant_code' => $dependant_code,

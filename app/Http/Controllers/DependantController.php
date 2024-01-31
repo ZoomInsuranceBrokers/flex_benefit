@@ -95,7 +95,7 @@ class DependantController extends Controller {
             
             if (!$validator->fails()) {
                 $dependant = new Dependant();
-                $dependant->external_id = 'sfdc_' . time();
+                $dependant->external_id = null;
                 $dependant->dependent_name = $input['dependent_name'];
                 $dependant->user_id_fk = Auth::user()->id;
                 // find dependant code from relationship type
@@ -129,8 +129,6 @@ class DependantController extends Controller {
                 }
                 //dd($validator->errors()->messages());
                 $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
-                
-                
             }
         }
         else {

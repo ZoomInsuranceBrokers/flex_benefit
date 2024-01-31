@@ -824,4 +824,37 @@ class EnrollmentController extends Controller
 
         return base64_encode(json_encode($dataArr));
     }
+
+    /* public function generateBaseDefaultPolicyMapping ($users, $confirmUpdate) {
+        $mapFYpolicyData = DB::table('map_financial_year_policy as mfyp')
+            ->select('mfyp.id')
+            ->leftJoin('financial_years as fy', 'fy.id', '=', 'mfyp.fy_id_fk')
+            ->leftJoin('insurance_policy as ip', 'ip.id', '=', 'mfyp.ins_policy_id_fk')
+            ->where('mfyp.is_active', '=', true)
+            ->where('fy.is_active', '=', true)
+            ->where('ip.is_active', '=', true)
+            ->where(function ($query) {
+                $query->where('ip.is_base_plan', 1)
+                      ->orWhere('ip.is_default_selection', 1);
+            })
+            ->get()->toArray();
+
+        foreach ($users as $user) {
+            foreach ($mapFYpolicyData as $mfypRow) {
+                $data[] = [
+                    'user_id_fk' => $user['id'],
+                    'fypolicy_id_fk' => $mfypRow->id,
+                    'selected_dependent' => NULL,
+                    'encoded_summary' => NULL,
+                    'points_used' => 0,
+                    'created_by' => '0',
+                    'modified_by' => '0',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+            echo __FUNCTION__ . ':INFO:Default Policy entries added for userId:' . $user['id'];
+        }
+        $confirmUpdate ? MapUserFYPolicy::insert($data) : '';
+    } */
 }

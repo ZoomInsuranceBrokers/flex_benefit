@@ -91,8 +91,10 @@ Route::get('/user/defaultpolicymapping/', function (Request $request) {
             ->where('mfyp.is_active', '=', true)
             ->where('fy.is_active', '=', true)
             ->where('ip.is_active', '=', true)
-            ->where('ip.is_base_plan', true)
-            ->orWhere('ip.is_default_selection', true)
+            ->where(function ($query) {
+                $query->where('ip.is_base_plan', 1)
+                      ->orWhere('ip.is_default_selection', 1);
+            })
             ->get()->toArray();
 
         foreach ($users as $user) {
