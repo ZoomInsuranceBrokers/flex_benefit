@@ -21,6 +21,7 @@ class Account extends Model
         'address',
         'country_id_fk',
         'mobile_number',
+        'is_active',
         'enrollment_start_date',
         'enrollment_end_date',
         'created_by',

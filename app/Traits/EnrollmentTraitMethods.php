@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 trait EnrollmentTraitMethods {
 
-    public function generateBaseDefaultPolicyMapping ($users, $confirmUpdate = false) {
+    public function generateBaseDefaultPolicyMapping ($users, $submissionStatus = false,$confirmUpdate = false) {
         $mapFYpolicyData = DB::table('map_financial_year_policy as mfyp')
             ->select('mfyp.id')
             ->leftJoin('financial_years as fy', 'fy.id', '=', 'mfyp.fy_id_fk')
@@ -30,6 +30,7 @@ trait EnrollmentTraitMethods {
                     'fypolicy_id_fk' => $mfypRow->id,
                     'selected_dependent' => NULL,
                     'encoded_summary' => NULL,
+                    'is_submitted' => $submissionStatus,
                     'points_used' => 0,
                     'created_by' => '0',
                     'modified_by' => '0',
@@ -45,7 +46,7 @@ trait EnrollmentTraitMethods {
 }
 
 trait dependantTraitMethods {
-    public function validatedUpsertDependant ($input, $userId) {
+    public function validatedUpsertDependant ($input, $userData, $depRow) {
         if (array_key_exists('external_id', $input)) { // possibly from api hit
             $rules = [
                 'dependent_name' => 'required|between:3,32|',
@@ -68,7 +69,7 @@ trait dependantTraitMethods {
                 //$dependant = new Dependant();
                 $dependant['external_id'] = array_key_exists('external_id', $input) ? $input['external_id'] : '';
                 $dependant['dependent_name'] = $input['dependent_name'];
-                $dependant['user_id_fk'] = $userId;
+                $dependant['user_id_fk'] = $userData['id'];
                 // find dependant code from relationship type
                 foreach (config('constant.dependant_code') as $code => $rltnArr) {
                     if(in_array($input['relationship_type'], $rltnArr))
@@ -78,7 +79,7 @@ trait dependantTraitMethods {
                     }
                 }
                 $dependant['dob'] = date('Y-m-d', strtotime($input['dob']));
-                //$dependant['gender'] = $input['gender']; @todo
+                $dependant['gender'] = $input['gender'];
                 $dependant['nominee_percentage'] = $input['nominee_percentage'];
                 $dependant['relationship_type'] = $input['relationship_type'];
                 $dependant['approval_status'] = $input['approval_status'];      
@@ -90,7 +91,9 @@ trait dependantTraitMethods {
                 session('confirmUpdate') ? Dependant::updateOrCreate(['external_id' => $input['external_id']],$dependant) : '';
 
                 //$result['Result'] = "OK";
-                $result['Message'] = '<br>----------' . __FUNCTION__ . ':INFO:Dependant upsert(' . implode(' ', [$dependant['dependent_name']]) . ') with ID:';
+                $result['Message'] = '<br>----------' . __FUNCTION__ . ':INFO:Dependant upsert(Name:' . implode(' ', [$dependant['dependent_name']]) . 
+                ', Relation:' . $depRow['Relationship_Type__c']  . ',ID:' . $input['external_id'] . 
+                ') for user(Ext ID:' . $userData['external_id'] . ', User Name:' . implode(' ', [$userData['fname'],$userData['lname']]) . ')';
                 
             } else {   
                 $error = '';             
