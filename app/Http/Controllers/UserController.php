@@ -69,25 +69,26 @@ class UserController extends Controller
         //echo bcrypt('1234567890');
         //dd(Crypt::decryptString('$2y$10$2OhRE\/zTnRX3OJIfUcBrAuySK375QJf0F2WarzkB3bRor7TYWRdj2'));
         session(['is_enrollment_window' => false]);
-        $accountData = Account::where('is_active',true)->get()->toArray();
-        $todayDate       = new DateTime(); // Today
-        $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
-        $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
-
-        // user level window opening
-        if (!is_null(Auth::user()->enrollment_start_date) && !is_null(Auth::user()->enrollment_end_date)) {
-            $uenrollmentDateBegin = new DateTime(Auth::user()->enrollment_start_date);
-            $uenrollmentDateEnd = new DateTime(Auth::user()->enrollment_end_date);
-            if ($uenrollmentDateBegin >= $enrollmentDateBegin) {    // user enrollment is after account enrollment date
-                $enrollmentDateBegin = $uenrollmentDateBegin;
-                $enrollmentDateEnd = $uenrollmentDateEnd;
-            }
-        }
-        if ($todayDate >= $enrollmentDateBegin && $todayDate < $enrollmentDateEnd) {
-            session(['is_enrollment_window' => true]);
-        }
+        
 
         if (Auth::check()) {
+            $accountData = Account::where('is_active',true)->get()->toArray();
+            $todayDate       = new DateTime(); // Today
+            $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
+            $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
+            
+            // user level window opening
+            if (!is_null(Auth::user()->enrollment_start_date) && !is_null(Auth::user()->enrollment_end_date)) {
+                $uenrollmentDateBegin = new DateTime(Auth::user()->enrollment_start_date);
+                $uenrollmentDateEnd = new DateTime(Auth::user()->enrollment_end_date);
+                if ($uenrollmentDateBegin >= $enrollmentDateBegin) {    // user enrollment is after account enrollment date
+                    $enrollmentDateBegin = $uenrollmentDateBegin;
+                    $enrollmentDateEnd = $uenrollmentDateEnd;
+                }
+            }
+            if ($todayDate >= $enrollmentDateBegin && $todayDate < $enrollmentDateEnd) {
+                session(['is_enrollment_window' => true]);
+            }
             return view('home')->with('user', Auth::user());
         } else {
             return view('home');
