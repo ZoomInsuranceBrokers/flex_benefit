@@ -586,8 +586,12 @@ class EnrollmentController extends Controller
             ->where('mfyp.is_active', '=', true)
             ->where('fy.is_active', '=', true)
             ->where('ip.is_active', '=', true)
-            //->where('ip.is_base_plan', '<>', true)
-            ->where('ip.is_default_selection', '<>', true)
+            // ->where(function ($query) {
+            //     $query->where('ip.is_base_plan','<>', true)
+            //           ->orWhere('ip.is_default_selection','<>',true);
+            // })
+            ->where('ip.is_base_plan', '<>', true)
+            //->where('ip.is_default_selection', '<>', true)
             ->select('mufyp.id as mufypId', 'mfyp.id as mfypId', 'mufyp.points_used', 'ip.id as ip_id')
             ->get()->toArray();
             //->toSql();
@@ -595,7 +599,7 @@ class EnrollmentController extends Controller
         $pointsCounter = 0;
         $ids = [];
 
-        if(count($userPolData)){    // means other policy saved apart from base_plan+default_selection
+        if(count($userPolData)){    // other policy saved apart from base_plan
             foreach ($userPolData as $polRow) {
                 $pointsCounter += $polRow->points_used;
                 $ids[] = $polRow->mufypId;
@@ -631,6 +635,7 @@ class EnrollmentController extends Controller
                     }
                 }
             }
+            // default policy re-added
             $mapUserFYPolicyData = [
                 'user_id_fk' => Auth::user()->id,
                 'fypolicy_id_fk' => $fyPolId,
