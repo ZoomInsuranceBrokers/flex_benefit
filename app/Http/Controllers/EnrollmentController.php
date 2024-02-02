@@ -7,7 +7,7 @@ use Dompdf\Dompdf;
 use App\Models\User;
 use NumberFormatter;
 use App\Models\Account;
-use App\Models\Dependent;
+use App\Models\Dependant;
 use App\Models\MapFYPolicy;
 use Illuminate\Http\Request;
 use App\Models\FinancialYear;
@@ -28,8 +28,6 @@ class EnrollmentController extends Controller
 {
     public function home()
     {
-        //dd(config('constant.salary'));
-        //dd(config('constant.relationshipDep_type_jTable'));
         // function encryptData($data, $key, $iv) {
         //     $cipher = "aes-256-cbc";
         //     $options = 0;
@@ -132,11 +130,13 @@ class EnrollmentController extends Controller
 
             session(['gradeData' => $gradeData]);
 
-            // dependent
-            $dependents = Dependent::where('is_active', config('constant.$_YES'))
+            // dependant
+            $dependants = Dependant::where('is_active', config('constant.$_YES'))
                 //->where('is_deceased',config('constant.$_NO'))
                 ->where('user_id_fk', Auth::user()->id)
                 ->where('is_deceased', config('constant.$_NO'))
+                ->orderBy('relationship_type')
+                ->orderBy('dependent_code')
                 ->get();
 
             $viewArray = [
@@ -145,7 +145,7 @@ class EnrollmentController extends Controller
                 'currentSelectedData' => $currentSelectedData,
                 'basePlan' => $basePlan,
                 'gradeAmtData' => $gradeData,
-                'dependent' => $dependents->toArray(),
+                'dependant' => $dependants->toArray(),
                 'is_enrollment_window' => session('is_enrollment_window')
             ];
         //} else {
@@ -236,7 +236,7 @@ class EnrollmentController extends Controller
         $fypmap = $request->fypmap;
         $catId = $request->catId;
         $policyId = $request->policyId;
-        $selDep = $request->sd;     // selected dependents
+        $selDep = $request->sd;     // selected dependants
         $userId = Auth::user()->id;
         $summary = $request->summary;
         $points = $request->points;
@@ -463,6 +463,8 @@ class EnrollmentController extends Controller
 
         $dataArr = [];
         $dataArr['extId'] = $polDet['external_id'];
+        $dataArr['user'] = Auth::user()->fname . ' ' . Auth::user()->lname . '[EMPID:' . Auth::user()->employee_id . ']';
+        $dataArr['extId'] = $polDet['external_id'];
         $dataArr['ptf'] = $polDet['price_tag'];
         $dataArr['bpName'] = $bpName;
         $dataArr['pt'] = $formatter->formatCurrency($polDet['points'], 'INR');
@@ -584,8 +586,12 @@ class EnrollmentController extends Controller
             ->where('mfyp.is_active', '=', true)
             ->where('fy.is_active', '=', true)
             ->where('ip.is_active', '=', true)
-            //->where('ip.is_base_plan', '<>', true)
-            ->where('ip.is_default_selection', '<>', true)
+            // ->where(function ($query) {
+            //     $query->where('ip.is_base_plan','<>', true)
+            //           ->orWhere('ip.is_default_selection','<>',true);
+            // })
+            ->where('ip.is_base_plan', '<>', true)
+            //->where('ip.is_default_selection', '<>', true)
             ->select('mufyp.id as mufypId', 'mfyp.id as mfypId', 'mufyp.points_used', 'ip.id as ip_id')
             ->get()->toArray();
             //->toSql();
@@ -593,7 +599,7 @@ class EnrollmentController extends Controller
         $pointsCounter = 0;
         $ids = [];
 
-        if(count($userPolData)){    // means other policy saved apart from base_plan+default_selection
+        if(count($userPolData)){    // other policy saved apart from base_plan
             foreach ($userPolData as $polRow) {
                 $pointsCounter += $polRow->points_used;
                 $ids[] = $polRow->mufypId;
@@ -629,6 +635,7 @@ class EnrollmentController extends Controller
                     }
                 }
             }
+            // default policy re-added
             $mapUserFYPolicyData = [
                 'user_id_fk' => Auth::user()->id,
                 'fypolicy_id_fk' => $fyPolId,
@@ -653,4 +660,206 @@ class EnrollmentController extends Controller
         }
         return json_encode($response);
     }
+
+    public function getPoints(Request $request) {
+        // get logged in user saved/selected policies
+        $fypmapData = MapUserFYPolicy::where('is_active', true)
+        ->with(['fyPolicy'])
+        ->where('user_id_fk', '=', Auth::user()->id)
+        ->get()->toArray();
+
+        $currentSelectedData = $basePlan = [];
+        if (count($fypmapData)) {
+            foreach ($fypmapData as $fypRow) {
+                if (!$fypRow['fy_policy']['policy']['is_base_plan'] && !$fypRow['fy_policy']['policy']['is_default_selection']) {
+                    $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
+                        'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']
+                    ];
+                }
+            }
+        }
+
+        $userPoints = User::where('id',Auth::user()->id)->select(['points_used', 'points_available'])->get()->toArray();
+
+        return json_encode(['userpts' => $userPoints, 'catpts' => $currentSelectedData ]);
+    }
+
+    public function updateBaseDefaultEncodedSummary(Request $request){
+        $userPolData = DB::table('map_user_fypolicy as mufyp')
+            ->leftJoin('map_financial_year_policy as mfyp', 'mufyp.fypolicy_id_fk', '=', 'mfyp.id')
+            ->leftJoin('financial_years as fy', 'mfyp.fy_id_fk', '=', 'fy.id')
+            ->leftJoin('insurance_policy as ip', 'ip.id', '=', 'mfyp.ins_policy_id_fk')
+            ->leftJoin('insurance_subcategory as isc', 'isc.id', '=', 'ip.ins_subcategory_id_fk')
+            ->leftJoin('insurance_category as ic', 'ic.id', '=', 'isc.ins_category_id_fk')
+            ->leftJoin('users as u', 'u.id', '=', 'mufyp.user_id_fk')
+            ->leftJoin('map_grade_category as mgc', 'mgc.grade_id_fk', '=', 'u.grade_id_fk')
+            ->where(function ($query) {
+                $query->where('ip.is_base_plan', 1)
+                      ->orWhere('ip.is_default_selection', 1);
+            })
+            // ->where('ip.is_base_plan', 1)
+            // ->orWhere('ip.is_default_selection', 1)
+            //->where('u.id',75)
+            //->where('ip.ins_subcategory_id_fk', '=', $request->catId)
+            ->where('mufyp.is_active', 1)
+            ->where('mfyp.is_active', 1)
+            ->where('fy.is_active', 1)
+            ->where('ip.is_active', 1)
+            ->where('isc.is_active', 1)
+            ->where('ic.is_active', 1)
+            ->where('mgc.is_active', 1)
+            ->where('u.is_active', 1)
+            ->whereNull('mufyp.encoded_summary',)
+            ->select('mufyp.id as mufypId', 'mufyp.fypolicy_id_fk','ip.*','u.id as uid', 'u.fname', 'u.lname',
+                'u.employee_id','u.salary','mgc.amount as gradeBasedAmount', 'fy.start_date','fy.end_date','u.hire_date')
+            ->orderBy('u.id')
+            ->get()->toArray();
+            //->toSql();
+        //dd($userPolData);
+        if (count($userPolData)) {
+            foreach ($userPolData as $rowData) {
+                $data = [
+                    'encoded_summary' => $this->_generateBaseDefaultEncodedSummary($rowData),
+                    'modified_by' => 0,
+                    'updated_at' => now()
+                ];
+                if ($request->has('confirmUpdate') && $request->confirmUpdate) {
+                    MapUserFYPolicy::where('id',$rowData->mufypId)->update($data);
+                }
+                echo '<br>Data of: ' . $rowData->fname . ' ' . $rowData->lname . '[Policy Name:' . 
+                        $rowData->name .'][EMPID:' . $rowData->employee_id
+                     . '][Data:' . json_encode($data) . ']<br>';                             
+            }
+            echo '<h1>Encoded Summary Updated for row count' . count($userPolData) . '</h1>';   
+        } else {
+            echo 'No empty encoded summary rows found!!!';die;
+        }
+            
+    }
+
+    private function _generateBaseDefaultEncodedSummary($data){
+        $fypmap = $data->fypolicy_id_fk;
+        //$polDet = $data['policy'];
+        $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
+        //$basePlans = session('base_default_plans');
+        $gradeAmount = $data->is_grade_based ? $data->gradeBasedAmount : 0;
+        $bpsa = 0;
+        $bpName = '';
+        $is_lumpsum = $is_si_sa = $is_sa = $is_grade_based = FALSE;
+        $base_si_factor = 0;
+        ;
+        $salary =  decryptAES(['data' => $data->salary, 'type' => 'salary']);
+        
+        //foreach ($basePlans as $bpRow) {
+        //    if ($bpRow['ins_subcategory_id_fk'] == $catId && $bpRow['is_base_plan']){
+                if ($gradeAmount) {
+                    $bpsa = (int)$gradeAmount;
+                    $is_grade_based = TRUE;
+                } else {
+                    $sa = !is_null($data->sum_insured) ? $data->sum_insured : 0;
+                    $sa_si = !is_null($data->si_factor) ?
+                            $sa_si = $data->si_factor * $salary : 0;
+                    if($sa_si > $sa) {
+                        $bpsa = (int)$sa_si;
+                        $is_si_sa = TRUE;
+                        $base_si_factor = $data->si_factor;
+                    } else {
+                        $bpsa = (int)$sa;
+                        $is_sa = TRUE;
+                    }
+                }
+        // name of base policy
+        $bpName = $data->name;
+                //break;
+        //    }
+        //}
+
+        $dataArr = [];
+        $dataArr['extId'] = $data->external_id;
+        $dataArr['user'] = $data->fname . ' ' . $data->lname . '[EMPID:' . $data->employee_id . ']';
+        $dataArr['ptf'] = $data->price_tag;
+        $dataArr['bpName'] = $bpName;
+        $dataArr['pt'] = $formatter->formatCurrency($data->points, 'INR');
+        $dataArr['name'] = $data->name;
+        $dataArr['osa'] = $formatter->formatCurrency($data->sum_insured, 'INR');
+        $dataArr['is-sa'] = $is_sa;
+        $dataArr['is-si-sa'] = $is_si_sa;
+        $dataArr['grdbsd'] = $is_grade_based;
+        $dataArr['fypmap'] = $fypmap;
+        $dataArr['isbp'] = $data->is_base_plan;
+        $dataArr['bpsa'] = $bpsa > 0 ? $formatter->formatCurrency($bpsa, 'INR') : '';
+        $dataArr['opplsa'] = !$data->is_base_plan ? $formatter->formatCurrency($data->sum_insured, 'INR') : 0;
+        $dataArr['totsa'] = $formatter->formatCurrency(($bpsa + (!$data->is_base_plan) ? (int)$data->sum_insured : 0), 'INR');
+        $dataArr['isvp'] = $data->is_point_value_based;
+        $dataArr['isvbsd'] = $data->show_value_column;
+        $dataArr['annup'] = $formatter->formatCurrency($data->points, 'INR');
+        $dataArr['annupwocurr'] = $data->points;
+            $fyStartDate = $data->start_date;
+            $fyEndDate = $data->end_date;
+            $joiningDate = $data->hire_date;
+            $policyStartDate = $joiningDate > $fyStartDate ? $joiningDate : $fyStartDate;
+        $dataArr['psd'] =  date_format(date_create($policyStartDate), 'd-M-Y');
+        $dataArr['ped'] = date_format(date_create($fyEndDate), 'd-M-Y');
+            $totalDays = date_diff(date_create($policyStartDate), date_create($fyEndDate));
+        $dataArr['totdc'] = $totalDays->days . ' Days';
+            $prorationfactor = number_format(($totalDays->days/date_diff(date_create($fyStartDate), 
+            date_create($fyEndDate))->days) * 100, '2', '.', '');
+        $dataArr['prorf'] = $prorationfactor;
+            $pts = 0;
+            if ($data->is_point_value_based) {
+                $pts = $data->points;
+            } else {
+                if (!is_null($data->price_tag) && $data->price_tag > 0) {
+                    $pts = ($data->sum_insured) * $data->price_tag * ($prorationfactor/100);
+                } else if (!is_null($data->points)){
+                    $pts = $data->points * ($prorationfactor/100);
+                }
+            }
+        $dataArr['opplpt'] = !$data->is_base_plan ? $formatter->formatCurrency(round($pts), 'INR') : 0;
+        $dataArr['effecp'] = !$data->is_base_plan ? $formatter->formatCurrency(round($pts), 'INR') : 0;
+        $dataArr['totpt'] = !$data->is_base_plan ? $formatter->formatCurrency(round($pts), 'INR') : 0;
+        $dataArr['totptwocurr'] = !$data->is_base_plan ? round($pts) : 0;
+        $dataArr['memcvrd'] = $data->dependent_structure;
+        $dataArr['prntSbLim'] = $data->is_parent_sublimit ? $formatter->formatCurrency($data->parent_sublimit_amount, 'INR') : 0;
+        $dataArr['corem'] = $base_si_factor . 'X of CTC';
+        $dataArr['coresa'] = $formatter->formatCurrency($bpsa, 'INR');
+        $dataArr['jongDate'] = $data->hire_date;
+
+        //dd($dataArr);
+
+        return base64_encode(json_encode($dataArr));
+    }
+
+    /* public function generateBaseDefaultPolicyMapping ($users, $confirmUpdate) {
+        $mapFYpolicyData = DB::table('map_financial_year_policy as mfyp')
+            ->select('mfyp.id')
+            ->leftJoin('financial_years as fy', 'fy.id', '=', 'mfyp.fy_id_fk')
+            ->leftJoin('insurance_policy as ip', 'ip.id', '=', 'mfyp.ins_policy_id_fk')
+            ->where('mfyp.is_active', '=', true)
+            ->where('fy.is_active', '=', true)
+            ->where('ip.is_active', '=', true)
+            ->where(function ($query) {
+                $query->where('ip.is_base_plan', 1)
+                      ->orWhere('ip.is_default_selection', 1);
+            })
+            ->get()->toArray();
+
+        foreach ($users as $user) {
+            foreach ($mapFYpolicyData as $mfypRow) {
+                $data[] = [
+                    'user_id_fk' => $user['id'],
+                    'fypolicy_id_fk' => $mfypRow->id,
+                    'selected_dependent' => NULL,
+                    'encoded_summary' => NULL,
+                    'points_used' => 0,
+                    'created_by' => '0',
+                    'modified_by' => '0',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+            echo __FUNCTION__ . ':INFO:Default Policy entries added for userId:' . $user['id'];
+        }
+        $confirmUpdate ? MapUserFYPolicy::insert($data) : '';
+    } */
 }

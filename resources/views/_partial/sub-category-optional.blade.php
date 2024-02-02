@@ -1,7 +1,7 @@
 @php
     //dd($userPolData[0]->ip_id);
 @endphp
-<div class="col-4">
+<div class="col-5">
     <form id="subCategoryForm{{ $subCatId }}">
     <table class="tab-content-table table-responsive mb-3 fs-11 col-3">
         <th>Additional Coverage</th>
@@ -40,13 +40,13 @@
     </table>
     </form>
 </div>
-<div class="col-8">
+<div class="col-7">
     <div class="row">
         <div class="col-6">
             <div class="section-heading">
                 <h4 class="mt-1 mb-1">Coverage Period</h4>                                        
             </div>   
-            <div class="fp-numbers col-10 offset-1" id="fp-numbers-summary{{ $subCatId }}">                                         
+            <div class="fp-numbers col" id="fp-numbers-summary{{ $subCatId }}">                                         
                 <div class="row fs-12">
                     <div class="col-12">
                         <dl>
@@ -83,7 +83,7 @@
             <div class="section-heading">
                 <h4 class="mt-1 mb-1">Premium Calculations</h4>                                        
             </div>   
-            <div class="fp-numbers col-10 offset-1" id="fp-numbers-premiumcalc{{ $subCatId }}">                                                         
+            <div class="fp-numbers col" id="fp-numbers-premiumcalc{{ $subCatId }}">                                                         
                 <div class="row fs-12">
                     <div class="col-12">
                         {{-- <dl id="ptfContainer{{ $subCatId }}" style="display:none;">
@@ -240,8 +240,8 @@
                 <h4 class="mt-1 mb-1">Member Covered</h4>                                        
             </div>   
             <div>                                            
-                <div class="row fs-12 text-center">
-                    <div class="col-10 offset-1">
+                <div class="row fs-12">
+                    <div class="col-12">
                         <dl>
                             <dt data-toggle="tooltip"
                                 data-placement="top" >
@@ -252,6 +252,25 @@
                 </div>
             </div>
         </div>
+        {{-- <div class="col" id="parentSubLimit{{ $subCatId }}" style="display:none;">
+            <div class="section-heading">
+                <h4 class="mt-1 mb-1">Parent Sub Limit</h4>                                        
+            </div>   
+            <div>                                            
+                <div class="row fs-13 text-center">
+                    <div class="col">
+                        <dl>
+                            <dt class="col" data-toggle="tooltip"
+                                data-placement="top" >
+                                <label id="prntSbLim{{ $subCatId }}"></label>
+                            </dt>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div> --}}
+    </div>
+    <div class="row mb-3">
         <div class="col" id="parentSubLimit{{ $subCatId }}" style="display:none;">
             <div class="section-heading">
                 <h4 class="mt-1 mb-1">Parent Sub Limit</h4>                                        

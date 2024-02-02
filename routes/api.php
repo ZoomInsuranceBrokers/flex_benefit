@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,9 +27,9 @@ use App\Http\Controllers\ApiController;
 */
 
 
-// Route::post('/dependents/create', 'create');
-// Route::post('/dependents/update', 'update');
-// Route::post('/dependents/delete', 'delete');
+// Route::post('/dependants/create', 'create');
+// Route::post('/dependants/update', 'update');
+// Route::post('/dependants/delete', 'delete');
 
 
 Route::post('/users', function (Request $request) {
@@ -89,8 +91,10 @@ Route::get('/user/defaultpolicymapping/', function (Request $request) {
             ->where('mfyp.is_active', '=', true)
             ->where('fy.is_active', '=', true)
             ->where('ip.is_active', '=', true)
-            ->where('ip.is_base_plan', true)
-            ->orWhere('ip.is_default_selection', true)
+            ->where(function ($query) {
+                $query->where('ip.is_base_plan', 1)
+                      ->orWhere('ip.is_default_selection', 1);
+            })
             ->get()->toArray();
 
         foreach ($users as $user) {
@@ -141,3 +145,5 @@ Route::get('/user/create/', function (Request $request) {
 
 Route::get('/enrollment/getSubmissionData', [ApiController::class, 'getUserEnrollmentData']);
 Route::get('/enrollment/autoSubmit', [ApiController::class, 'autoSubmitEnrollment']);
+Route::get('/user/add', [UserController::class, 'createUsers']);
+Route::get('/enrollment/updateEncodedSummary', [EnrollmentController::class, 'updateBaseDefaultEncodedSummary']);

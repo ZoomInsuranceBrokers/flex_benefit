@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Models\MapUserFYPolicy;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 
@@ -177,20 +178,22 @@ class ApiController extends Controller
                     $finalData['user'][$submissionRow['user_id_fk']]['gender'] = config('constant.gender')[$userData['gender']];
                     $finalData['user'][$submissionRow['user_id_fk']]['email'] = $userData['email'];
 
-                    // dependent data
-                    $dependentData = $submissionRow['user']['dependent'];
-                    if (count($dependentData)) {
-                        foreach ($dependentData as $depRow) {
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['external_id'] = $depRow['external_id'];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['dependent_code'] = config('constant.dependent_code_ui')[$depRow['dependent_code']];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['dob'] = $depRow['dob'];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['gender'] = config('constant.gender')[$depRow['gender']];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['nominee_percentage'] = $depRow['nominee_percentage'];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['relationship_type'] = config('constant.relationship_type')[$depRow['relationship_type']];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['approval_status'] = config('constant.approval_status')[$depRow['approval_status']];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['is_deceased'] = $depRow['is_deceased'];
-                            $finalData['user'][$submissionRow['user_id_fk']]['dependent'][$depRow['id']]['is_active'] = $depRow['is_active'];
+
+                    // dependant data
+                    $dependantData = $submissionRow['user']['dependant'];
+                    if (count($dependantData)) {
+                        foreach ($dependantData as $depRow){
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['external_id'] = $depRow['external_id'];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['dependent_code'] = config('constant.dependent_code_ui')[$depRow['dependent_code']];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['dob'] = $depRow['dob'];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['gender'] = config('constant.gender')[$depRow['gender']];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['nominee_percentage'] = $depRow['nominee_percentage'];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['relationship_type'] = config('constant.relationship_type')[$depRow['relationship_type']];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['approval_status'] = config('constant.approval_status')[$depRow['approval_status']];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['is_deceased'] = $depRow['is_deceased'];
+                            $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['is_active'] = $depRow['is_active'];
+
                         }
                     }
                 }
@@ -289,5 +292,5 @@ class ApiController extends Controller
         } else {
             return json_encode(['message' => 'Auto Submission not possible before enrollment window end date']);
         }
-    }
+    }    
 }
