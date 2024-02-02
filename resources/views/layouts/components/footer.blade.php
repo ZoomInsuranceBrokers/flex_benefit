@@ -82,7 +82,7 @@
           <br><b>Registered & Corporate Office:</b> D-104, Udyog Vihar Phase V, Sector-19, Gurugram, Haryana-122016
           <br><b>CIN:</b> U66000HR2008PTC065899, <b>IRDAI Licence No.:</b> 389, <b>Licence Category:</b> Composite, <b>Licence Expiry:</b> 1st January 2027
           <br>Insurance is a subject matter of solicitation. Kindly read all policy related documents and take expert advice before taking any insurance or investment decisions.
-          <br><b>© Copyright 2023 mybenefits.co.in All Rights Reserved.</b>
+          <br><b>© Copyright 2023 zoominsurance.mybenefits.co.in All Rights Reserved.</b>
         </p>
           </div>
         </div>

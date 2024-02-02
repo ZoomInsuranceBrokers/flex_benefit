@@ -68,7 +68,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
 
     Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
-    Route::post('/claim/initiate', [ClaimController::class, 'saveClaimIntimation']);
+    Route::post('/claim/phs/initiate', [ClaimController::class, 'phs_save_claim_intimation']);
     Route::get('/claim/track', [ClaimController::class, 'trackClaimStatus']);
 
 

@@ -137,12 +137,12 @@
                                         <div class="row mb-3">
                                             <form>
                                            
-                                            <div class="col-3 pt-2 mb-3">pincode: <input type="number" name="pincode" id="pincode" /></div>
+                                            <div class="col-3 pt-2 mb-3">Pin Code: <input type="number" name="pincode" id="pincode" /></div>
                                              <input type="hidden" value="62" name="tpa_id" id="tpa" />
                                              <input type="hidden" name="policy_no" value="{{$policy_details->policy_number}}" id="policy_no">
 
                                             <div class="col-2">
-                                                <button type="submit"id="LoadRecordsButton" class="btn btn-secondary">Load records</button>
+                                                <button type="submit"id="LoadRecordsButton" class="btn btn-secondary" style="width: max-content;">Search Network Hospitals</button>
                                             </div>
                                             </form>
                                         </div>
