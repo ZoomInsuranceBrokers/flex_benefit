@@ -87,7 +87,7 @@
                     <div class="section-heading">
                         <h4><em>network</em> hospitals in case of <em>emergencies</em></h4>
                         <img src="{{asset('assets/images/heading-line-dec.png') }}" alt="">
-                        {{-- <h5>Ensure nominations add upto <em>100%</em> across elected dependents</h5> --}}
+                        {{-- <h5>Ensure nominations add upto <em>100%</em> across elected dependants</h5> --}}
                     </div>
                     </div>
                 </div>
@@ -102,11 +102,11 @@
 
                                 <li><b>Spouse</b> - Legally married to the employee. Spouse may include live-in partners of the opposite sex as per the corporate policy of Zoom. Spouse to also include legal guardian of adopted kids</li>
 
-                                <li><b>Children</b> – 2 children upto 25 years of age, unmarried and must be dependent on employee for financial support, are eligible. Children definition also covers legally adopted.</li>
+                                <li><b>Children</b> – 2 children upto 25 years of age, unmarried and must be dependant on employee for financial support, are eligible. Children definition also covers legally adopted.</li>
 
-                                <li><b>Parents</b> - Dependent parents or parents-in law. Cross selection of 1parent and 1 parent-in-law is not applicable under plans 5-10. This is possible if the employee has declared the other parent and parent-in-law as deceased on the tool. Employee can include both parents and parents-in-law together under plan 11-13</li>
+                                <li><b>Parents</b> - Dependant parents or parents-in law. Cross selection of 1parent and 1 parent-in-law is not applicable under plans 5-10. This is possible if the employee has declared the other parent and parent-in-law as deceased on the tool. Employee can include both parents and parents-in-law together under plan 11-13</li>
 
-                                <li><b>LGBTQIA+</b> - (Lesbian, Gay, Bi-sexual, Transgender, Queer, Agender) - Employees are eligible to cover their partners (married or unmarried) as dependents</li>
+                                <li><b>LGBTQIA+</b> - (Lesbian, Gay, Bi-sexual, Transgender, Queer, Agender) - Employees are eligible to cover their partners (married or unmarried) as dependants</li>
 
                                 <li><b>Live in Partners</b> - Employees are eligible to cover their live in partners as defined by Indian Law</li>
 
@@ -119,7 +119,7 @@
                         <div class="section-heading">
                             <h4>Select below values to get list of nearest hospitals nearby</h4>
                             <img src="{{ asset('assets/images/heading-line-dec.png') }}" alt="">
-                            <h5>Manage your dependents by adding new ones, modify existing ones</h5>
+                            <h5>Manage your dependants by adding new ones, modify existing ones</h5>
                         </div>
                     </div> --}}
                     <div class="col-lg-12">
@@ -128,7 +128,7 @@
                                 <!-- Tab links -->
                                 <div class="tabs">
                                     <button class="tablinks" data-country="network-hospitals"><p data-title="Network Hospitals">Network Hospitals</p></button>
-                                    {{-- <button class="tablinks active" data-country="add-new-dependent"><p data-title="Add New Dependent">Add New Dependent</p></button> --}}
+                                    {{-- <button class="tablinks active" data-country="add-new-dependant"><p data-title="Add New Dependant">Add New Dependant</p></button> --}}
                                 </div>
                                 <!-- Tab content -->
                                 <div class="wrapper_tabcontent">
@@ -137,12 +137,12 @@
                                         <div class="row mb-3">
                                             <form>
                                            
-                                            <div class="col-3 pt-2 mb-3">pincode: <input type="number" name="pincode" id="pincode" /></div>
+                                            <div class="col-3 pt-2 mb-3">Pin Code: <input type="number" name="pincode" id="pincode" /></div>
                                              <input type="hidden" value="62" name="tpa_id" id="tpa" />
                                              <input type="hidden" name="policy_no" value="{{$policy_details->policy_number}}" id="policy_no">
 
                                             <div class="col-2">
-                                                <button type="submit"id="LoadRecordsButton" class="btn btn-secondary">Load records</button>
+                                                <button type="submit"id="LoadRecordsButton" class="btn btn-secondary" style="width: max-content;">Search Network Hospitals</button>
                                             </div>
                                             </form>
                                         </div>

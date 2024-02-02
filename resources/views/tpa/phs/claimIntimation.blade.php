@@ -11,6 +11,9 @@
 @stop
 
 @section('content')
+
+
+
 <div id="networkHospitals" class="pricing-tables">
     <div class="container">
         <div class="row" style="height:30px;">
@@ -67,31 +70,50 @@
                 <div class="wrapper_tabcontent">
                     <div id="network-hospitals" class="tabcontent active">
                         <h3>Claim Intimate</h3>
+                        @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>Success!</strong> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        @endif
 
-                        <form action="{{ url('/claim/initiate') }}" method="post">
+                        @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error!</strong> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        @endif
+                        <form action="{{ url('/claim/phs/initiate') }}" method="post">
                             @csrf
 
 
                             <input name="claim_type" type="hidden" value="CASHLESS">
                             <input type="hidden" name="policy_no" value="{{$policy_details->policy_number}}">
                             <input type="hidden" name="tpa_id" value="{{$policy_details->tpa_id}}">
+                            <input name="phs_tpa_id" type="hidden" value="{{ $phs_tpa_id }}">
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="col-sm-12 control-label form-label">Dependent Name <span class="text-danger">*</span></label>
+                                        <label class="col-sm-12 control-label form-label">Select Relation <span class="text-danger">*</span></label>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control" id="input4" name="dependent_name" placeholder="Enter Member Name">
+                                            <select name="dependent_relation" class="form-control selectpicker" id="slct_relation" onchange="show_dependents2(this.value)" required>
+                                                @foreach($relations as $relation)
+                                                <option value="{{ $relation }}">
+                                                    {{ $relation }}
+                                                </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="col-sm-12 control-label form-label">Select Relation <span class="text-danger">*</span></label>
+                                        <label class="col-sm-12 control-label form-label">Dependent Name <span class="text-danger">*</span></label>
                                         <div class="col-sm-12">
-                                            <select name="dependent_relation" class="form-control selectpicker" id="slct_relation" required>
-                                                <option value="SELF">SELF</option>
+                                            <select name="dependent_name" class="form-control selectpicker" id="slct_person2" required>
+
                                             </select>
                                         </div>
                                     </div>
@@ -149,7 +171,7 @@
                                     <div class="form-group">
                                         <label for="input002" class="col-sm-12 control-label form-label">Name of Doctor <span class="text-danger">*</span></label>
                                         <div class="col-sm-12">
-                                            <input name="claim_name_of_doctor" type="text" class="form-control" id="input002" placeholder="Enter Doctor Name" required>
+                                            <input name="claim_name_of_doctor" type="text" class="form-control" id="input0902" placeholder="Enter Doctor Name" required>
                                         </div>
                                     </div>
                                 </div>
@@ -158,7 +180,18 @@
                                     <div class="form-group">
                                         <label for="input002" class="col-sm-12 control-label form-label">Name of Hospital <span class="text-danger">*</span></label>
                                         <div class="col-sm-12">
-                                            <input name="claim_name_of_hospital" type="text" class="form-control" id="input002" placeholder="Enter Hospital Name" required>
+                                            <input name="claim_name_of_hospital" type="text" class="form-control" id="input02" placeholder="Enter Hospital Name" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="input002" class="col-sm-12 control-label form-label">Contact Number <span class="text-danger">*</span></label>
+                                        <div class="col-sm-12">
+                                            <input name="mobile" type="number" class="form-control" placeholder="Enter your contact" required>
                                         </div>
                                     </div>
                                 </div>
@@ -178,6 +211,26 @@
 </div>
 </div>
 </div>
+@php
+$dependentsArray = json_decode($dependents, true);
+@endphp
+
+<script>
+    let dependents = @json($dependentsArray);
+    let relations = @json($relations);
+
+    function show_dependents2(rel) {
+        let html = '';
+        dependents.forEach(dependent => {
+            if (dependent.relation === rel) {
+                html += '<option value="' + dependent.dependent + '">' + dependent.dependent + '</option>';
+            }
+        });
+        document.getElementById('slct_person2').innerHTML = html;
+    }
+
+    show_dependents2(relations[0]);
+</script>
 
 
 @stop

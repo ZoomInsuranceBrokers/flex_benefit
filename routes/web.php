@@ -85,7 +85,7 @@ Route::group(['middleware' => 'auth'], function () {
     // Route::post('/claim/update', [DependentController::class, 'update']);
  
     Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
-    Route::post('/claim/initiate', [ClaimController::class, 'saveClaimIntimation']);
+    Route::post('/claim/phs/initiate', [ClaimController::class, 'phs_save_claim_intimation']);
     Route::get('/claim/track', [ClaimController::class, 'trackClaimStatus']);
 
 
