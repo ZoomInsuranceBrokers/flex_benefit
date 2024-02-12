@@ -22,6 +22,7 @@ class Dependant extends Model
         'user_id_fk',
         'dependent_code',
         'dob',
+        'doe',
         'gender',
         'nominee_percentage',
         'relationship_type',

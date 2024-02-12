@@ -160,8 +160,8 @@ return [
 
     'attributes' => [
         'dob' => '<b><em>Date of Birth</em></b>',
+        'doe' => '<b><em>Date of Event/Marriage</em></b>',
         'dependent_name' => '<b><em>Dependant\'s Name</em></b>',
-        'nominee_percentage' => '<b><em>Nomination Percentage</em></b>',
         'nominee_percentage' => '<b><em>Nomination Percentage</em></b>',
         'gender' => '<b><em>Gender</em></b>',
     ],

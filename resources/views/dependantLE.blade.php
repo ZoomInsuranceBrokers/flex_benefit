@@ -50,7 +50,6 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-
                             @include('layouts.components.dependantLE-tabs')
                         </div>
                     </div>

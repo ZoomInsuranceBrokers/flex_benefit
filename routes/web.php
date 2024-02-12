@@ -47,7 +47,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/dependants/nominationCount', [DependantController::class, 'getNominationAllocation']);
     Route::post('/dependants/list', [DependantController::class, 'listDependants']);
     Route::post('/dependants/saveLifeEvent', [DependantController::class, 'createLE']);
-    Route::get('/dependants/listLE', [DependantController::class, 'listLifeEvents']);
+    Route::post('/dependants/listLE', [DependantController::class, 'listLifeEvents']);
     Route::get('/dependants/life-events', [DependantController::class, 'loaddependantsLE']);
     Route::get('/dependants/getRelations', [DependantController::class, 'getAvailableRelations']);
     Route::get('/dependants', [DependantController::class, 'loaddependants']);

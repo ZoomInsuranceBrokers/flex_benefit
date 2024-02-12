@@ -15,9 +15,11 @@
                     <a id="header_home" href="/" class="active">Program Details</a>
                 </li>
                 &nbsp;
-                <li class="nav-item scroll-to-section bg-light">
-                    <a id="header_dependants" href="/dependants">dependants</a></li>
-                &nbsp;
+                @if(session('is_enrollment_window'))
+                  <li class="nav-item scroll-to-section bg-light">
+                      <a id="header_dependants" href="/dependants">Dependants</a></li>
+                  &nbsp;
+                @endif
                 <li class="nav-item scroll-to-section bg-light">
                     <a id="header_enrollment" href="/enrollment">Enrollment</a></li>
                 &nbsp;

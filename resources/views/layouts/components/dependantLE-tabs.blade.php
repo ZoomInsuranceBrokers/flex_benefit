@@ -1,25 +1,30 @@
 @section('link_rel')
-<link href="{{ asset('assets/css/jtable/themes/metro/blue/jtable.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="/assets/css/jtable/themes/metro/blue/jtable.css" rel="stylesheet" type="text/css" />
+<link href="/assets/css/jquery/validationEngine.jquery.min.css" rel="stylesheet" type="text/css" />
 @stop
 
 @section('inline-page-style')
-<style>.ui-dialog{z-index:2 !important;}</style>
+<style>
+.ui-widget-overlay{opacity:0.4}
+</style>
 @stop
-
 <section class="tab-wrapper">
    <div class="tab-content">
       <!-- Tab links -->
       <div class="tabs">
-         <button class="tablinks" data-country="Update Life Event">
-            <p data-title="Update Life Event">Update Life Event</p>
-        </button>
+         <button class="tablinks active" data-country="existing-dependant"><p data-title="Existing Dependant">Existing Dependants</p></button>
+         <button class="tablinks" data-country="new-life-event"><p data-title="New Life Event">Life Event</p></button>
       </div>
 
       <!-- Tab content -->
       <div class="wrapper_tabcontent">
          <div id="existing-dependant" class="tabcontent active">
             <h3>Existing</h3>
-            <div id="dependentLE_list"></div>
+            <div id="dependant_list"></div>
+         </div>
+         <div id="new-life-event" class="tabcontent">
+            <h3>Life Event</h3>
+            <div id="dependantLE_list"></div>
          </div>
 {{-- 
          <div id="add-new-dependant" class="tabcontent">
@@ -28,6 +33,26 @@
          </div> --}}
       </div>
    </div>
+   <a id="depError_trigger" style="display:none;" href="#depErrorModal">Logout</a>
+
+    <!-- Modal -->
+    <div class="modal" id="depErrorModal" style="display:none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="depErrorModalTitle">Nomination Limit Exceeds</h5>
+                <button type="button" class="modal_close close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"><p id="depErrorModalBody" class="text-danger"></p>              
+            </div>
+            <div class="modal-footer">
+                <button class="btn-success btn modal_close" data-dismiss="modal">Change Nomination Percentage</button>
+            </div>
+            </div>
+        </div>
+        </div>
 </section>
 
 @section('script')
@@ -58,6 +83,71 @@ function openTabs(el) {
    
    btnTarget.classList.add("active");
 }
+
+function checkNominationAllocation(field, rules, i, options){
+    returnVal = false;
+    hideAdd = hideEdit = false;
+    $('#AddRecordDialogSaveButton,#EditDialogSaveButton').show();   
+    if ($.trim($(field).val()) != '') {
+        $.ajax({
+            url:'/dependants/nominationCount?nomAlloc=' + $(field).val()+'&editId=' + $('#Edit-id').val(),
+            type:'GET',
+            async:false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+            },
+            success:function(result) {
+                response = JSON.parse(result);
+                if (!response.status) {
+                    {{-- options.allrules.validate2fields.alertText = 'Nomination execeeding 100%. Existing Allocation: ' 
+                    + response.msg; --}}
+                    {{-- $(field).validationEngine('showPrompt', 'Nomination execeeding 100%. Existing Allocation: ' 
+                    + response.msg);  --}}
+                    $('#depErrorModalBody').html('Nomination execeeding 100%. Existing Allocation: ' + response.msg);
+                    $('#depError_trigger').click();
+                    $('#AddRecordDialogSaveButton,#EditDialogSaveButton').hide();
+                    {{-- alert('Nomination execeeding 100%. Existing Allocation: ' + response.msg); --}}
+                } else {
+                    $('#AddRecordDialogSaveButton,#EditDialogSaveButton').show();
+                    returnVal =  true;
+                }
+            }
+        });
+        return returnVal;   
+    }    
+}
+
+function validateGender(field, rules, i, options){
+    let selectedOption = parseInt($(field).val());
+    if(selectedOption < 0 || selectedOption > 3){
+        return options.allrules.validate2fields.alertText = 'Invalid gender selected';
+    }
+}
+function validateRelationType(field, rules, i, options){
+    let selectedOption = parseInt($(field).val());
+    doeObj = $('input[name="doe"]').parents().eq(1);
+    doeObj.hide();
+    if (selectedOption == 6) {
+        doeObj.show();
+    }
+    if(selectedOption < 2 || selectedOption > 12){
+        return options.allrules.validate2fields.alertText = 'Invalid relationship selected';
+    }
+}
+function removeUsedRelations() {
+    $.ajax({
+        url : '/dependants/getRelations?isLEList=1',
+        async:false,
+        success:function(response) {
+            availableArr = response.split(',');
+            $('select[name="relationship_type"] > option').each(function(){
+                if(!availableArr.includes($(this).val())) {
+                    $(this).remove();
+                }
+            });
+        }
+    });
+}
 </script>
 
 {{-- JTABLE GRID --}}
@@ -65,22 +155,25 @@ function openTabs(el) {
 
 @section('document_ready')
     $('[id^=header_]').removeClass('active');
-    $('#header_dependantsLE').addClass('active');
+    $('#header_dependants').addClass('active');
 
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
         }
     });
-    $('#dependentLE_list').jtable({
-        title: 'Life Event dependants',
+
+    $('#dependant_list').jtable({
+        title: 'Existing Dependants',
         toolbar:{
             show:true
         },
         dialogShowEffect:'scale',
         actions: {
-            listAction: '/dependants/list',
-            createAction: '/dependants/saveLifeEvent',
+            listAction: '/dependants/list?isLEList=1',
+            //createAction: '/dependants/create',
+            //updateAction: '/dependants/update',
+            //deleteAction: '/dependants/delete'
         },
         fields: {
             id: {
@@ -100,11 +193,12 @@ function openTabs(el) {
                 title: 'Relation Type',
                 width: 'auto',
                 edit: false,
-                options: [@php echo $relationLE_Table; @endphp]
+                {{-- options: [@php echo config('constant.relationshipDep_type_jTable') @endphp] --}}
+                options: [@php echo $relation_Table; @endphp]
             },
             gender: {
                 title: 'Gender',
-                dependsOn:'relationship_type'
+                dependsOn: 'relationship_type',
                 width: 'auto',
                 edit: false,
                 options: [@php echo config('constant.gender_jTable') @endphp]
@@ -113,10 +207,14 @@ function openTabs(el) {
                 title: 'Date of Birth',
                 width: 'auto',
                 type: 'date',
+                displayFormat: 'dd-mm-yy',
+                changeMonth: true,
+                changeYear: true,
+                maxDate: "+0D"
             },
             nominee_percentage: {
                 title: 'Nomination Percentage',
-                width: 'auto'
+                width: 'auto',
             },
             approval_status: {
                 title: 'Approval Status',
@@ -126,9 +224,128 @@ function openTabs(el) {
                 edit: false,
                 list: true
             }
+        },
+        {{-- //Initialize validation logic when a form is created
+        formCreated: function (event, data) {
+            data.form.find('input[name="nominee_percentage"]').addClass('validate[required,min[0],max[100],funcCall[checkNominationAllocation]]');
+            data.form.find('input[name="dob"]').addClass('validate[required]');
+            data.form.find('select[name="gender"]').addClass('validate[funcCall[validateGender]]');
+            data.form.find('select[name="relationship_type"]').addClass('validate[funcCall[validateRelationType]]');
+            data.form.find('input[name="dependant_name"]').addClass('validate[required]');
+            data.form.validationEngine({promptPosition:"topLeft", focusFirstField : false, autoHidePrompt: true,  autoHideDelay: 4000});
+            removeUsedRelations();
+        },
+        //Validate form when it is being submitted
+        formSubmitting: function (event, data) {
+            return data.form.validationEngine('validate');
+        },
+        //Dispose validation logic when form is closed
+        formClosed: function (event, data) {
+            data.form.validationEngine('hide');
+            data.form.validationEngine('detach');
+            //$('#dependant_list').jtable('load');
+        } --}}
+    });
+    $('#dependant_list').jtable('load',{},function(){ 
+        //removeUsedRelations();
+    });
+
+    $('#dependantLE_list').jtable({
+        title: 'Life Event Dependants',
+        toolbar:{
+            show:true
+        },
+        dialogShowEffect:'scale',
+        actions: {
+            listAction: '/dependants/listLE',
+            createAction: '/dependants/saveLifeEvent',
+            updateAction: '/dependants/update',
+            deleteAction: '/dependants/delete'
+        },
+        fields: {
+            id: {
+                title: 'Id',
+                width: 'auto',
+                create: false,
+                edit: false,
+                list: false,
+                key:true
+            },
+
+            dependent_name: {
+                title: 'Dependant Name',
+                width: 'auto'
+            },
+            relationship_type: {
+                title: 'Relation Type',
+                width: 'auto',
+                //edit: false,
+                options: [@php echo $relation_Table; @endphp]
+            },
+            gender: {
+                title: 'Gender',
+                dependsOn: 'relationship_type',
+                width: 'auto',
+                edit: false,
+                options: [@php echo config('constant.gender_jTable') @endphp]
+            },
+            dob: {
+                title: 'Date of Birth',
+                width: 'auto',
+                type: 'date',
+                displayFormat: 'dd-mm-yy',
+                changeMonth: true,
+                changeYear: true,
+                maxDate: "+0D"
+            },
+            doe: {
+                title: 'Date of Event/Marriage',
+                width: 'auto',
+                type: 'date',
+                displayFormat: 'dd-mm-yy',
+                changeMonth: true,
+                changeYear: true,
+                maxDate: "+0D",
+                create: true,
+                edit: true,
+                list: false
+            },
+            nominee_percentage: {
+                title: 'Nomination Percentage',
+                width: 'auto',
+            },
+            approval_status: {
+                title: 'Approval Status',
+                width: 'auto',
+                options: [@php echo config('constant.approval_status_jTable') @endphp],
+                create: false,
+                edit: false,
+                list: true
+            }
+        },
+        //Initialize validation logic when a form is created
+        formCreated: function (event, data) {
+            data.form.find('input[name="nominee_percentage"]').addClass('validate[required,min[0],max[100],funcCall[checkNominationAllocation]]');
+            data.form.find('input[name="dob"]').addClass('validate[required]');
+            data.form.find('input[name="doe"]').parents().eq(1).hide();
+            data.form.find('select[name="gender"]').addClass('validate[funcCall[validateGender]]');
+            data.form.find('select[name="relationship_type"]').addClass('validate[funcCall[validateRelationType]]');
+            data.form.find('input[name="dependant_name"]').addClass('validate[required]');
+            data.form.validationEngine({promptPosition:"topLeft", focusFirstField : false, autoHidePrompt: true,  autoHideDelay: 4000});
+            removeUsedRelations();
+        },
+        //Validate form when it is being submitted
+        formSubmitting: function (event, data) {
+            return data.form.validationEngine('validate');
+        },
+        //Dispose validation logic when form is closed
+        formClosed: function (event, data) {
+            data.form.validationEngine('hide');
+            data.form.validationEngine('detach');
+        },
+        recordsLoaded: function (event, data){
         }
     });
-    	
-    $('#dependent_list').jtable('load');
+    $('#dependantLE_list').jtable('load',{},function(){666999999});
 
 @endsection

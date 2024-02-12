@@ -32,9 +32,15 @@ class DependantController extends Controller {
         return view('dependant',compact('relation_Table'));
     }
 
-    public function getAvailableRelations() {
+    public function getAvailableRelations(Request $request) {
         // all relation possible in case fo Life Event
-        $relation_Table = config('constant.relationshipDep_type_jTable');
+        if ($request->has('isLEList') && $request->isLEList) {
+            $relation_Table = config('constant.relationshipLE_type_jTable');
+        } else {
+            //$relation_Table = config('constant.relationship_type');
+            $relation_Table = config('constant.relationshipDep_type_jTable');
+            unset($relation_Table[config('constant.$_RLTN_SELF')]);
+        }
         $relationshipNonDuplicate_Table = config('constant.relationshipNonDuplicate_types');
         // check logged in user's existing dependants
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
@@ -59,8 +65,11 @@ class DependantController extends Controller {
                                 //->where('is_deceased',config('constant.$_NO'))
                                 ->where('user_id_fk',Auth::user()->id)
                                 ->where('relationship_type','<>',config('constant.$_RLTN_SELF'))
-                                ->orderBy('dependent_name', 'ASC')
-                                ->get();
+                                ->orderBy('dependent_name', 'ASC');
+        if ($request->has('isLEList') && $request->isLEList) {
+            $dependants->where('approval_status', config('constant.$_APPR_STATUS_APPROVED'));
+        }                        
+        $dependants = $dependants->get();
         if(!count($dependants)) {       // no/zero dependant count
             $jTableResult['Result'] = 'ERROR';
             $jTableResult['Message'] = 'No dependants found for you! Please secure your loved ones asap.';
@@ -234,14 +243,18 @@ class DependantController extends Controller {
         return json_encode($jTableResult);
     }
 
-    public function listLifeEvents(Request $request) {        
+    /**
+     * Ajax function to load list of any Life Events entries present
+     * **/
+    public function listLifeEvents(Request $request) {    
         $jTableResult = array('Result' => 'OK');        // default optimistic approach
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
                                 ->where('user_id_fk',Auth::user()->id)
+                                ->where('approval_status','<>', config('constant.$_APPR_STATUS_APPROVED'))
                                 ->get();        
         if(!count($dependants)) {       // no/zero dependant count
-            $jTableResult['Result'] = 'ERROR';
-            //$jTableResult['Message'] = 'No dependants found for you! Please secure your loved ones asap.';
+            $jTableResult['Result'] = 'OK';
+            $jTableResult['Message'] = 'No life event dependants found for you';
         } else {        // dependants found 
             $jTableResult['Result'] = "OK";
             $jTableResult['Records'] = $dependants->toArray();
@@ -249,9 +262,13 @@ class DependantController extends Controller {
         return json_encode($jTableResult);
     }
 
+    /**
+     * Function to load Life Event Page
+     * **/
     public function loaddependantsLE() {
         // all relation possible in case fo Life Event
         $relationLE_Table = config('constant.relationshipLE_type_jTable');
+        $relation_Table = config('constant.relationshipDep_type_jTable');
         //dd($relationLE_Table);
         // check logged in user's existing dependants
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
@@ -267,8 +284,9 @@ class DependantController extends Controller {
             }
         }
         $relationLE_Table = implode(',',$relationLE_Table);
+        $relation_Table = implode(',',$relation_Table);
 
-        return view('dependantLE',compact('relationLE_Table'));
+        return view('dependantLE',compact('relationLE_Table','relation_Table'));
     }
 
     public function createLE(Request $request) {
@@ -279,15 +297,15 @@ class DependantController extends Controller {
             $rules = [
                 'dependent_name' => 'required|between:3,32|',
                 'dob'=> 'required|date_format:d-m-Y',
+                'doe'=> 'required_if:relationship_type,==,' . config('constant.$_RLTN_SPOUSE'),
                 'gender' => 'required|min:0|max:3',
                 'nominee_percentage' => 'required|numeric|digits_between:0,100',
                 'relationship_type'  => 'required|min:1|max:12',
-                //'is_active' => 'required',
-                // 'is_deceased' => 'required'
             ];
 
             $validator = Validator::make($input, $rules, $messages = [
                 'required' => 'The :attribute field is required.',
+                'required_if' => 'The :attribute field is required for selected "Relation Type"',
                 'numeric' => 'The :attribute field should be numbers only',
                 'boolen' => 'The :attribute field should be Yes or No.',
                 'date_format' => 'The :attribute should follow date format of YYYY-MM-DD',
@@ -297,18 +315,21 @@ class DependantController extends Controller {
             
             if (!$validator->fails()) {
                 $dependant = new Dependant();
-                $dependant->external_id = 'sfdc_' . time();
+                $dependant->external_id = null;
                 $dependant->dependent_name = $input['dependent_name'];
                 $dependant->user_id_fk = Auth::user()->id;
                 // find dependant code from relationship type
-                foreach (config('constant.dependent_code') as $code => $rltnArr) {
+                foreach (config('constant.dependant_code') as $code => $rltnArr) {
                     if(in_array($input['relationship_type'], $rltnArr))
                     {
                         $dependant->dependent_code = $code;
                         break;
                     }
                 }
-                $dependant->dob = $input['dob'];
+                $dependant->dob = date('Y-m-d', strtotime($input['dob']));
+                if ($input['relationship_type'] == config('constant.$_RLTN_SPOUSE')) {
+                    $dependant->doe = $input['doe'];    // date of event
+                }
                 $dependant->gender = $input['gender'];
                 $dependant->nominee_percentage = $input['nominee_percentage'];
                 $dependant->relationship_type = $input['relationship_type'];
@@ -316,7 +337,8 @@ class DependantController extends Controller {
                 $dependant->is_active = config('constant.$_YES');
                 $dependant->is_deceased = config('constant.$_NO');
                 $dependant->created_by = Auth::user()->id;     
-                $dependant->modified_by = Auth::user()->id;     
+                $dependant->modified_by = Auth::user()->id; 
+                //dd($dependant);    
                 $dependant->save();
 
                 $jTableResult['Result'] = "OK";
@@ -340,9 +362,10 @@ class DependantController extends Controller {
         return json_encode($jTableResult);
     }
 
-    public function getRelationshipTypes () {
+    public function getRelationshipTypes (Request $request) {
         $relation_Table = config('constant.relationship_type');
         unset($relation_Table[config('constant.$_RLTN_SELF')]);
+        //dd($relation_Table);
         //$relation_Table = config('constant.relationship_type_jTable');
         //dd($relation_Table);
         // check logged in user's existing dependants

@@ -153,6 +153,7 @@ $dependant_code_ui = [ // these values are indexes/keys of relationship_types
 return [
     // relationship array
     'relationship_type' => $relationship_types,
+    'relationship_typeLE' => $relationship_typesLE,
     'dependant_code_ui' => $dependant_code_ui,
     'relationshipNonDuplicate_types' => $relationshipNonDuplicate_types,
     'relationship_type_jTable' => implode(',', generateJtableOptions($selectLabel,$relationship_types)),
