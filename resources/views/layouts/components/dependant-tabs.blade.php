@@ -162,10 +162,9 @@ function removeUsedRelations() {
         },
         dialogShowEffect:'scale',
         actions: {
-            listAction: '/dependants/list',
-            createAction: '/dependants/create',
-            updateAction: '/dependants/update',
-            deleteAction: '/dependants/delete'
+            listAction: '/dependants/list',            
+            @php echo session('is_enrollment_window') ? "createAction: '/dependants/create',updateAction: '/dependants/update'," : '' ; @endphp
+        //    deleteAction: '/dependants/delete'
         },
         fields: {
             id: {
@@ -184,7 +183,7 @@ function removeUsedRelations() {
             relationship_type: {
                 title: 'Relation Type',
                 width: 'auto',
-                edit: false,
+                edit: true,
                 {{-- options: [@php echo config('constant.relationshipDep_type_jTable') @endphp] --}}
                 options: [@php echo $relation_Table; @endphp]
             },
@@ -192,7 +191,7 @@ function removeUsedRelations() {
                 title: 'Gender',
                 dependsOn: 'relationship_type',
                 width: 'auto',
-                edit: false,
+                edit: true,
                 options: [@php echo config('constant.gender_jTable') @endphp]
             },
             dob: {

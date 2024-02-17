@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use App\Models\User;
 use App\Models\Account;
+use App\Models\Dependant;
 use Illuminate\Http\Request;
 use App\Models\MapUserFYPolicy;
 use Illuminate\Support\Facades\DB;
@@ -178,9 +179,8 @@ class ApiController extends Controller
                     $finalData['user'][$submissionRow['user_id_fk']]['gender'] = config('constant.gender')[$userData['gender']];
                     $finalData['user'][$submissionRow['user_id_fk']]['email'] = $userData['email'];
 
-
                     // dependant data
-                    $dependantData = $submissionRow['user']['dependant'];
+                    /*$dependantData = $submissionRow['user']['dependant'];
                     if (count($dependantData)) {
                         foreach ($dependantData as $depRow){
                             $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['external_id'] = $depRow['external_id'];
@@ -195,7 +195,34 @@ class ApiController extends Controller
                             $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['is_active'] = $depRow['is_active'];
 
                         }
-                    }
+                    }*/
+                }
+            }
+
+            // enrollment/submission date filter
+            $depData = Dependant::get();
+            if (array_key_exists('colName', $filters)) {
+                if (array_key_exists('sdate', $filters) && array_key_exists('edate', $filters)) {
+                    $depData->whereBetween($request->has('colName'), [$filters['sdate'], $filters['edate']]);
+                } else if (array_key_exists('sdate', $filters)) {
+                    $depData->where($request->has('colName'), '>=', $filters['sdate']);
+                } else if (array_key_exists('edate', $filters)) {
+                    $depData->where($request->has('colName'), '<=', $filters['edate']);
+                }
+            }
+            if (count($dependantData)) {
+                foreach ($dependantData as $depRow){
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['external_id'] = $depRow['external_id'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['dependent_code'] = config('constant.dependent_code_ui')[$depRow['dependent_code']];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['dob'] = $depRow['dob'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['gender'] = config('constant.gender')[$depRow['gender']];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['nominee_percentage'] = $depRow['nominee_percentage'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['relationship_type'] = config('constant.relationship_type')[$depRow['relationship_type']];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['approval_status'] = config('constant.approval_status')[$depRow['approval_status']];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['is_deceased'] = $depRow['is_deceased'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['dependant'][$depRow['id']]['is_active'] = $depRow['is_active'];
+
                 }
             }
             //dd($finalData);

@@ -19,7 +19,7 @@ class AccountController extends Controller
     public function setupAccount(Request $request) {
         if ($request->has('accId') && strlen(trim($request->accId))) {
             session(['confirmUpdate' => $request->has('confirmUpdate')]);
-            $this->upsertAccount();
+            //$this->upsertAccount();
 
 
             // financial year
