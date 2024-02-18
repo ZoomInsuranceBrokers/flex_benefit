@@ -159,9 +159,10 @@
     @endphp
     @php //} 
     @endphp
-
-    
-
 @else
-    <h4 class="mb-5 mt-5 text-center text-danger">Enrollment details not found.<br>Please select appropriate policies and submit before enrollment window ends</h4>
+    <h4 class="mb-5 mt-5 text-center">
+        <div class="alert-danger p-2">
+            Enrollment details not found for the year
+        </div>
+    </h4>
 @endif

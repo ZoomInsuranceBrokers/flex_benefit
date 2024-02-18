@@ -170,8 +170,8 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
             @endif
          </div>
          <div id="enrollment-history" class="tabcontent">
-            <h3>Enrollment History</h3>
-            <div id="enrollment_history"></div>
+            <h3>History</h3>
+            @include('_partial.enrollment-history')
          </div>
       </div>
    </div>
@@ -700,11 +700,12 @@ $('[id^=policySubCategoryList]').each(function(){
 });
 
 $('#enrollment-summary').on('click', function(){
-    $('#summary_content').load('/enrollment/summary', function(response){
-        
-        
-    });
-}); 
+    $('#summary_content').load('/enrollment/summary');
+});
+$('[id^="fyClick"]').on('click', function(){
+    $('#enrollment_history_year').html($(this).text());
+    $('#enrollment_history_content').load('/enrollment/summary?fid=' + $(this).attr('data-id'));
+});
 
 {{-- // trigger for radio button --}}
     {{-- $('[id^=planId]').click(function(){

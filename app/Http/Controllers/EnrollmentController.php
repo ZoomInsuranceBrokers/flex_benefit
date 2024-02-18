@@ -62,8 +62,16 @@ class EnrollmentController extends Controller
         // $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
 
         // financial year start and end date
-        $fyData = FinancialYear::where('is_active',true)->select('start_date', 'end_date')->get()->toArray();
-        session(['fy' => $fyData[0]]);
+        $fyData = FinancialYear::select('id','name', 'start_date', 'end_date', 'is_active', 'last_enrollment_date')
+            ->orderBy('start_date','DESC')->limit(5)
+            ->get()->toArray();
+        //dd($fyData);
+        foreach ($fyData as $fyd) {
+            if ($fyd['is_active']) {
+                session(['fy' => $fyd]);
+                break;
+            }
+        }        
         
         // check if data already final submission made
         $is_submitted = MapUserFYPolicy::where('user_id_fk', Auth::user()->id)->where('is_submitted', true)->get();
@@ -146,6 +154,7 @@ class EnrollmentController extends Controller
                 'basePlan' => $basePlan,
                 'gradeAmtData' => $gradeData,
                 'dependant' => $dependants->toArray(),
+                'fyData' => $fyData,
                 'is_enrollment_window' => session('is_enrollment_window')
             ];
         //} else {
@@ -516,12 +525,18 @@ class EnrollmentController extends Controller
         return base64_encode(json_encode($dataArr));
     }
 
-    public function loadSummary()
+    public function loadSummary(Request $request)
     {
-        $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)
-        ->where('is_active', true)
-        ->with(['fyPolicy'])
-            ->get()->toArray();
+        $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy']);
+        $activeEntries = true;
+        if ($request->has('fid') && base64_decode($request->fid)) {
+            $mapUserFYPolicyData->whereRelation('fyPolicy.financialYears', 'id',base64_decode($request->fid));
+            $activeEntries = null;
+        }
+        $activeEntries ? $mapUserFYPolicyData->where('is_active', true) : '';
+        //$mapUserFYPolicyData->toSql();
+        $mapUserFYPolicyData = $mapUserFYPolicyData->get()->toArray();
+        //dd($mapUserFYPolicyData);
         $html = view('summary')
             ->with('mapUserFYPolicyData', $mapUserFYPolicyData)->render();
         return $html;
