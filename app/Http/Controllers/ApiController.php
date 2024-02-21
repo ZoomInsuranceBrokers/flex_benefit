@@ -225,19 +225,19 @@ class ApiController extends Controller
             //dd($dependantData);
             if (count($dependantData)) {
                 foreach ($dependantData as $depRow){
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['external_id'] = $depRow['external_id'];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['user_id_fk'] = $depRow['user_id_fk'];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['dependent_code'] = config('constant.dependant_code_ui')[$depRow['dependent_code']];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['dob'] = $depRow['dob'];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['doe'] = $depRow['doe'];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['gender'] = $depRow['gender'] ? config('constant.gender')[$depRow['gender']] : null;
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['nominee_percentage'] = $depRow['nominee_percentage'];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['relationship_type'] = config('constant.relationship_type')[$depRow['relationship_type']];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['approval_status'] = config('constant.approval_status')[$depRow['approval_status']];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['is_deceased'] = $depRow['is_deceased'];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['is_active'] = $depRow['is_active'];
-                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['is_life_event'] = $depRow['is_life_event'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['external_id'] = $depRow['external_id'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['user_id_fk'] = $depRow['user_id_fk'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_code'] = config('constant.dependant_code_ui')[$depRow['dependent_code']];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dob'] = $depRow['dob'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['doe'] = $depRow['doe'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['gender'] = $depRow['gender'] ? config('constant.gender')[$depRow['gender']] : null;
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['nominee_percentage'] = $depRow['nominee_percentage'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['relationship_type'] = config('constant.relationship_type')[$depRow['relationship_type']];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['approval_status'] = config('constant.approval_status')[$depRow['approval_status']];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['is_deceased'] = $depRow['is_deceased'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['is_active'] = $depRow['is_active'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['is_life_event'] = $depRow['is_life_event'];
 
                 }
             }
