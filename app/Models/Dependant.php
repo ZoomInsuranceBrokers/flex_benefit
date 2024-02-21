@@ -28,6 +28,7 @@ class Dependant extends Model
         'relationship_type',
         'approval_status',
         'is_active',
+        'is_life_event',
         'is_deceased',
         'created_by',
         'modified_by'

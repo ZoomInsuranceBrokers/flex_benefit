@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Models\User;
 // use App\Models\Contact;
 use App\Models\Currency;
@@ -147,3 +148,4 @@ Route::get('/enrollment/getSubmissionData', [ApiController::class, 'getUserEnrol
 Route::get('/enrollment/autoSubmit', [ApiController::class, 'autoSubmitEnrollment']);
 Route::get('/user/add', [UserController::class, 'createUsers']);
 Route::get('/enrollment/updateEncodedSummary', [EnrollmentController::class, 'updateBaseDefaultEncodedSummary']);
+Route::get('/account/setup', [AccountController::class, 'setupAccount']);

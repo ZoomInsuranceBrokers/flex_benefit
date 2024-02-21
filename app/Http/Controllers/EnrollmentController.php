@@ -699,7 +699,8 @@ class EnrollmentController extends Controller
         return json_encode(['userpts' => $userPoints, 'catpts' => $currentSelectedData ]);
     }
 
-    public function updateBaseDefaultEncodedSummary(Request $request){
+    public function updateBaseDefaultEncodedSummary(Request $request)
+    {
         $userPolData = DB::table('map_user_fypolicy as mufyp')
             ->leftJoin('map_financial_year_policy as mfyp', 'mufyp.fypolicy_id_fk', '=', 'mfyp.id')
             ->leftJoin('financial_years as fy', 'mfyp.fy_id_fk', '=', 'fy.id')

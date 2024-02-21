@@ -1,6 +1,7 @@
 <?php
-
+/*
 namespace App\AccountTraits;
+
 use App\Models\Account;
 use App\Models\CountryCurrency;
 use App\Models\FinancialYear;
@@ -255,5 +256,5 @@ trait insuancePolicyMethods {
             }
         }        
     }
-}
+} */
 ?>

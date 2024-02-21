@@ -122,6 +122,7 @@ class DependantController extends Controller {
                 $dependant->relationship_type = $input['relationship_type'];
                 $dependant->approval_status = config('constant.$_APPR_STATUS_APPROVED');      
                 $dependant->is_active = config('constant.$_YES');
+                $dependant->is_life_event = false;
                 $dependant->is_deceased = config('constant.$_NO');
                 $dependant->created_by = Auth::user()->id;     
                 $dependant->modified_by = Auth::user()->id;     
@@ -250,6 +251,7 @@ class DependantController extends Controller {
         $jTableResult = array('Result' => 'OK');        // default optimistic approach
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
                                 ->where('user_id_fk',Auth::user()->id)
+                                ->where('is_life_event',true)
                                 ->where('approval_status','<>', config('constant.$_APPR_STATUS_APPROVED'))
                                 ->get();        
         if(!count($dependants)) {       // no/zero dependant count
@@ -335,6 +337,7 @@ class DependantController extends Controller {
                 $dependant->relationship_type = $input['relationship_type'];
                 $dependant->approval_status = config('constant.$_APPR_STATUS_INPROGRESS');      
                 $dependant->is_active = config('constant.$_YES');
+                $dependant->is_life_event = true;
                 $dependant->is_deceased = config('constant.$_NO');
                 $dependant->created_by = Auth::user()->id;     
                 $dependant->modified_by = Auth::user()->id; 

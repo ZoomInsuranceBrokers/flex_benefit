@@ -109,11 +109,11 @@ class ApiController extends Controller
     {
         // dd(base64_encode('a9#Bc2$eDfGhIjK4LmNpQr6StUvWxYz' . date('d-m-Y')));
         // dd($request->authKey);
-        // if (
-        //     $request->isMethod('get') && $request->has('authKey') &&
-        //     $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
-        // )
-        if (1)
+        if (
+            $request->isMethod('get') && $request->has('authKey') &&
+            $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
+        )
+        //if (1)
         {
             $filters = ['output' => 'json', 'active' => true];
             $request->has('sdte') ? $filters['sdate'] = $request->sdte : '';
@@ -237,6 +237,7 @@ class ApiController extends Controller
                     $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['approval_status'] = config('constant.approval_status')[$depRow['approval_status']];
                     $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['is_deceased'] = $depRow['is_deceased'];
                     $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['is_active'] = $depRow['is_active'];
+                    $finalData['dependant'][$depRow['user_id_fk']][$depRow['id']]['is_life_event'] = $depRow['is_life_event'];
 
                 }
             }
