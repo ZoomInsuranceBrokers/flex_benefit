@@ -26,7 +26,7 @@ class MapUserFYPolicy extends Model
     public function user()
     {
         //return $this->hasOne(User::class, 'id', 'user_id_fk')->with('dependant');
-        return $this->belongsTo(User::class, 'user_id_fk','id',)->with('dependant');
+        return $this->belongsTo(User::class, 'user_id_fk','id')->with('dependant');
     }
     public function userCompact()
     {

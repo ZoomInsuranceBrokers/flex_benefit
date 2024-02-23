@@ -113,7 +113,7 @@ class ApiController extends Controller
             $request->isMethod('get') && $request->has('authKey') &&
             $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
         )
-        //if (1)
+        // if (1)
         {
             $filters = ['output' => 'json', 'active' => true];
             $request->has('sdte') ? $filters['sdate'] = $request->sdte : '';
@@ -205,7 +205,7 @@ class ApiController extends Controller
             }
 
             // enrollment/submission date filter
-            $depData = Dependant::select('*');
+            $depData = Dependant::select('*')->with('user');
             if (array_key_exists('colName', $filters)) {//dd('here');
                 if (array_key_exists('sdate', $filters) && array_key_exists('edate', $filters)) {
                     $depData->where($filters['colName'], '>=', $filters['sdate']);
@@ -225,6 +225,7 @@ class ApiController extends Controller
             //dd($dependantData);
             if (count($dependantData)) {
                 foreach ($dependantData as $depRow){
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['user_ext_id'] = $depRow['user']['user_ext_id'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['external_id'] = $depRow['external_id'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['user_id_fk'] = $depRow['user_id_fk'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
@@ -238,7 +239,6 @@ class ApiController extends Controller
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['is_deceased'] = $depRow['is_deceased'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['is_active'] = $depRow['is_active'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['is_life_event'] = $depRow['is_life_event'];
-
                 }
             }
             //dd($finalData);

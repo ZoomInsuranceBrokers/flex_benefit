@@ -34,8 +34,8 @@ class Dependant extends Model
         'modified_by'
     ];
 
-    // public function contact(): BelongsTo
-    // {
-    //     return $this->belongsTo(Contact::class, 'contact_id_fk');
-    // }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id_fk','id')->select(['id','external_id as user_ext_id','fname','lname']);
+    }
 }
