@@ -12,3 +12,6 @@
 <link rel="stylesheet" href="{{ asset('assets/css/animated.css')}}">
 <link rel="stylesheet" href="{{ asset('assets/css/owl.css')}}">
 <link rel="stylesheet" href="{{ asset('assets/css/app-custom.css')}}">
+<link rel="stylesheet" href="{{ asset('assets/css/style.css')}}">
+<link rel="stylesheet" href="{{ asset('assets/css/responsive.css')}}">
+<link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css')}}">

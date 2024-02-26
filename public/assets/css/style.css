@@ -1,0 +1,421 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    color: var(--black);
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    overflow-x: hidden;
+}
+
+:root {
+    --darkblue: #03313d;
+    --darkcerulean: #084F60;
+    --blue: #0FA2D5;
+    --gray: #D3D3D3;
+    --grayfont: #606060;
+    --white: #ffffff;
+    --black: #000000;
+}
+/* For Home Page CSS */
+.custom-nav .navbar-expand-lg .navbar-collapse {
+    justify-content: flex-end;
+    gap: 5rem;
+}
+.custom-nav .navbar-expand-lg .navbar-nav {
+    gap: 4rem;
+    font-weight: 600;
+}
+
+
+.profile-dropdown .dropdown-toggle::after{
+    border:0;
+}
+.profile-dropdown .dropdown-toggle{
+    color: #fff;
+    font-size: 14px;
+}
+.custom-nav .navbar-brand {
+    width: 300px;
+}
+
+.custom-nav .navbar-brand img {
+    width: 100%;
+}
+
+.custom-nav .header-nav {
+    background-color: var(--gray);
+    padding: 10px 25px;
+    font-weight: bold;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.custom-nav .navbar-nav .nav-link.active{
+    box-shadow: 0 4px 8px 0 rgb(255 255 255 / 16%), 0 4px 5px 0 rgb(110 110 110 / 44%);
+    color: var(--darkblue);
+    border-radius: 5px;
+}
+.custom-nav .navbar-nav .nav-link:hover{
+    box-shadow: 0 4px 8px 0 rgb(255 255 255 / 16%), 0 4px 5px 0 rgb(110 110 110 / 44%);
+    color: var(--darkblue);
+}
+.custom-nav .header-nav .dropdown-menu[data-bs-popper] {
+    left: -62px;
+}
+.banner__section{
+    min-height: 70vh;
+    display: flex;
+}
+ .banner__section .left-cols {
+         background: url('{{ asset('assets/images/1.png') }}');
+         background-repeat: no-repeat;
+         position: relative;
+     }
+
+     .right-col {
+         background: url('{{ asset('assets/images/bg-icon1.png') }}') center no-repeat;
+         background-size: 300px;
+     }
+     
+.new-banner{
+    padding: 5rem;
+}
+.new-banner h1{
+    font-size: 3rem;
+    color: var(--blue);
+    font-weight: 600;
+}
+.new-banner p{
+    margin: 2rem 0.5rem 1rem 0;;
+}
+.color-black{
+    color: var(--darkblue);
+}
+.profile-dropdown{
+    background: var(--blue);
+    padding: 0px 5px;
+    border-radius: 5px;
+}
+.profile-dropdown img{
+    width: 25px;
+    height: 25px;
+    border-radius: 50px;
+}
+.login-btn{
+    background: linear-gradient(105deg, rgb(3, 49, 61) 0%, rgb(3, 49, 61) 100%);
+    border: none;
+    color: #fff;
+    padding: 0.6rem 2.5rem;
+    border-radius: 20px;
+}
+
+.login-btn:hover{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.work{
+    padding: 2rem;
+}
+.side-border{
+    background: url('../img/shadow.png') no-repeat left;
+    background-size: 8px;
+    padding: 0 0 0 1rem;
+}
+.gray-border{
+    background: url('../img/gray-border.png') no-repeat left;
+    background-size: 8px;
+    padding: 0 0 0 1rem; 
+}
+.work-bg{
+    background: var(--darkblue);
+}
+.work h2{
+   font-size: 3rem;
+   font-weight: 600;
+   color: #fff;
+   text-transform: capitalize;
+}
+
+.work {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 300;
+}
+.hire-bg{
+    background: var(--blue);
+}
+.hire{
+    padding: 2.1rem;
+}
+
+.hire h2{
+   font-size: 3rem;
+   font-weight: 600;
+   color: #fff;
+   text-transform: capitalize;
+}
+
+.hire {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 300;
+}
+.hire .custom-text{
+    padding-left: 15px;
+}
+.white-btn{
+    background: var(--white);
+    padding: 0.5rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--blue);
+    font-weight: 600;
+    font-size: 16px;
+    margin-left: 15px;
+}
+
+.white-btn:hover{
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    color: var(--blue);
+}
+
+.custom-container{
+margin: 2.5rem;
+}
+.plan h2{
+    font-size: 3rem;
+    font-weight: 600;
+    color: var(--blue);
+}
+
+.card-items .card-list{
+    border-radius: 10px;
+    border-top-right-radius: 50px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+    background-color: #fff;
+    border-radius: 10px;
+    border-top-right-radius: 50px;
+    transition: all .3s;
+    padding-bottom: 10px;
+}
+
+.service-img .service-main{
+    width: 100%;
+    border-top-right-radius: 50px;
+    border-bottom-left-radius: 50px;
+}
+
+.card-list h3{
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 15px 15px;
+}
+.img-icon{
+    width: 60px;
+    position: absolute;
+    left: 15px;
+    bottom: 80px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+.img-icon img{
+    width: 100%;
+}
+#plan .service-col .medical-info{
+    transition: all 2s ease;
+}
+.medical-info{
+    position: absolute;
+    /* display: none; */
+    background: var(--gray);
+    font-size: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 40px;
+    margin-left: 20px;
+    position: relative;
+}
+.hidden {
+    display: none;
+  }
+#serviceCol, #terms-col, #plans-col, #non-col{
+    cursor: pointer;
+}
+.medical-info p{
+    margin-bottom: 0;
+}
+.medical-info::after{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: -18px;
+    z-index: -1;
+    border-bottom-right-radius: 43px;
+    right: auto;
+    top: 0px;
+    transform: skewY(40deg);
+    transition: translate(90);
+    bottom: auto;
+    border: 28px solid;
+    border-color: var(--gray) transparent transparent transparent;
+}
+.main-footer{
+    background: var(--darkblue);
+    color: #fff;
+}
+ul.custom-icon{
+    list-style-type: none;
+}
+ul.custom-icon li{
+    background: url(../img/white\ flex\ icon-01.png) no-repeat left center;
+    background-size: 16px;
+    padding-left: 1.5em;
+}
+
+.tax-banner{
+    background: url(../img/tax-img.png) no-repeat;
+    background-size: 100%;
+    position: relative;
+}
+.tax-banner .tax-img{
+    position: absolute;
+    width: 200px;
+    bottom: 50px;
+    padding: 5px;
+    left: 0;
+}
+.tax-banner .tax-img img{
+    width: 100%;
+    border-radius: 15px;
+}
+
+/*==============================================
+enrollment CSS start
+===============================================*/
+
+.secondary-header{
+    background: url('../img/header-bg.png') no-repeat;
+    padding: 25px 0;
+    background-size: cover;
+    background-position: center;
+}
+.secondary-header h3{
+    text-align: center;
+    background: rgb(5,104,136);
+background: radial-gradient(circle, rgba(5,104,136,1) 0%, rgb(9, 129, 169) 49%, rgba(5,104,136,1) 100%);
+color: #fff;
+/* font-size: 34px; */
+border-radius: 10px;
+font-weight: 500;
+padding: 10px;
+box-shadow: 0 2px 4px 0 rgba(4, 58, 76,.2), 0 1px 4px 0 rgba(4, 58, 76,.4);
+}
+
+.enroll-banner{
+    background: url('../img/bg-2.jpg') no-repeat;
+    padding: 25px 0;
+    background-size: cover;
+    background-position: center; 
+    position: relative;  
+}
+
+.container-card{
+    border-radius: 20px;
+    padding: 20px;
+}
+
+#tabcontent_section{
+    margin-top: 50px;
+    border-radius: 20px;
+    padding: 50px 30px;
+    border: 2px solid rgba(0, 0, 0, 0.186);
+    /* box-shadow: 0 4px 8px 5px rgba(0, 0, 0, 0.044), 0 5px 5px 10px rgba(0, 0, 0, 0.115);   */
+    position: relative;
+}
+
+
+#tabcontent_section::before{
+    content: '';
+    width: 115px;
+    height: 211px;
+    position:absolute;
+    left: -21px;
+    top: -92px;
+    background: url('../img/before-bg-11.png') no-repeat;
+    background-size: contain;
+    /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0,.2), 0 1px 4px 0 rgba(0, 0, 0,.4);   */
+}
+
+.nav-tabs#enrolTabs li .nav-link{
+    border-radius: 50px 0px 50px 50px;
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 4px 0 rgba(163, 163, 163, 0.16), 0 4px 5px 0 rgb(110 110 110 / 30%);
+    color: #000000;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 10px 10px 10px 0;
+    min-width: 160px;
+    margin-right: 10px;
+    text-align: left;
+}
+.nav-tabs#enrolTabs li .nav-link img{
+    width:30px;
+    height: 30px;
+}
+
+.enroll-banner .nav{
+    border-bottom: 0;
+}
+
+.nav-tabs#enrolTabs li .nav-link.active{
+    background-color: #0fa2d5;
+    color: #fff;
+}
+
+#tabcontent_section h1{
+    color: #03313d;
+}
+
+ul.star-icon{
+    list-style-type: none;
+    padding: 0;
+}
+ul.star-icon li{
+    background: url(../img/bg-icon.png) no-repeat left center;
+    background-size: 25px;
+    padding-left: 2em;
+}
+
+.medical__Services img.star_img{
+    width: 20px;
+    height: 20px;
+    margin-left: 63px;
+    margin-top: -23px;
+}
+
+.medical__Services .card {
+    border-radius: 30px 30px 0px 30px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0,.2), 0 1px 4px 0 rgba(0, 0, 0,.4);
+}
+
+.medical__Services .card h4{
+    font-weight: 400;
+    font-size: 20px;
+    padding-left: 65px;
+    padding-bottom: 20px;
+    margin-top: 15px;
+}
+
+
+.insurance-list{
+ background-color: #0fa2d5;   
+ padding: 20px;
+}

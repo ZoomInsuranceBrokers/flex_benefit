@@ -12,17 +12,17 @@
    <div class="tab-content">
       <!-- Tab links -->
       <div class="tabs">
-         <button class="tablinks active" data-country="existing-dependant"><p data-title="Existing Dependant">Existing Dependants</p></button>
-         <button class="tablinks" data-country="new-life-event"><p data-title="New Life Event">Life Event</p></button>
+         <!-- <button class="tablinks active" data-country="existing-dependant"><p data-title="Existing Dependant">Existing Dependants</p></button> -->
+         <button class="tablinks active" data-country="new-life-event"><p data-title="New Life Event">Life Event</p></button>
       </div>
 
       <!-- Tab content -->
       <div class="wrapper_tabcontent">
-         <div id="existing-dependant" class="tabcontent active">
+         <!-- <div id="existing-dependant" class="tabcontent active">
             <h3>Existing</h3>
             <div id="dependant_list"></div>
-         </div>
-         <div id="new-life-event" class="tabcontent">
+         </div> -->
+         <div id="new-life-event" class="tabcontent active">
             <h3>Life Event</h3>
             <div id="dependantLE_list"></div>
          </div>
@@ -259,8 +259,8 @@ function removeUsedRelations() {
         actions: {
             listAction: '/dependants/listLE',
             createAction: '/dependants/saveLifeEvent',
-            updateAction: '/dependants/update',
-            deleteAction: '/dependants/delete'
+            updateAction: '/dependants/updateLE',
+            <!-- deleteAction: '/dependants/delete' -->
         },
         fields: {
             id: {

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\ClaimIntimation;
+use App\Mail\ClaimSubmission;
 use Illuminate\Support\Facades\Mail;
 
 class ClaimController extends Controller
@@ -73,7 +74,7 @@ class ClaimController extends Controller
             switch ($policy_details->tpa_id) {
                 case 62:
 
-                  
+
                     $curl = curl_init();
 
 
@@ -108,7 +109,7 @@ class ClaimController extends Controller
 
                     $enrollment_data = json_decode($response);
 
-                    if (isset($enrollment_data->GetEnrollmentDetailsResult)) {
+                    if (isset($enrollment_data->GetEnrollmentDetailsResult[0]->TPAID)) {
                         $enrollment_data = $enrollment_data->GetEnrollmentDetailsResult;
                     } else {
                         echo 'Looks Like an Error Occured! Kindly Refresh Page';
@@ -151,6 +152,111 @@ class ClaimController extends Controller
                     $dependents = json_encode($dependents);
 
                     return view('tpa.phs.claimIntimation', compact('policy_details', 'dependents', 'relations', 'phs_tpa_id'));
+                    break;
+
+                default:
+                    echo "TPA INTEGRATION IS IN PROCESS";
+                    exit;
+                    break;
+            }
+        } else {
+            redirect('/');
+        }
+    }
+
+    public function loadClaimSubmission()
+    {
+
+        if (Auth::check()) {
+            $currentDate = now(); // or \Carbon\Carbon::now() for more control
+
+            $policy_details = DB::table('policy_master')
+                ->whereDate('policy_start_date', '<=', $currentDate)
+                ->whereDate('policy_end_date', '>=', $currentDate)
+                ->first();
+
+
+            switch ($policy_details->tpa_id) {
+                case 62:
+
+
+                    $curl = curl_init();
+
+
+                    $data = json_encode(
+                        array(
+                            "USERNAME" => "ZOOM-ADMIN",
+                            "PASSWORD" => "ADMIN-USER@389",
+                            "EMPLOYEE_NO" => Auth::user()->employee_id,
+                            "POLICY_NO" => $policy_details->policy_number,
+                        )
+                    );
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => 'https://webintegrations.paramounttpa.com/ZoomBrokerAPI/Service1.svc/GetEnrollmentDetails',
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $data,
+                        CURLOPT_HTTPHEADER => array(
+                            'Content-Type: application/json'
+                        ),
+                    ));
+
+                    $response = curl_exec($curl);
+
+                    curl_close($curl);
+
+
+
+                    $enrollment_data = json_decode($response);
+
+                    if (isset($enrollment_data->GetEnrollmentDetailsResult[0]->TPAID)) {
+                        $enrollment_data = $enrollment_data->GetEnrollmentDetailsResult;
+                    } else {
+                        echo 'Looks Like an Error Occured! Kindly Refresh Page';
+                        exit;
+                    }
+
+                    $relations = array();
+
+                    $dependents = array();
+
+                    $phs_tpa_id = $enrollment_data[0]->TPAID;
+
+                    foreach ($enrollment_data as $enrollment) {
+
+                        if ($enrollment->RELATION == 'EMPLOYEE') {
+
+                            if (!in_array('SELF', $relations, true)) {
+                                array_unshift($relations, 'SELF');
+                            }
+
+                            $array = array(
+                                'relation' => 'SELF',
+                                'dependent' => $enrollment->BENEFICIARY_NAME,
+                            );
+                        } else {
+
+                            if (!in_array($enrollment->RELATION, $relations, true)) {
+                                array_push($relations, $enrollment->RELATION);
+                            }
+
+                            $array = array(
+                                'relation' => $enrollment->RELATION,
+                                'dependent' => $enrollment->BENEFICIARY_NAME,
+                            );
+                        }
+
+                        array_push($dependents, $array);
+                    }
+
+                    $dependents = json_encode($dependents);
+
+                    return view('tpa.phs.claimSubmit', compact('policy_details', 'dependents', 'relations', 'phs_tpa_id'));
                     break;
 
                 default:
@@ -446,5 +552,68 @@ class ClaimController extends Controller
             }
         }
         return $claims;
+    }
+
+    public function phs_save_claim_reimbursement(Request $request)
+    {
+        $validatedData = $request->validate([
+            'policy_no' => 'required|string|max:100',
+            'claim_date_of_admission' => 'required|date_format:Y-m-d',
+            'claim_date_of_discharge' => 'required|date_format:Y-m-d',
+            'document' => 'required|mimes:jpg,png,jpeg,pdf|max:2048', // Assuming max file size is 2MB
+        ]);
+
+        $employee = Auth::user(); 
+
+        $data2 = [
+            "USERNAME" => "ZOOM-ADMIN",
+            "PASSWORD" => "ADMIN-USER@389",
+            "PATIENT_TYPE" => "IPD",
+            "POLICY_NO" => $validatedData['policy_no'],
+            "MEMBER_ID" => $request->phs_tpa_id,
+            "EMPLOYEE_NO" => $employee->employee_id ,
+            "TPA_ID" => "62",
+            "DT_OF_ADMISSION" => date('d M Y', strtotime($validatedData['claim_date_of_admission'])),
+            "DT_OF_DISCHARGE" => date('d M Y', strtotime($validatedData['claim_date_of_discharge'])),
+            "base64string" => base64_encode($request->file('document')->get()),
+        ];
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://webintegrations.paramounttpa.com/ZoomBrokerAPI/Service1.svc/UploadMainClaimDocuments',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($data2),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+
+        $response = json_decode($response);
+
+        if (isset($response->UploadMainClaimDocumentsResult[0]->INWARD_NO)) {
+
+            $ClaimReferenceNo =$response->UploadMainClaimDocumentsResult[0]->INWARD_NO;
+
+            $email =  Auth::user()->email;
+
+            Mail::to($email)->send(new ClaimSubmission($ClaimReferenceNo));
+
+            return redirect()->back()->with('success', 'Claim Submited Successfully! Claim Intimation No: ' . $ClaimReferenceNo);
+        } else {
+            return redirect()->back()->with('error', 'Error occurred during form submission.');
+        }
+
     }
 }

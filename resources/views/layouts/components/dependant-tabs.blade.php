@@ -162,8 +162,14 @@ function removeUsedRelations() {
         },
         dialogShowEffect:'scale',
         actions: {
-            listAction: '/dependants/list',            
-            @php echo session('is_enrollment_window') ? "createAction: '/dependants/create',updateAction: '/dependants/update'," : '' ; @endphp
+            listAction: '/dependants/list',
+            @if(session('is_submitted') != 1)
+            createAction: '/dependants/create',
+            updateAction: '/dependants/update',           
+            @else
+            updateAction: '/dependants/updateAfterSubmission',           
+            @endif 
+            {{-- @php echo session('is_enrollment_window') ? "createAction: '/dependants/create',updateAction: '/dependants/update'," : '' ; @endphp --}}
         //    deleteAction: '/dependants/delete'
         },
         fields: {
@@ -183,7 +189,7 @@ function removeUsedRelations() {
             relationship_type: {
                 title: 'Relation Type',
                 width: 'auto',
-                edit: true,
+                edit: {{ session('is_submitted') == 1 ? 'false' : 'true' }},
                 {{-- options: [@php echo config('constant.relationshipDep_type_jTable') @endphp] --}}
                 options: [@php echo $relation_Table; @endphp]
             },
@@ -201,11 +207,13 @@ function removeUsedRelations() {
                 displayFormat: 'dd-mm-yy',
                 changeMonth: true,
                 changeYear: true,
-                maxDate: "+0D"
+                maxDate: "+0D",
+                edit: {{ session('is_submitted') == 1 ? 'false' : 'true' }}
             },
             nominee_percentage: {
                 title: 'Nomination Percentage',
                 width: 'auto',
+                edit: true,
             },
             approval_status: {
                 title: 'Approval Status',
@@ -214,7 +222,8 @@ function removeUsedRelations() {
                 create: false,
                 edit: false,
                 list: true
-            }
+            },
+
         },
         //Initialize validation logic when a form is created
         formCreated: function (event, data) {

@@ -12,6 +12,8 @@ use App\Models\MapUserFYPolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
+
 
 class ApiController extends Controller
 {
@@ -71,10 +73,56 @@ class ApiController extends Controller
             return response()->json($response);
         }
         $accessToken = $this->getAccessToken();
+       
+        $accessToken = $accessToken['access_token'];
 
         $salesforceData = $this->getSalesforceDataUsingToken($accessToken);
 
         return response()->json($salesforceData);
+    }
+
+    public function executeSalesforceAPI(Request $request)
+    {
+        $api_key = trim($request->api_key);
+
+        if (empty($api_key)) {
+            $response = [
+                'status' => 'not found',
+                'response' => 'Api Key not found',
+            ];
+
+            return response()->json($response);
+        }
+
+        if ($api_key != $this->secret_key) {
+            $response = [
+                'status' => 'invalid',
+                'response' => 'Api Key is invalid',
+            ];
+
+            return response()->json($response);
+        }
+
+        $accessTokenResponse = $this->getAccessToken();
+
+        $accessToken = $accessTokenResponse['access_token'];
+        $instanceUrl = $accessTokenResponse['instance_url'];
+        $apiResponse = $this->hitSalesforceAPI($accessToken, $instanceUrl);
+
+        return response()->json($apiResponse);
+    }
+
+    private function hitSalesforceAPI($accessToken, $instanceUrl)
+    {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->post($instanceUrl.'/services/apexrest/getUpdates', [
+            'ids' => ['001UN000001lfNPYAY'],
+            'reqtype' => 'CLIENT_POLICY_SCHEMA',
+        ]);
+        
+        return $response->json();
     }
 
     private function getAccessToken()
@@ -89,7 +137,7 @@ class ApiController extends Controller
 
         $responseData = $response->json();
 
-        return $responseData['access_token'];
+        return $responseData;
     }
 
     private function getSalesforceDataUsingToken($accessToken)
@@ -109,6 +157,8 @@ class ApiController extends Controller
     {
         // dd(base64_encode('a9#Bc2$eDfGhIjK4LmNpQr6StUvWxYz' . date('d-m-Y')));
         // dd($request->authKey);
+        Log::info('Request received for getUserEnrollmentData', ['request' => $request->all()]);
+
         if (
             $request->isMethod('get') && $request->has('authKey') &&
             $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
