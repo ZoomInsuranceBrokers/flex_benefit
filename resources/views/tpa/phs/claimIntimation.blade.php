@@ -62,7 +62,7 @@
                 <!-- Tab links -->
                 <div class="tabs">
                     <button class="tablinks" data-country="network-hospitals">
-                        <p data-title="Network Hospitals">Claim Intimation</p>
+                        <p data-title="Claim Intimation">Claim Intimation</p>
                     </button>
                     {{-- <button class="tablinks active" data-country="add-new-dependent"><p data-title="Add New Dependent">Add New Dependent</p></button> --}}
                 </div>

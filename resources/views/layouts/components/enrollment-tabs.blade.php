@@ -178,6 +178,21 @@ $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
 </section>
 
 @section('script')
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+    document.getElementById('downloadPdf').addEventListener('click', function() {
+        var element = document.getElementById('enrollment_history_content');
+        
+        html2pdf(element, {
+            filename: 'enrollment_history.pdf',
+            html2canvas: { scale: 2 },
+            jsPDF: { orientation: 'portrait' }
+        });
+    });
+</script>
+
 <script>
 // tabs
 var tabLinks = document.querySelectorAll(".tablinks");

@@ -12,3 +12,8 @@
   <script src="{{ asset('assets/js/imagesloaded.js')}}"></script>
   <script src="{{ asset('assets/js/popup.js')}}"></script>
   <script src="{{ asset('assets/js/custom.js')}}"></script>
+  <script src="{{ asset('assets/js/main.js')}}"></script>
+  <script src="{{ asset('assets/js/jspdf.umd.min.js')}}"></script>
+
+
+  
