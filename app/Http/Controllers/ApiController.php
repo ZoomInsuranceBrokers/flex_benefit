@@ -244,8 +244,9 @@ class ApiController extends Controller
             //dd($finalData);
             switch ($filters['output']) {
                 case 'json': {
-                        return (json_encode($finalData));
-                        break;
+                        // return (json_encode($finalData));
+                        // break;
+                        return response()->json($finalData, 200);
                     }
                 case 'html': {
                     }
