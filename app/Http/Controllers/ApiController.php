@@ -280,8 +280,8 @@ class ApiController extends Controller
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['user_id_fk'] = $depRow['user_id_fk'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_code'] = config('constant.dependant_code_ui')[$depRow['dependent_code']];
-                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dob'] = $depRow['dob'];
-                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['doe'] = $depRow['doe'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dob'] = strlen(str_replace([0,'-',':', ' '], '', $depRow['dob'])) ? $depRow['dob'] : '';
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['doe'] = strlen(str_replace([0,'-',':', ' '], '', $depRow['doe'])) ? $depRow['doe'] : '';
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['gender'] = $depRow['gender'] ? config('constant.gender')[$depRow['gender']] : null;
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['nominee_percentage'] = $depRow['nominee_percentage'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['relationship_type'] = config('constant.relationship_type')[$depRow['relationship_type']];
@@ -302,7 +302,7 @@ class ApiController extends Controller
                     }
             }
         } else {
-            return json_encode(['status' => false, 'Message' => 'Invalid Request']);
+            return response()->json(['status' => false, 'Message' => 'Invalid Request'], );
         }
     }
 
