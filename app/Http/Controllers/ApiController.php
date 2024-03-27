@@ -291,7 +291,7 @@ class ApiController extends Controller
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['is_life_event'] = $depRow['is_life_event'];
                 }
             }
-            dd($finalData);
+            //dd($finalData);
             switch ($filters['output']) {
                 case 'json': {
                         // return (json_encode($finalData));
