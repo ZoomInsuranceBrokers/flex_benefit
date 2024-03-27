@@ -313,6 +313,8 @@ function generateDependentItems(subCatId, depList) {
         //console.log(parentRadio);
         var existingDependent = [];
         var i = 0;
+        console.log("cfjed")
+
         $('[id^=dependant-list]').each(function(){
             var dCode = $(this).attr('data-depcode');
             var depId = $(this).attr('data-depId');
@@ -326,7 +328,7 @@ function generateDependentItems(subCatId, depList) {
                 );
             }
         });
-        //console.log(existingDependent);
+        console.log(existingDependent);
         for(depCode in existingDependent) {
             depId = [];
             depName = [];
@@ -336,7 +338,7 @@ function generateDependentItems(subCatId, depList) {
                 depId.push(depRow[0]);
                 depName.push('(' + depRow[1] + ':' + depRow[2] + '%)');
             });
-            //console.log('DepCode/:' + depCode);
+            console.log('DepCode/:' + depCode);
             depList.forEach(function(x) {
                 if(depCode.toLowerCase() == x.toLowerCase()) {
                     //console.log(['PIL','P'].find(depList), depCode.toLowerCase(), x.toLowerCase(),depList);
