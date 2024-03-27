@@ -1,6 +1,5 @@
 <?php
-/*
-namespace App\AccountTraits;
+namespace App\Traits;
 
 use App\Models\Account;
 use App\Models\CountryCurrency;
@@ -10,8 +9,63 @@ use Illuminate\Support\Facades\Validator;
 
 trait accountTraitMethods {
 
-    public function upsertAccount($accountData) {
+    public function upsertAccount($jsonData) {
         // update or create account
+        foreach ($jsonData as $accRow) {
+            $account = $this->_extractAccountData($accRow['Response']);
+        }        
+        $rules = [
+            'external_id' => 'required',
+            'name' => 'required',
+            'enrollment_start_date'=> 'required|date:Y-m-d',
+            'enrollment_end_date' => 'required|date:Y-m-d',
+        ];
+
+        $validator = Validator::make($account, $rules, $messages = [
+            'required' => 'The :attribute field is required',
+            'date_format' => 'The :attribute should follow date format of YYYY-MM-DD',
+        ]);
+
+        if (!$validator->fails()) {
+            echo __FUNCTION__ . ':INFO:Account [Name:' . $account['name'] . '] with details[Ext ID:' . 
+            $account['external_id'] . ',Enrollment Start Date:' . $account['enrollment_start_date'] . 
+            ',Enrollment End Date:' . $account['enrollment_end_date'] . '] to be created/updated ';
+
+            session('confirmUpdate') ? Account::updateOrCreate(['external_id' => $account['external_id']],$account) : '';
+        } else {   
+            $error = '';             
+            //$result['Result'] = "ERROR";
+            foreach (array_values($validator->errors()->messages()) as $item) {
+                $error.= '<li>' . $item[0] . '</li>';
+            }
+            echo '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>Account:</b><ul>' . $error . '</ul></div>';
+        }
+        //return $result['Message'];
+    }
+    
+    private function _extractAccountData($jsonData){
+        return [
+            'external_id' => $jsonData['Client']['Id'],
+            'name' => $jsonData['Client']['Name'],
+            'address' => $jsonData['Client']['FullAddress__c'],
+            'country_id_fk' => CountryCurrency::where(DB::raw('UPPER(name)'),strtoupper($jsonData['Client']['ShippingCountry']))
+                ->select('id')->first()->toArray()['id'],
+            'is_active' => true,
+            'enrollment_start_date' => date('Y-m-d', strtotime('13-09-2022')),
+            'enrollment_end_date' => date('Y-m-d', strtotime('13-09-2022')),
+            'created_by' => 0,
+            'modified_by' => 0,
+        ];
+    }
+
+}
+
+trait financialYearTraitMethods {
+    public function upsertFY($jsonData) {
+        // update or create FY
+        foreach ($jsonData as $accRow) {
+            $fy = $this->_extractFYData($accRow['Response']);
+        }    
         $rules = [
             'external_id' => 'required',
             'name' => 'required',
@@ -25,79 +79,36 @@ trait accountTraitMethods {
         ]);
 
         if (!$validator->fails()) {
-            $account = [];
-            $account['external_id'] = 0;
-            $account['name'] = 0;
-            $account['address'] = 0;
-            $account['country_id_fk'] = CountryCurrency::where(DB::raw('UPPER(name)'),strtoupper($jsonRow['Details']['MailingCountry']))
-                ->select('id')->first()->toArray()['id'];
-            $account['is_active'] = false;
-            $account['enrollment_start_date'] = 0;
-            $account['enrollment_end_date'] = 0;
-            $account['created_by'] = 0;     // admin
-            $account['modified_by'] = 0;    // admin
+            echo __FUNCTION__ . ':INFO:Financial Year [Name:' . $fy['name'] . '] with details[Ext ID:' . 
+            $fy['external_id'] . ',FY Start Date:' . $fy['start_date'] . 
+            ',FY End Date:' . $fy['end_date'] . ', FY Last Enrollment Date:' . $fy['last_enrollment_date'] . '] to be created/updated ';
 
-            echo __FUNCTION__ . ':INFO:Account [Name:' . $account['name'] . '] with details[Ext ID:' . 
-            $account['external_id'] . ',Enrollment Start Date:' . $account['enrollment_start_date'] . 
-            ',Enrollment End Date:' . $account['enrollment_end_date'] . '] to be created/updated ';
-
-            session('confirmUpdate') ? Account::updateOrCreate(['external_id' => $account['external_id']],$account) : '';
-
+            session('confirmUpdate') ? FinancialYear::updateOrCreate(['external_id' => $fy['external_id']],$fy) : '';
         } else {   
             $error = '';             
             //$result['Result'] = "ERROR";
             foreach (array_values($validator->errors()->messages()) as $item) {
                 $error.= '<li>' . $item[0] . '</li>';
             }
-            $result['Message'] = '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>Account:</b><ul>' . $error . '</ul></div>';
+            echo '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>FY:</b><ul>' . $error . '</ul></div>';
         }
-        return $result['Message'];
     }
 
-}
-
-trait financialYearTraitMethods {
-    public function upsertFY($accountData) {
-        // update or create FY
-            
-            $rules = [
-                'external_id' => 'required',
-                'name' => 'required',
-                'enrollment_start_date'=> 'required|date:Y-m-d',
-                'enrollment_end_date' => 'required|date:Y-m-d',
-            ];
-
-            $validator = Validator::make($input, $rules, $messages = [
-                'required' => 'The :attribute field is required',
-                'date_format' => 'The :attribute should follow date format of YYYY-MM-DD',
-            ]);
-
-            if (!$validator->fails()) {
-                $fy = [];
-                $fy['external_id'] = 0;    
-                $fy['name'] = 0;    
-                $fy['start_date'] = 0;    
-                $fy['end_date'] = 0;    
-                $fy['last_enrollment_date'] = 0;    
-                $fy['future_fy_year_fk'] = null;    
-                $fy['prev_fy_year_fk'] = null;    
-                $fy['is_active'] = false;
-                $fy['created_by'] = 0;  // admin
-                $fy['modified_by'] = 0;    // admin
-
-                echo __FUNCTION__ . ':INFO:Financial Year [Name:' . $fy['name'] . '] with details[Ext ID:' . 
-                $fy['external_id'] . ',FY Start Date:' . $fy['enrollment_start_date'] . 
-                ',FY End Date:' . $fy['enrollment_end_date'] . ', FY Last Enrollment Date:' . $fy['last_enrollment_date'] . '] to be created/updated ';
-
-                session('confirmUpdate') ? FinancialYear::updateOrCreate(['external_id' => $fy['external_id']],$fy) : '';
-            } else {   
-                $error = '';             
-                //$result['Result'] = "ERROR";
-                foreach (array_values($validator->errors()->messages()) as $item) {
-                    $error.= '<li>' . $item[0] . '</li>';
-                }
-                echo '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>FY:</b><ul>' . $error . '</ul></div>';
-            }
+    private function _extractFYData($jsonData){
+        return [
+            'external_id' => $jsonData['Client']['Id'],
+            'name' => $jsonData['Client']['Name'],
+            'start_date' => $jsonData['Client']['FullAddress__c'],
+            'end_date' => $jsonData['Client']['FullAddress__c'],
+            'last_enrollment_date' => $jsonData['Client']['FullAddress__c'],
+            'future_fy_year_fk' => $jsonData['Client']['FullAddress__c'],
+            'prev_fy_year_fk' => $jsonData['Client']['FullAddress__c'],
+            'country_id_fk' => CountryCurrency::where(DB::raw('UPPER(name)'),strtoupper($jsonData['Client']['ShippingCountry']))
+                ->select('id')->first()->toArray()['id'],
+            'is_active' => true,
+            'created_by' => 0,
+            'modified_by' => 0,
+        ];
     }
 }
 
@@ -256,5 +267,5 @@ trait insuancePolicyMethods {
             }
         }        
     }
-} */
+}
 ?>

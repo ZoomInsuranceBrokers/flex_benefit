@@ -160,9 +160,9 @@ class ApiController extends Controller
         Log::info('Request received for getUserEnrollmentData', ['request' => $request->all()]);
 
         if (
-            $request->isMethod('get') && $request->has('authKey') &&
-            $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
-        )
+             $request->isMethod('get') && $request->has('authKey') &&
+             $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
+         )
         // if (1)
         {
             $filters = ['output' => 'json', 'active' => true];
@@ -291,7 +291,7 @@ class ApiController extends Controller
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['is_life_event'] = $depRow['is_life_event'];
                 }
             }
-            //dd($finalData);
+            dd($finalData);
             switch ($filters['output']) {
                 case 'json': {
                         // return (json_encode($finalData));
