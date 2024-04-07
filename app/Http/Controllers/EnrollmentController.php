@@ -486,7 +486,7 @@ class EnrollmentController extends Controller
         $dataArr['isbp'] = $polDet['is_base_plan'];
         $dataArr['bpsa'] = $bpsa > 0 ? $formatter->formatCurrency($bpsa, 'INR') : '';
         $dataArr['opplsa'] = !$polDet['is_base_plan'] ? $formatter->formatCurrency($polDet['sum_insured'], 'INR') : 0;
-        $dataArr['totsa'] = $formatter->formatCurrency(($bpsa + (!$polDet['is_base_plan']) ? (int)$polDet['sum_insured'] : 0), 'INR');
+        $dataArr['totsa'] = $formatter->formatCurrency(($bpsa + (!$polDet['is_base_plan'] ? (int)$polDet['sum_insured'] : 0)), 'INR');
         $dataArr['isvp'] = $polDet['is_point_value_based'];
         $dataArr['isvbsd'] = $polDet['show_value_column'];
         $dataArr['annup'] = $formatter->formatCurrency($polDet['points'], 'INR');
