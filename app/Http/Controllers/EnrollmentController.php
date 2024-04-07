@@ -750,7 +750,7 @@ class EnrollmentController extends Controller
         if (count($userPolData)) {
             foreach ($userPolData as $rowData) {
                 $data = [
-                    'encoded_summary' => $this->_generateBaseDefaultEncodedSummary($rowData, $request->has('includeAllBaseDefault')),
+                    'encoded_summary' => $this->_generateBaseDefaultEncodedSummary($rowData),
                     'modified_by' => 0,
                     'updated_at' => now()
                 ];
