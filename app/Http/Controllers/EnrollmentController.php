@@ -865,8 +865,8 @@ class EnrollmentController extends Controller
         $dataArr['jongDate'] = $data->hire_date;
         
 
-        print '<pre>';
-        print_r($dataArr);
+        //print '<pre>';
+        //print_r($dataArr);
 
         return base64_encode(json_encode($dataArr));
     }
