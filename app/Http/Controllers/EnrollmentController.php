@@ -701,9 +701,17 @@ class EnrollmentController extends Controller
 
     public function updateBaseDefaultEncodedSummary(Request $request)
     {
+        $basePlan = InsurancePolicy::where('is_base_plan', 1)
+                ->orWhere('is_default_selection', 1)
+                ->where('is_active', 1)
+                ->with('subcategory')
+                ->get()->toArray();
+
+        session(['base_default_plans' => $basePlan]);
+
         $userPolDataObj = DB::table('map_user_fypolicy as mufyp')->select('mufyp.id as mufypId', 'mufyp.fypolicy_id_fk','ip.*','u.id as uid', 'u.fname', 'u.lname',
         'u.employee_id','u.salary','mgc.amount as gradeBasedAmount', 'fy.start_date','fy.end_date','u.hire_date')
-    ->orderBy('u.id');
+        ->orderBy('u.id');
         $userPolDataObj
             ->leftJoin('map_financial_year_policy as mfyp', 'mufyp.fypolicy_id_fk', '=', 'mfyp.id')
             ->leftJoin('financial_years as fy', 'mfyp.fy_id_fk', '=', 'fy.id')
@@ -711,15 +719,12 @@ class EnrollmentController extends Controller
             //->leftJoin('insurance_subcategory as isc', 'isc.id', '=', 'ip.ins_subcategory_id_fk')
             //->leftJoin('insurance_category as ic', 'ic.id', '=', 'isc.ins_category_id_fk')
             ->leftJoin('users as u', 'u.id', '=', 'mufyp.user_id_fk')
-            ->leftJoin('map_grade_category as mgc', 'mgc.grade_id_fk', '=', 'u.grade_id_fk')
-            ->where(function ($query) {
-                $query->where('ip.is_base_plan', 1)
-                      ->orWhere('ip.is_default_selection', 1);
-            })
+            ->leftJoin('map_grade_category as mgc', 'mgc.grade_id_fk', '=', 'u.grade_id_fk');
+            
             // ->where('ip.is_base_plan', 1)
             // ->orWhere('ip.is_default_selection', 1)
             //->where('ip.ins_subcategory_id_fk', '=', $request->catId)
-            ->where('mufyp.is_active', 1)
+            $userPolDataObj->where('mufyp.is_active', 1)
             ->where('mfyp.is_active', 1)
             ->where('fy.is_active', 1)
             ->where('ip.is_active', 1)
@@ -733,13 +738,19 @@ class EnrollmentController extends Controller
         if ($request->has('eid') && $request->eid) {
             $userPolDataObj->where('u.id',$request->eid);
         }
+        if (!$request->has('includeAllBaseDefault')) {  // filter only default/base when no parameter coming in URL
+            $userPolDataObj->where(function ($query) {
+                $query->where('ip.is_base_plan', 1)
+                    ->orWhere('ip.is_default_selection', 1);
+            });
+        }
         $userPolData =   $userPolDataObj->get()->toArray();
             //->toSql();
-        //dd($userPolData);
+        //dd($basePlan);
         if (count($userPolData)) {
             foreach ($userPolData as $rowData) {
                 $data = [
-                    'encoded_summary' => $this->_generateBaseDefaultEncodedSummary($rowData),
+                    'encoded_summary' => $this->_generateBaseDefaultEncodedSummary($rowData, $request->has('includeAllBaseDefault')),
                     'modified_by' => 0,
                     'updated_at' => now()
                 ];
@@ -760,17 +771,25 @@ class EnrollmentController extends Controller
         $fypmap = $data->fypolicy_id_fk;
         //$polDet = $data['policy'];
         $formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY);
-        //$basePlans = session('base_default_plans');
         $gradeAmount = $data->is_grade_based ? $data->gradeBasedAmount : 0;
+        $basePlans = session('base_default_plans');
+        if (!$data->is_grade_based) {   // select grade amount in case current policy is not grade based but core policy is grade based
+            foreach ($basePlans as $bpRow) {
+                if ($bpRow['ins_subcategory_id_fk'] == $data->ins_subcategory_id_fk &&
+                    $bpRow['is_base_plan'] && $bpRow['is_grade_based']){
+                        $gradeAmount = $data->gradeBasedAmount;
+                }
+            }
+        }
         $bpsa = 0;
         $bpName = '';
         $is_lumpsum = $is_si_sa = $is_sa = $is_grade_based = FALSE;
         $base_si_factor = 0;
-        ;
         $salary =  decryptAES(['data' => $data->salary, 'type' => 'salary']);
-        
-        //foreach ($basePlans as $bpRow) {
-        //    if ($bpRow['ins_subcategory_id_fk'] == $catId && $bpRow['is_base_plan']){
+
+        foreach ($basePlans as $bpRow) {
+            if ($bpRow['ins_subcategory_id_fk'] == $data->ins_subcategory_id_fk &&
+                $bpRow['is_base_plan']){
                 if ($gradeAmount) {
                     $bpsa = (int)$gradeAmount;
                     $is_grade_based = TRUE;
@@ -787,11 +806,13 @@ class EnrollmentController extends Controller
                         $is_sa = TRUE;
                     }
                 }
-        // name of base policy
-        $bpName = $data->name;
+                // name of base policy
+                $bpName = $data->name;
                 //break;
-        //    }
-        //}
+            }
+        }
+        
+        
         $dataArr = [];
         $dataArr['extId'] = $data->external_id;
         $dataArr['user'] = $data->fname . ' ' . $data->lname . '[EMPID:' . $data->employee_id . ']';
@@ -842,8 +863,10 @@ class EnrollmentController extends Controller
         $dataArr['corem'] = $base_si_factor . 'X of CTC';
         $dataArr['coresa'] = $formatter->formatCurrency($bpsa, 'INR');
         $dataArr['jongDate'] = $data->hire_date;
+        
 
-        //dd($dataArr);
+        print '<pre>';
+        print_r($dataArr);
 
         return base64_encode(json_encode($dataArr));
     }
