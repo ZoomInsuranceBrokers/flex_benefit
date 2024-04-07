@@ -701,12 +701,15 @@ class EnrollmentController extends Controller
 
     public function updateBaseDefaultEncodedSummary(Request $request)
     {
-        $userPolData = DB::table('map_user_fypolicy as mufyp')
+        $userPolDataObj = DB::table('map_user_fypolicy as mufyp')->select('mufyp.id as mufypId', 'mufyp.fypolicy_id_fk','ip.*','u.id as uid', 'u.fname', 'u.lname',
+        'u.employee_id','u.salary','mgc.amount as gradeBasedAmount', 'fy.start_date','fy.end_date','u.hire_date')
+    ->orderBy('u.id');
+        $userPolDataObj
             ->leftJoin('map_financial_year_policy as mfyp', 'mufyp.fypolicy_id_fk', '=', 'mfyp.id')
             ->leftJoin('financial_years as fy', 'mfyp.fy_id_fk', '=', 'fy.id')
             ->leftJoin('insurance_policy as ip', 'ip.id', '=', 'mfyp.ins_policy_id_fk')
-            ->leftJoin('insurance_subcategory as isc', 'isc.id', '=', 'ip.ins_subcategory_id_fk')
-            ->leftJoin('insurance_category as ic', 'ic.id', '=', 'isc.ins_category_id_fk')
+            //->leftJoin('insurance_subcategory as isc', 'isc.id', '=', 'ip.ins_subcategory_id_fk')
+            //->leftJoin('insurance_category as ic', 'ic.id', '=', 'isc.ins_category_id_fk')
             ->leftJoin('users as u', 'u.id', '=', 'mufyp.user_id_fk')
             ->leftJoin('map_grade_category as mgc', 'mgc.grade_id_fk', '=', 'u.grade_id_fk')
             ->where(function ($query) {
@@ -715,21 +718,22 @@ class EnrollmentController extends Controller
             })
             // ->where('ip.is_base_plan', 1)
             // ->orWhere('ip.is_default_selection', 1)
-            //->where('u.id',75)
             //->where('ip.ins_subcategory_id_fk', '=', $request->catId)
             ->where('mufyp.is_active', 1)
             ->where('mfyp.is_active', 1)
             ->where('fy.is_active', 1)
             ->where('ip.is_active', 1)
-            ->where('isc.is_active', 1)
-            ->where('ic.is_active', 1)
-            ->where('mgc.is_active', 1)
+            //->where('isc.is_active', 1)
+            //->where('ic.is_active', 1)
+            //->where('mgc.is_active', 1)
             ->where('u.is_active', 1)
             ->whereNull('mufyp.encoded_summary',)
-            ->select('mufyp.id as mufypId', 'mufyp.fypolicy_id_fk','ip.*','u.id as uid', 'u.fname', 'u.lname',
-                'u.employee_id','u.salary','mgc.amount as gradeBasedAmount', 'fy.start_date','fy.end_date','u.hire_date')
-            ->orderBy('u.id')
-            ->get()->toArray();
+            ->orderBy('u.id');
+        
+        if ($request->has('eid') && $request->eid) {
+            $userPolDataObj->where('u.id',$request->eid);
+        }
+        $userPolData =   $userPolDataObj->get()->toArray();
             //->toSql();
         //dd($userPolData);
         if (count($userPolData)) {
@@ -743,14 +747,13 @@ class EnrollmentController extends Controller
                     MapUserFYPolicy::where('id',$rowData->mufypId)->update($data);
                 }
                 echo '<br>Data of: ' . $rowData->fname . ' ' . $rowData->lname . '[Policy Name:' . 
-                        $rowData->name .'][EMPID:' . $rowData->employee_id
+                        $rowData->name .'][UID: ' . $rowData->uid . ',EMPID:' . $rowData->employee_id
                      . '][Data:' . json_encode($data) . ']<br>';                             
             }
-            echo '<h1>Encoded Summary Updated for row count' . count($userPolData) . '</h1>';   
+            echo '<h1>Encoded summary ' . ($request->has('confirmUpdate') && $request->confirmUpdate ? '' : 'to be' ) . ' updated for row count ' . count($userPolData) . '</h1>';   
         } else {
             echo 'No empty encoded summary rows found!!!';die;
-        }
-            
+        }            
     }
 
     private function _generateBaseDefaultEncodedSummary($data){
@@ -789,7 +792,6 @@ class EnrollmentController extends Controller
                 //break;
         //    }
         //}
-
         $dataArr = [];
         $dataArr['extId'] = $data->external_id;
         $dataArr['user'] = $data->fname . ' ' . $data->lname . '[EMPID:' . $data->employee_id . ']';
@@ -805,7 +807,7 @@ class EnrollmentController extends Controller
         $dataArr['isbp'] = $data->is_base_plan;
         $dataArr['bpsa'] = $bpsa > 0 ? $formatter->formatCurrency($bpsa, 'INR') : '';
         $dataArr['opplsa'] = !$data->is_base_plan ? $formatter->formatCurrency($data->sum_insured, 'INR') : 0;
-        $dataArr['totsa'] = $formatter->formatCurrency(($bpsa + (!$data->is_base_plan) ? (int)$data->sum_insured : 0), 'INR');
+        $dataArr['totsa'] = $formatter->formatCurrency(($bpsa + (!$data->is_base_plan ? (int)$data->sum_insured : 0)), 'INR');
         $dataArr['isvp'] = $data->is_point_value_based;
         $dataArr['isvbsd'] = $data->show_value_column;
         $dataArr['annup'] = $formatter->formatCurrency($data->points, 'INR');
