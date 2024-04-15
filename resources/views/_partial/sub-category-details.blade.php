@@ -11,7 +11,7 @@
     <div class="row optnBenft" data-sc-id="{{ $subCatId }}">
         <div class="col-12">
             <hr class="my-2">
-            <div class="row">                                
+            <div class="row custom-heading">                                
                 <div class="section-heading">
                     <h4 class="py-1">Optional Benefits</h4>                                        
                 </div>
@@ -23,7 +23,7 @@
                 <hr class="my-2">                                      
             </div>
         </div>
-        
+       
         <div class="col-12 text-center">
                 @if(!session('is_submitted'))
                     <script type="text/javascript">
@@ -40,7 +40,7 @@
                     }
                     </style>
                     <button onclick="saveEnrollment('{{ $subCatId }}')" class="col-3 my-2 p-3 fs-15 btn-primary text-uppercase"> Save Selection  </button>
-                    <a id="resetSelection_trigger{{ $subCatId }}" href="#resetSelectionModal{{ $subCatId }}" class="col-3 p-3 btn btn-secondary text-uppercase fs-15"> Reset Selection  </a>
+                    <button id="resetSelection_trigger_selection{{ $subCatId }}"  onclick="resetSelection('{{ $subCatId }}',this)" class="col-3 p-3 btn btn-secondary text-uppercase fs-15"> Reset Selection  </button>
                     <!-- FINAL SUMBIT ENROLLMENT MODAL -->
                     <div class="modal" id="resetSelectionModal{{ $subCatId }}" style="display:none;left:40%;">
                         <div class="modal-dialog" role="document">

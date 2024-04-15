@@ -1,194 +1,350 @@
-@section('link_rel')
-<link href="{{ asset('assets/css/jtable/themes/metro/blue/jtable.min.css') }}" rel="stylesheet" type="text/css" />
-@stop
-
 @php
-//dd($data['currentSelectedData']);
-$formatter = new NumberFormatter('en_GB',  NumberFormatter::CURRENCY); 
-//dd($data['sub_categories_data']);
-    /* foreach($data['category'] as $key => $value) {
-        echo '<pre>';
-        print_r($value);
-    }
-    die; */
+$formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
 @endphp
 
+<style>
+    .custom-heading .section-heading{
+        background: var(--blue);
+        padding: 6px;
+        margin-bottom: 5px;
+    }
+    .custom-heading .section-heading h4{
+        font-size: 20px;
+        color: var(--white);
+    }
+    .custom-heading dl{
+        background-color: #d4f2ff;
+        padding: 10px;
+        margin-bottom: 5px;
+    }
+    .custom-heading .col-4 dl{
+        background-color: #d4f2ff;
+        padding: 10px;
+        height: 100%;
+    }
+    .custom-heading .col-4{
+        margin-bottom: 5px;
+    }
+    .custom-heading .col-left dl{
+      margin-right: 5px;
+    }
+    .custom-heading .col-right dl{
+      margin-left: 5px;
+    }
+    .additional-table .table{
+        --bs-table-border-color: #0fa2d5;
+    }
+</style>
+<!-- <a id="enrollmentModal_trigger" style="display:none;" href="#launchEnrollmentModal">modalEnrollment</a> -->
+<div class="modal" id="launchEnrollmentModal" style="display:none; position: fixed; top: 70%; left: 60%; transform: translate(-50%, -50%);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="modal_close close" data-dismiss="modal" aria-label="Close" onclick="updatePoints()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p></p>
+      </div>
+      <div class="modal-footer">
+        {{-- <a class="btn-danger btn" href="/logout"></a> --}}
+        <button class="btn-info btn modal_close" data-dismiss="modal" onclick="updatePoints()"></button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<a id="enrollmentModal_trigger" style="display:none;" href="#launchEnrollmentModal">modalEnrollment</a>
-@include('_partial.enrollmentModal')
-<section class="tab-wrapper">
-   <div class="tab-content">
-      <!-- Tab links -->
-      <div class="tabs">
-            <button class="tablinks active" data-country="how-it-works">
-                <p data-title="How It Works">How It Works</p>
-            </button>
-            @if(Auth::check())
-                @if($data['is_enrollment_window'])
-                    @foreach($data['category'] as $item)
-                        <button class="tablinks" id="tabLink{{ $item['id'] }}" 
-                            data-country="{{ 'content-tab-' . $item['id'] }}">
-                            <p data-title="{{ $item['name'] }}">{{ $item['name'] }}</p>
+
+<section class="enroll-banner px-2 px-md-0">
+    <div class="container bg-white container-card">
+        <ul class="nav nav-tabs" id="enrolTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="howwork-tab" data-bs-toggle="tab" data-bs-target="#howwork"
+                    type="button" role="tab" aria-controls="howwork" aria-selected="true">
+                    <img src="{{ asset('assets/images/icon1.png') }}" alt="query icon" />
+                    How It Works
+                </button>
+            </li>
+            @if (Auth::check())
+                @if ($data['is_enrollment_window'])
+                @foreach ($data['category'] as $item)
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tabLink{{ $item['id'] }}" data-bs-toggle="tab"
+                            data-bs-target="#content-tab-{{ $item['id'] }}" type="button" role="tab" aria-controls="content-tab-{{ $item['id'] }}"
+                            aria-selected="false">
+                            <img src="{{ asset('assets/images/icon-plus.png') }}" alt="query icon" />
+                            {{ $item['name'] }}
                         </button>
-                    @endforeach 
-                @endif      
-                <button class="tablinks" data-country="summary" id="enrollment-summary">
-                    <p data-title="Summary">Summary</p>
-                </button>
-                <button class="tablinks" data-country="enrollment-history">
-                    <p data-title="Enrollment History">Enrollment History</p>
-                </button>
-            @endif                
-      </div>
-      <!-- Tab content -->
-      <div class="wrapper_tabcontent">
-         <div id="how-it-works" class="tabcontent active">
-            <h3>How It Works</h3>
-            <div id="how_it_works_static">
-                <h5>Follow the steps provided below to finalize your enrollment for the plan year 2023-24:</h5>
-                <ul class="ul-points">
-                    
-                    <li>Each tab within the enrollment menu provides an opportunity to choose benefits within a specific category. For instance, 
-                    benefits such as term life are located in the "Term Life Insurance" section. The four main sections are</li>
-                    
-                        <ul class="ul-points">
-                            <li>Life Insurance</li>
-                            <li>Accident Insurance</li>
-                            <li>Medical Insurance</li>
-                            <li>Flexi Cash Benefits</li>
-                        </ul>
                     </li>
-                    <li>
-                        Below are the default base coverage category wise:
-                        <table class="table table-bordered table-info">
-                            <tr>
-                                <th scope="col">Category</th>
-                                <!-- <th scope="col">Sub-Category</th> -->
-                                <th scope="col">Core Benefit</th>
-                                <th scope="col">Sum Insured</th>
-                            </tr>
-                            @foreach($data['basePlan'] as $bpRow)
-                            @php
-                                if (count($data['gradeAmtData']) && array_key_exists($bpRow['subcategory']['categories']['id'], $data['gradeAmtData'])) {
-                                    $bpsa = (int)$data['gradeAmtData'][$bpRow['subcategory']['categories']['id']];
-                                    $is_grade_based = TRUE;
-                                } else {
-
-                                    // Provided values
-                                    $encryptedData =  Auth::user()->salary;
-                                    $encryptionKey = 'QCsmMqMwEE+Iqfv0IIXDjAqrK4SOSp3tZfCadq1KlI4=';
-                                    $initializationVector = 'G4bfDHjL3gXiq5NCFFGnqQ==';
-
-                                    // Decrypt the data
-                                    $cipher = "aes-256-cbc";
-                                    $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
-
-                                    $salary = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
-
-                                    if ($salary === false) {
-                                        echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
-                                    } else {
-                                        $salary = floatval(rtrim($salary, "\0"));
-                                    }
-
-
-                                    
-                                    $sa = !is_null($bpRow['sum_insured']) ? $bpRow['sum_insured'] : 0;
-                                    $sa_si = !is_null($bpRow['si_factor']) ?
-                                            $sa_si = $bpRow['si_factor'] * $salary : 0;
-                                    if($sa_si > $sa) {
-                                        $bpsa = (int)$sa_si;
-                                        $is_si_sa = TRUE;
-                                        $base_si_factor = $bpRow['si_factor'];
-                                    } else {
-                                        $bpsa = (int)$sa;
-                                        $is_sa = TRUE;
-                                    }
-                                }
-                                // name of base policy
-                                $bpName = $bpRow['name'];
-                            @endphp
-                            <tr>
-                                <td scope="row">{{ $bpRow['subcategory']['categories']['name'] }}</td>
-                                <!-- <td>{{ $bpRow['subcategory']['name'] }}</td> -->
-                                <td>{{ $bpRow['name'] }}</td>
-                                <td>{{ $formatter->formatCurrency(round($bpsa), 'INR') }}</td>
-                            </tr>
-                            @endforeach
-                            
-                        </table>
-                    </li>
-                    <li>Sequentially navigate through each of these sections to explore and select from 
-                    the various available benefits. It's important to note that a positive point balance 
-                    is required for the selection of Flexi Cash Benefits
-                    </li>
-                    <li>
-                    Within each section, you'll find a list of different benefits presented in a tabular 
-                    format. Begin your selection by clicking on the desired benefit and then choosing the 
-                    relevant option
-                    </li> 
-                    <li>
-                    For insured benefits, the names of your dependants eligible for coverage will be 
-                    visible in tabular form. Ensure you select the dependants you wish to include in applicable
-                    benefits by checking against their names
-                    </li>
-                    <li>
-                    As you make your choices for benefits, the FlexPoints utilization table will automatically
-                    reflect the updates. If the cost of the insured benefits surpasses the available 
-                    FlexPoints, any surplus will be covered through salary deduction
-                    </li>
-                    <li>
-                    After finalizing your benefit selections and saving the enrollment, navigate to the
-                     'Summary' tab to ensure accurate capture of all details
-                    </li>
-                    <li>
-                    Click the 'Confirm enrollment' button to validate your benefit choices for the plan year
-                    2023-24. It's important to note that once enrollment is confirmed, no further 
-                    alterations or edits can be made to your selection
-                    </li>
-                </ul>
-            </div>
-         </div>
-         @if($data['is_enrollment_window'] )
-            @if(count($data['category']))
-                @foreach($data['category'] as $item)
-                    @include('_partial.category-tab')
-                @endforeach 
-            @else
-                No CATGEORY FOUND. WRONG SETUP.
-                {{-- @todo: Error to show on no category list available --}}
-            @endif 
-         @endif
-         <div id="summary" class="tabcontent">
-            <h3>Summary</h3>
-            
-            <div id="summary_content"></div>
-            @if(!session('is_submitted') && count($data['currentSelectedData']))
-                <h5 class="text-secondary" style="text-align:right;">Make your decision <em>FINAL</em> by clicking 
-                    <a href="#finalSubmissionModal" class="btn btn-primary" id="finalSubmit_trigger">Final Submission</a>
-                </h5>
+                @endforeach
             @endif
-         </div>
-         <div id="enrollment-history" class="tabcontent">
-            <h3>History</h3>
-            @include('_partial.enrollment-history')
-         </div>
-      </div>
-   </div>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Summary-tab" data-bs-toggle="tab" data-bs-target="#summary"
+                        type="button" role="tab" aria-controls="summary" aria-selected="false">
+                        <img src="{{ asset('assets/images/icon-img5.png') }}" alt="query icon" />
+                        Summary
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#enrollment-history"
+                        type="button" role="tab" aria-controls="enrollment-history" aria-selected="false">
+                        <img src="{{ asset('assets/images/icon-plus.png') }}" alt="query icon" />
+                        Enrollment History
+                    </button>
+                </li>
+            @endif
+        </ul>
+    </div>
 </section>
 
-@section('script')
+<section>
+    <div class="col-11">
+        <div class="tab-content" id="tabcontent_section">
+            <div class="tab-pane fade show active" id="howwork" role="tabpanel" aria-labelledby="howwork-tab">
+                @include('_partial.how-it-works')
+            </div>
+
+            @if($data['is_enrollment_window'] && count($data['category']))
+                @foreach($data['category'] as $item)
+                    <div id="content-tab-{{ $item['id'] }}" class="tab-pane fade">
+                        <div class="row">
+                            <div class="col-12">
+                                <h1 class="text-center mb-3">
+                                    {{ $item['name'] }}
+                                </h1>
+                                <table class="table table-bordered table-responsive table--custom">
+                                    <thead>
+                                        <tr>
+                                            <th>Benefit Name</th>
+                                            <th>Description</th>
+                                            <th @foreach($data['sub_categories_data'] as $subcat)
+                                                @if($item['id']==$subcat->ic_id)
+                                                    id="currSelectionHeadCol{{ $subcat->id }}"
+                                                @endif
+                                            @endforeach>Current Selection</th>
+                                            <th>Point Used</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if(count($data['sub_categories_data']))
+                                            @foreach($data['sub_categories_data'] as $subcat)
+                                                @if($item['id'] == $subcat->ic_id)
+                                                    <tr>
+                                                        <td><a id="enrollmentSubCategory{{ $subcat->id }}" data-cat-id="{{ $subcat->id }}" href="javascript:return false;">{{ $subcat->name }}</a></td>
+                                                        <td>{{ $subcat->description }}</td>
+                                                        <td id="currSelectionDataCol{{ $subcat->id }}">{{ array_key_exists($subcat->id, $data['currentSelectedData']) ? $data['currentSelectedData'][$subcat->id][0]['polName']  : 'N.A.' }}</td>
+                                                        <td id="currSelectionDataVal{{ $subcat->id }}">@php $sum = 0;
+                                                            if(array_key_exists($subcat->id, $data['currentSelectedData'])) {
+                                                                foreach($data['currentSelectedData'][$subcat->id] as $pointRow) {
+                                                                    $sum += $pointRow['points'];
+                                                                } 
+                                                            }
+                                                            echo $sum;
+                                                        @endphp</td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="4">Missing Sub-Categories. Contact Admin for details!!</td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        @if(count($data['sub_categories_data']))
+                            @foreach($data['sub_categories_data'] as $subcat)
+                                @if($item['id'] == $subcat->ic_id)
+                                    <div style="display:none;" class="container enrollmentSubCategory mt-lg-3" id="subCtgryDetail{{ $subcat->id }}">
+                                        <div class="row">
+                                            <div class="col-12 custom-heading">
+                                                <div class="section-heading">
+                                                    <h4 class="p-lg-2">{{ $subcat->name }}</h4>
+                                                    <img src="{{asset('assets/images/heading-line-dec.png') }}" alt="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @php
+                                            $detailPoints = explode('###', $subcat->details);
+                                        @endphp
+                                        @if(count($detailPoints))
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <ul class="ul-points fs-16">
+                                                        @foreach($detailPoints as $detailItem)
+                                                            <li>{{ $detailItem }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <hr class="my-2">
+                                                <div class="row custom-heading">
+                                                    <div class="section-heading">
+                                                        <h4 class="py-1">Policy Details</h4>
+                                                    </div>
+                                                    <div class="col text-center">
+                                                        <dl>
+                                                            <dt class="col">Name</dt>
+                                                            <dd class="col">{{ $subcat->fullname }}</dd>
+                                                        </dl>
+                                                    </div>
+                                                    <div class="col text-center" id="coreMultiple{{ $subcat->id }}">
+                                                        <dl>
+                                                            <dt class="col">Core Multiple</dt>
+                                                            <dd class="col">
+                                                                <label id="corem{{ $subcat->id }}"></label>
+                                                            </dd>
+                                                        </dl>
+                                                    </div>
+                                                    <div class="col text-center" id="coreSum{{ $subcat->id }}">
+                                                        <dl>
+                                                            <dt class="col">Core Sum Assured</dt>
+                                                            <dd class="col">
+                                                                <label id="coresa{{ $subcat->id }}"></label>
+                                                            </dd>
+                                                        </dl>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="policySubCategoryList{{ $subcat->id }}" data-scid="{{ $subcat->id }}"></div>
+                                        {{-- CARDS TEMPLATE--}}
+                                        {{-- Paste your card template code here --}}
+                                    </div>
+                                @endif
+                            @endforeach
+                        @endif
+                    </div>
+                @endforeach 
+            @else
+                <div class="tab-pane fade" id="no-category" role="tabpanel">
+                    No Category Found. Wrong Setup.
+                </div>
+            @endif
+
+            <div class="tab-pane fade show" id="summary" role="tabpanel" aria-labelledby="summary-tab">
+                <h3>Summary</h3>
+                <div id="summary_content"></div>
+                @if(!session('is_submitted'))
+                <div class="final-button">
+                    <h5 class="text-secondary" style="text-align:right;">Make your decision <em>FINAL</em> by clicking 
+                        <a href="#" class="btn btn-primary" id="finalSubmit_trigger">Final Submission</a>
+                    </h5>
+                </div>
+                @endif
+            </div>
+
+            <div id="enrollment-history" class="tab-pane fade show" role="tabpanel" aria-labelledby="summary-tab">
+                <h3>History</h3>
+                @include('_partial.enrollment-history')
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('finalSubmit_trigger').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default action (opening modal)
+
+            Swal.fire({
+                title: 'Do you really want to submit?',
+                text: 'This step is IRREVERSIBLE. Once submission is done, no further modification is possible until next year!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, submit it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/enrollment/finalSubmit',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            is_submitted: 1
+                        },
+                        success: function(response) {
+                            response = JSON.parse(response);
+                            if (response.status) {
+                                $(".final-button").hide();
+                                Swal.fire('Submitted!', 'Your decision has been successfully submitted.', 'success');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle error
+                            console.error(xhr.responseText);
+                        }
+                    });
+
+                }
+            });
+        });
+    });
+
+    function resetSelection(catId, buttonObj) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Resetting the previous selection will discard all changes. Do you want to proceed?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "/enrollment/resetCategory",
+                    type: "POST",
+                    data: {
+                        "_token": '{{ csrf_token() }}',
+                        'catId': catId,
+                    },
+                    success: function (response) {
+                        response = JSON.parse(response);
+                        if (response.status) {
+                            updatePoints();
+                        }
+                    }
+                });
+            } else {
+                // User clicked cancel, do nothing
+            }
+        });
+    }
+</script>
+
 <script>
     document.getElementById('downloadPdf').addEventListener('click', function() {
         var element = document.getElementById('enrollment_history_content');
-        
+
         html2pdf(element, {
             filename: 'enrollment_history.pdf',
-            html2canvas: { scale: 2 },
-            jsPDF: { orientation: 'portrait' }
+            html2canvas: {
+                scale: 2
+            },
+            jsPDF: {
+                orientation: 'portrait'
+            }
         });
     });
 </script>
@@ -313,8 +469,6 @@ function generateDependentItems(subCatId, depList) {
         //console.log(parentRadio);
         var existingDependent = [];
         var i = 0;
-        console.log("cfjed")
-
         $('[id^=dependant-list]').each(function(){
             var dCode = $(this).attr('data-depcode');
             var depId = $(this).attr('data-depId');
@@ -328,7 +482,7 @@ function generateDependentItems(subCatId, depList) {
                 );
             }
         });
-        console.log(existingDependent);
+        //console.log(existingDependent);
         for(depCode in existingDependent) {
             depId = [];
             depName = [];
@@ -336,23 +490,23 @@ function generateDependentItems(subCatId, depList) {
             existingDependent[depCode].forEach(function(depRow){
                 //console.log(depRow);
                 depId.push(depRow[0]);
-                depName.push('(' + depRow[1] + ':' + depRow[2] + '%)');
+                depName.push( depRow[1] );
             });
-            console.log('DepCode/:' + depCode);
+            //console.log('DepCode/:' + depCode);
             depList.forEach(function(x) {
                 if(depCode.toLowerCase() == x.toLowerCase()) {
                     //console.log(['PIL','P'].find(depList), depCode.toLowerCase(), x.toLowerCase(),depList);
                     if(['PIL','P'].includes(x.toUpperCase())) {   // match if dependant added is PIL or P case
                         memCvrdStr += '<div class="col-12 m-1 mt-2 mb-2"><input id="depMemCrvd_' + depId.join('_')  + 
                             '" type="' + (parentRadio ? 'radio' : 'checkbox' ) + '" name="depMemCrvd[]" value="' + depId.join(',') + 
-                            '" /><label for="depMemCrvd_' + depId.join('_')  + 
-                            '">' + depCodeFullName + '[' + depName.join(',') + ']' + '</label></div>';
+                            '" checked /><label for="depMemCrvd_' + depId.join('_')  + 
+                            '">' + depName.join(',') + '[' + depCodeFullName + ']' + '</label></div>';
                     } else {
                         memCvrdStr += '<div class="col-12 m-1 mt-2 mb-2"><input id="depMemCrvd_' + depId.join('_') + '"' + 
                             (x.toLowerCase() == 'e'? 'disabled checked' : '' )  +
                             ' type="checkbox" name="depMemCrvd[]" value="' + depId.join(',') + 
-                            '" /><label for="depMemCrvd_' + depId.join('_')  + 
-                            '">' + depCodeFullName + '[' + depName.join(',') + ']' + '</label></div>';
+                            '" checked/><label for="depMemCrvd_' + depId.join('_')  + 
+                            '">' + depName.join(',') + '[' + depCodeFullName + ']' + '</label></div>';
                     }
                 }
             });
@@ -496,32 +650,31 @@ function policyDetailsforSubCategory(subCatId) {
     }, 3000);
 }
 
-function saveEnrollment(catId){
+function saveEnrollment(catId) {
     var polData = new Object();
     var fypmapId = 0;
-    if ($('form#subCategoryForm' + catId).attr('data-ispv')==1) {
+    if ($('form#subCategoryForm' + catId).attr('data-ispv') == 1) {
         var checkboxCounter = 0;
         var policySelected = [];
-        $('form#subCategoryForm' + catId).find('input[type=checkbox]:checked').each(function(item){
+        $('form#subCategoryForm' + catId).find('input[type=checkbox]:checked').each(function(item) {
             checkboxCounter++;
             policySelected.push($(this).val());
         });
-        //console.log(policySelected); 
         if (checkboxCounter && policySelected.length) {
             let savePoints = [];
             let isvbsd = 0;
             let polData = [];
             let summary = [];
-            policySelected.forEach(function(policyID){
+            policySelected.forEach(function(policyID) {
                 polDet = $('#planDetails' + policyID);
                 isvbsd = parseInt(polDet.attr('data-isvbsd'));
                 var fypmap = polDet.attr('data-fypmap');
                 polDetJs = document.getElementById('planDetails' + policyID);
-                for (var i = 0; i < polDetJs.attributes.length; i++) {            
-                    attr = polDetJs.attributes[i];    // current attr
-                    if (/^data-/.test(attr.nodeName)) { // If attribute nodeName starts with 'data-'
+                for (var i = 0; i < polDetJs.attributes.length; i++) {
+                    attr = polDetJs.attributes[i];
+                    if (/^data-/.test(attr.nodeName)) {
                         attrName = attr.nodeName.replace(/^data-/, '');
-                        summary.push(fypmap + ':' + attrName + ':' + attr.nodeValue);    // array of array
+                        summary.push(fypmap + ':' + attrName + ':' + attr.nodeValue);
                     }
                 }
                 if (isvbsd) {
@@ -533,27 +686,24 @@ function saveEnrollment(catId){
             if (savePoints.length) {
                 $.ajax({
                     url: "/enrollment/savePV",
-                    type:"POST",
-                    data:{
+                    type: "POST",
+                    data: {
                         "_token": '{{ csrf_token() }}',
-                        'savePoints':btoa(unescape(encodeURIComponent(JSON.stringify(savePoints)))),
+                        'savePoints': btoa(unescape(encodeURIComponent(JSON.stringify(savePoints)))),
                         'catId': catId,
-                        //'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(summary)))),
                         'dependants': 'N.A.'
                     },
-                    success:function(response) {
+                    success: function(response) {
                         if (response.status) {
-                            title = 
                             $('#launchEnrollmentModal .modal-title').html('Yay!! Selection Saved').addClass('text-success');
                             $('#launchEnrollmentModal .btn.modal_close').html('Proceed Ahead');
-                        } else {                            
+                        } else {
                             $('#launchEnrollmentModal .modal-title').html('OOPS.. :( Something went wrong').addClass('text-danger');
                             $('#launchEnrollmentModal .btn.modal_close').html('Try Again');
-                            $("#enrollmentModal_trigger").click();
+                            $("#launchEnrollmentModal").show();
                         }
-                        $('#launchEnrollmentModal .modal-body>p').html(response.message);                        
-                        $("#enrollmentModal_trigger").click();
-                        //updatePoints();
+                        $('#launchEnrollmentModal .modal-body>p').html(response.message);
+                        $("#launchEnrollmentModal").show();
                     }
                 });
             }
@@ -562,29 +712,28 @@ function saveEnrollment(catId){
             $('#launchEnrollmentModal .modal-body>p').html('Please choose available benefits as you still have <b>' +
                 @php echo Auth::user()->points_available @endphp + '</b> points');
             $('#launchEnrollmentModal .btn.modal_close').html('I\'ll select again');
-            $("#enrollmentModal_trigger").click();
+            $("#launchEnrollmentModal").show();
         }
     } else {
-        $('form#subCategoryForm' + catId).find('input[type=radio]:checked').each(function(item){
+        $('form#subCategoryForm' + catId).find('input[type=radio]:checked').each(function(item) {
             let policyID = $(this).val();
             polDet = $('#planDetails' + policyID);
             let points = 0;
             let depSelected = [];
-            
+
             var polDet = document.getElementById('planDetails' + policyID);
-            // iterate each attribute
             if (parseInt(polDet.attributes['data-isbp'].nodeValue)) {
                 $('#launchEnrollmentModal .modal-title').html('Invalid Selection!').addClass('text-danger');
                 $('#launchEnrollmentModal .modal-body>p').html('Base plan is already present. Please select top-up to increase coverage.');
                 $('#launchEnrollmentModal .btn.modal_close').html('I\'ll select again');
-                $("#enrollmentModal_trigger").click();
+                $("#launchEnrollmentModal").show();
             } else {
-                for (var i = 0; i < polDet.attributes.length; i++) {            
-                    attr = polDet.attributes[i];    // current attr
-                    if (/^data-/.test(attr.nodeName)) { // If attribute nodeName starts with 'data-'
+                for (var i = 0; i < polDet.attributes.length; i++) {
+                    attr = polDet.attributes[i];
+                    if (/^data-/.test(attr.nodeName)) {
                         attrName = attr.nodeName.replace(/^data-/, '');
                         polData[attrName] = attr.nodeValue;
-                        if(attrName=='fypmap') {
+                        if (attrName == 'fypmap') {
                             fypmapId = parseInt(attr.nodeValue);
                         }
                         if (attrName == 'totptwocurr') {
@@ -592,65 +741,42 @@ function saveEnrollment(catId){
                         }
                     }
                 }
-                // members saved
-                $('#memcvrd'+catId).find('input[type="checkbox"]:checked').each(function(){
+                $('#memcvrd' + catId).find('input[type="checkbox"]:checked').each(function() {
                     depSelected.push($(this).val())
-                });          
+                });
                 if (fypmapId) {
                     $.ajax({
                         url: "/enrollment/save",
-                        type:"POST",
-                        data:{
+                        type: "POST",
+                        data: {
                             "_token": '{{ csrf_token() }}',
-                            'fypmap':fypmapId,
+                            'fypmap': fypmapId,
                             'catId': catId,
-                            'policyId' : policyID,
+                            'policyId': policyID,
                             'points': points,
-                            'sd': depSelected.join('###'),  // selected dependants
-                            //'summary' : btoa(unescape(encodeURIComponent(JSON.stringify(polData))))
+                            'sd': depSelected.join('###'),
                         },
-                        success:function(response) {
+                        success: function(response) {
                             if (response.status) {
-                                title = 
                                 $('#launchEnrollmentModal .modal-title').html('Yay!! Selection Saved').addClass('text-success');
                                 $('#launchEnrollmentModal .btn.modal_close').html('Proceed Ahead');
-                            } else {                            
+                            } else {
                                 $('#launchEnrollmentModal .modal-title').html('OOPS.. :( Something went wrong').addClass('text-danger');
                                 $('#launchEnrollmentModal .btn.modal_close').html('Try Again');
-                                $("#enrollmentModal_trigger").click();
+                                $("#launchEnrollmentModal").show();
                             }
-                            $('#launchEnrollmentModal .modal-body>p').html(response.message);                        
-                            $("#enrollmentModal_trigger").click();
-                            //updatePoints();
+                            $('#launchEnrollmentModal .modal-body>p').html(response.message);
+                            $("#launchEnrollmentModal").show();
                         }
                     });
-                } else {
-
                 }
-            }        
+            }
         });
     }
 }
 
-function resetSelection(catId, buttonObj){
-    $(buttonObj).hide();
-    $.ajax({
-        url: "/enrollment/resetCategory",
-        type:"POST",
-        data:{
-            "_token": '{{ csrf_token() }}',
-            'catId': catId,
-        },
-        success:function(response) {
-            $(buttonObj).show();
-            response = JSON.parse(response);
-            if (response.status) {
-                updatePoints();
-                $('#resetSelectionModalClose' + catId).click();                
-            }
-        }
-    });
-}
+
+
 
 function updatePoints() {
     $.ajax({
@@ -672,6 +798,7 @@ function updatePoints() {
             countNumber('points-head-tot', response.userpts[0]['points_used'] + response.userpts[0]['points_available']); 
             countNumber('points-head-used', response.userpts[0]['points_used']); 
             countNumber('points-head-avail', response.userpts[0]['points_available']); 
+            $("#launchEnrollmentModal").hide();
 
         }
     });
@@ -679,10 +806,10 @@ function updatePoints() {
 </script>
 <script src="/assets/js/number-rush.js"></script>
 
-{{-- JTABLE GRID --}}
-@endsection
+<script>
+    $(document).ready(function() {
+       
 
-@section('document_ready')
 $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
@@ -716,39 +843,16 @@ $('[id^=policySubCategoryList]').each(function(){
     policyDetailsforSubCategory($(this).attr('data-scid'));
 });
 
-$('#enrollment-summary').on('click', function(){
-    $('#summary_content').load('/enrollment/summary');
-});
 $('[id^="fyClick"]').on('click', function(){
     $('#enrollment_history_year').html($(this).text());
     $('#enrollment_history_content').load('/enrollment/summary?fid=' + $(this).attr('data-id'));
 });
-
-{{-- // trigger for radio button --}}
-    {{-- $('[id^=planId]').click(function(){
-        var subCatId = $(this).attr('data-sc-id');
-        var planId = $(this).attr('data-plan-id');
-        let planDetailArr = ['ptf','pt','osa','allo','currs','avail','tots','effecp','prorf','annup','totdc','psd','ped'];
-
-        planDetailArr.forEach(function (item,index) {
-            itemVal = $('#' + item + 'subCatId').html($('#planDetails' + planId).attr('data-' + item));
-        });
-        let currPlanValue = 5607;
-        let allPlanValue = 565607;
-        let balancePlanValue = 20569;
-
-        countNumber('currentPlanValue', currPlanValue);        
-        countNumber('allPlanValue', allPlanValue);
-        countNumber('remainingPlanValue', balancePlanValue);
-    }); --}}
-    
-    {{-- // trigger click for plan which is marked as selected --}}
-    {{-- $('[id^=planId]').each(function(){
-        if ($(this).attr('data-default-select') == 1) {
-            $(this).click();
-            console.log($(this).attr('data-plan-id'));
-        }
-    }); --}}
-
+$('#Summary-tab').on('click', function(){
+    $('#summary_content').load('/enrollment/summary', function(response){
         
-@endsection
+        
+    });
+}); 
+    });
+</script>
+

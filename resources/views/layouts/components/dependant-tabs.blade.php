@@ -197,7 +197,7 @@ function removeUsedRelations() {
                 title: 'Gender',
                 dependsOn: 'relationship_type',
                 width: 'auto',
-                edit: true,
+                edit: {{ session('is_submitted') == 1 ? 'false' : 'true' }},
                 options: [@php echo config('constant.gender_jTable') @endphp]
             },
             dob: {
@@ -213,7 +213,7 @@ function removeUsedRelations() {
             nominee_percentage: {
                 title: 'Nomination Percentage',
                 width: 'auto',
-                edit: true,
+                edit: {{ session('is_submitted') == 1 ? 'false' : 'true' }}
             },
             approval_status: {
                 title: 'Approval Status',

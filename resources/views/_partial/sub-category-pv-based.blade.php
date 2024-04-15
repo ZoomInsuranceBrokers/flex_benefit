@@ -1,6 +1,6 @@
 <div class="col-4 offset-4">
     <form id="subCategoryForm{{ $subCatId }}" data-ispv="{{ $is_point_value_based }}">
-    <table class="tab-content-table table-responsive mb-3 fs-11 col-3">
+    <table class="tab-content-table table table-bordered boder-primary mb-3 fs-11">
         <tbody class="col-6">
             <tr>
                 <th>Benefit Name</th>
