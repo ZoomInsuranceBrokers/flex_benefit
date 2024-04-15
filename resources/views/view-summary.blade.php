@@ -303,49 +303,49 @@
                             </span></p>
                         <p style="width: 30%;padding: 10px; display: inline; margin: 0px;" class="bold-text">Total Coverage <br> <span class="light-text">
 
-                        @php
-                                    $encryptedData =  Auth::user()->salary;
-                                    $encryptionKey = 'QCsmMqMwEE+Iqfv0IIXDjAqrK4SOSp3tZfCadq1KlI4=';
-                                    $initializationVector = 'G4bfDHjL3gXiq5NCFFGnqQ==';
+                                @php
+                                $encryptedData = Auth::user()->salary;
+                                $encryptionKey = 'QCsmMqMwEE+Iqfv0IIXDjAqrK4SOSp3tZfCadq1KlI4=';
+                                $initializationVector = 'G4bfDHjL3gXiq5NCFFGnqQ==';
 
-                                    // Decrypt the data
-                                    $cipher = "aes-256-cbc";
-                                        $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
+                                // Decrypt the data
+                                $cipher = "aes-256-cbc";
+                                $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING;
 
-                                        $decryptedData = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
+                                $decryptedData = openssl_decrypt(base64_decode($encryptedData), $cipher, base64_decode($encryptionKey), $options, base64_decode($initializationVector));
 
-                                        if ($decryptedData === false) {
-                                            echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
-                                        } else {
-                                            $decryptedData = floatval(rtrim($decryptedData, "\0"));
-                                        }
-
-    
-                            if (!$item['is_base_default']) {
-                                echo $item['summary']->totsa;
-                            } else {                                
-                                if (count($data['gradeAmtData']) && array_key_exists($item['policyDetail']['subcategory']['categories']['id'], $data['gradeAmtData'])) {
-                                    $bpsa = (int)$data['gradeAmtData'][$item['policyDetail']['subcategory']['categories']['id']];
-                                    $is_grade_based = TRUE;
+                                if ($decryptedData === false) {
+                                echo "Error during decryption: " . openssl_error_string() . PHP_EOL;
                                 } else {
-                                    $sa = !is_null($item['policyDetail']['sum_insured']) ? $item['policyDetail']['sum_insured'] : 0;
-                                    $sa_si = !is_null($item['policyDetail']['si_factor']) ?
-                                            $sa_si = $item['policyDetail']['si_factor'] * $decryptedData : 0;
-                                    if($sa_si > $sa) {
-                                        $bpsa = (int)$sa_si;
-                                        $is_si_sa = TRUE;
-                                        $base_si_factor = $item['policyDetail']['si_factor'];
-                                    } else {
-                                        $bpsa = (int)$sa;
-                                        $is_sa = TRUE;
-                                    }
+                                $decryptedData = floatval(rtrim($decryptedData, "\0"));
+                                }
+
+
+                                if (!$item['is_base_default']) {
+                                echo $item['summary']->totsa;
+                                } else {
+                                if (count($data['gradeAmtData']) && array_key_exists($item['policyDetail']['subcategory']['categories']['id'], $data['gradeAmtData'])) {
+                                $bpsa = (int)$data['gradeAmtData'][$item['policyDetail']['subcategory']['categories']['id']];
+                                $is_grade_based = TRUE;
+                                } else {
+                                $sa = !is_null($item['policyDetail']['sum_insured']) ? $item['policyDetail']['sum_insured'] : 0;
+                                $sa_si = !is_null($item['policyDetail']['si_factor']) ?
+                                $sa_si = $item['policyDetail']['si_factor'] * $decryptedData : 0;
+                                if($sa_si > $sa) {
+                                $bpsa = (int)$sa_si;
+                                $is_si_sa = TRUE;
+                                $base_si_factor = $item['policyDetail']['si_factor'];
+                                } else {
+                                $bpsa = (int)$sa;
+                                $is_sa = TRUE;
+                                }
                                 }
                                 echo $formatter->formatCurrency(round($bpsa), 'INR');
-                            }                            
-                            @endphp
-                        </span></p>
+                                }
+                                @endphp
+                            </span></p>
                     </div>
-                    <p style="width: 100%;padding:10px; margin: 0px; text-align: left;" class="bold-text">Point Used <br> <span class="light-text">{{  $formatter->formatCurrency($item['points'], 'INR') }}</span></p>
+                    <p style="width: 100%;padding:10px; margin: 0px; text-align: left;" class="bold-text">Point Used <br> <span class="light-text">{{ $formatter->formatCurrency($item['points'], 'INR') }}</span></p>
                 </div>
             </div>
             @endforeach
@@ -353,8 +353,14 @@
 
             <div style="display: flex;justify-content: center;flex-direction: column; height:30vh;  border-bottom: 3px solid #B5B5B5; " class="bold-text">
                 <p style="margin:0px; margin-left: 47%;  display: inline;">Total Points Used: {{number_format(Auth::user()->points_used,2) }}</p>
-                <p style="margin:0px; margin-left: 47%; display: inline;">Salary Contribuation: {{number_format(Auth::user()->points_used - 5000,2) }}</p>
-                <p style="margin:0px; margin-left: 47%; display: inline;">Monthly Installment: {{ number_format((Auth::user()->points_used - 5000) / 6, 2) }} </p>
+                <p style="margin:0px; margin-left: 47%; display: inline;">Salary Contribuation: {{ number_format(max(Auth::user()->points_used - 5000, 0), 2) }}</p>
+                <p style="margin:0px; margin-left: 47%; display: inline;">Monthly Installment:
+                    @if(Auth::user()->points_used >= 5000)
+                    {{ number_format((Auth::user()->points_used - 5000) / 6, 2) }}
+                    @else
+                    0.00
+                    @endif
+                </p>
             </div>
         </div>
 

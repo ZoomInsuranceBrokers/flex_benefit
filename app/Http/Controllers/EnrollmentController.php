@@ -112,7 +112,7 @@ class EnrollmentController extends Controller
                     }
                 }
             }
-            //dd($currentSelectedData);
+            // dd($currentSelectedData);
 
             $basePlan = InsurancePolicy::where('is_base_plan', 1)
                 ->orWhere('is_default_selection', 1)
@@ -140,12 +140,12 @@ class EnrollmentController extends Controller
 
             // dependant
             $dependants = Dependant::where('is_active', config('constant.$_YES'))
-                //->where('is_deceased',config('constant.$_NO'))
-                ->where('user_id_fk', Auth::user()->id)
-                ->where('is_deceased', config('constant.$_NO'))
-                ->orderBy('relationship_type')
-                ->orderBy('dependent_code')
-                ->get();
+            //->where('is_deceased',config('constant.$_NO'))
+            ->where('user_id_fk', Auth::user()->id)
+            ->where('is_deceased', 0)
+            ->orderBy('relationship_type')
+            ->orderBy('dependent_code')
+            ->get();
 
             $viewArray = [
                 'sub_categories_data' => $data->toArray(),
@@ -529,6 +529,7 @@ class EnrollmentController extends Controller
     {
         $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy']);
         $activeEntries = true;
+        // dd(base64_decode($request->fid));
         if ($request->has('fid') && base64_decode($request->fid)) {
             $mapUserFYPolicyData->whereRelation('fyPolicy.financialYears', 'id',base64_decode($request->fid));
             $activeEntries = null;
@@ -575,7 +576,7 @@ class EnrollmentController extends Controller
                 'enrollment_submit_date' => now(),
                 'submission_by' => Auth::user()->id
             ];
-            User::whereIn('id',Auth::user()->id)->update($userUpdateData);
+            // User::whereIn('id',Auth::user()->id)->update($userUpdateData);
             
             $email =  Auth::user()->email;
             $user = DB::table('users')->where('email', $email)->first();
@@ -610,7 +611,7 @@ class EnrollmentController extends Controller
             ->select('mufyp.id as mufypId', 'mfyp.id as mfypId', 'mufyp.points_used', 'ip.id as ip_id')
             ->get()->toArray();
             //->toSql();
-        //dd($userPolData);
+        // dd($userPolData);
         $pointsCounter = 0;
         $ids = [];
 
@@ -620,6 +621,7 @@ class EnrollmentController extends Controller
                 $ids[] = $polRow->mufypId;
             }
         }
+        MapUserFYPolicy::whereIn('id', $ids)->delete();// deleting existing record on every reset as soft deleting existing ones may cause corrupted data
 
         // update user points
         $user = User::where('id', Auth::user()->id)->get()->toArray();
@@ -667,7 +669,6 @@ class EnrollmentController extends Controller
             //     'modified_by' => Auth::user()->id,
             //     'updated_at' => now()
             // ]);
-            MapUserFYPolicy::whereIn('id', $ids)->delete();// deleting existing record on every reset as soft deleting existing ones may cause corrupted data
 
             $response = ['status' => true, 'msg' => 'Reset Done. Default entries added!!!'];
         } else {

@@ -41,7 +41,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('password-reset', [UserController::class, 'passworReset'])->name('previous.form.route');
     Route::post('/password/authupdate', [UserController::class, 'updatePassword'])->name('password.authupdate');
     Route::post('/dependants/create', [DependantController::class, 'create']);
+    Route::post('/dependants/edit', [DependantController::class, 'findDependent'])->name('dependants.edit');;
     Route::post('/dependants/update', [DependantController::class, 'update']);
+    Route::post('/dependants/updateLE', [DependantController::class, 'updateLE']);
+    Route::post('/dependants/updateAfterSubmission', [DependantController::class, 'updateAfterSubmission']);
     Route::post('/dependants/delete', [DependantController::class, 'delete']);
     Route::post('/dependants/getRelationshipTypes', [DependantController::class, 'getRelationshipTypes']);
     Route::get('/dependants/nominationCount', [DependantController::class, 'getNominationAllocation']);
@@ -66,9 +69,13 @@ Route::group(['middleware' => 'auth'], function () {
     // Route::post('/claim/update', [DependantController::class, 'update']);
     Route::any('/claim/loadHospital', [ClaimController::class, 'loadNetworkHospital']);
     Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
+    Route::post('/claim/phsHospitalList', [ClaimController::class, 'phs_network_hospital']);
+
 
     Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
+    Route::get('/claim/submit', [ClaimController::class, 'loadClaimSubmission']);
     Route::post('/claim/phs/initiate', [ClaimController::class, 'phs_save_claim_intimation']);
+    Route::post('/claim/phs/reimbursement', [ClaimController::class, 'phs_save_claim_reimbursement']);
     Route::get('/claim/track', [ClaimController::class, 'trackClaimStatus']);
 
 

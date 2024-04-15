@@ -1,0 +1,934 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: none; /* Hide the overlay by default */
+    z-index: 9999; /* Ensure the overlay is on top */
+}
+
+.loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px; /* Adjust the width and height as needed */
+    height: 100px;
+    background-image: url('/assets/videos/Flex-Final-Logo-icon_4.gif'); /* Path to the GIF */
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: 10000; /* Ensure the loader is on top of the overlay */
+}
+
+
+body {
+    color: var(--black);
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 16px;
+    overflow-x: hidden;
+}
+
+section {
+    position: relative;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+:root {
+    --darkblue: #03313d;
+    --darkcerulean: #084F60;
+    --blue: #0FA2D5;
+    --gray: #D3D3D3;
+    --grayfont: #606060;
+    --white: #ffffff;
+    --black: #000000;
+}
+
+/* Login CSS */
+.loginModal .modal-body input.login-input {
+    height: 45px;
+    border: 1px solid #5772ed57;
+    border-radius: 5px;
+}
+
+.loginModal .modal-dialog {
+    width: 430px;
+}
+
+.loginModal .modal-content {
+    border-radius: 5px;
+}
+
+.loginModal .modal-header {
+    padding: 12px 16px;
+}
+
+.login-label {
+    font-size: 14px;
+}
+
+.loginModal .btn-login {
+    width: 100%;
+    background: var(--darkblue);
+    border: 0;
+    height: 45px;
+    color: var(--white);
+}
+
+/* End Login CSS */
+
+/* For Home Page CSS */
+.custom-nav .navbar-expand-lg .navbar-collapse {
+    justify-content: flex-end;
+    gap: 4rem;
+}
+.custom-nav .navbar-expand-lg .navbar-nav {
+    gap: 1.5rem;
+    font-weight: 600;
+}
+
+
+.profile-dropdown .dropdown-toggle::after{
+    border:0;
+}
+.profile-dropdown .dropdown-toggle{
+    color: #fff;
+    font-size: 14px;
+}
+.custom-nav .navbar-brand {
+    width: 300px;
+}
+
+.custom-nav .navbar-brand img {
+    width: 100%;
+}
+
+.custom-nav .header-nav {
+    background-color:#d2c9c95e;
+    padding: 10px 25px;
+    font-weight: bold;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.custom-nav .navbar-nav .nav-link.active{
+    box-shadow: 0 4px 8px 0 rgb(255 255 255 / 16%), 0 4px 5px 0 rgb(110 110 110 / 44%);
+    color: var(--darkblue);
+    border-radius: 5px;
+}
+.custom-nav .navbar-nav .nav-link:hover{
+    box-shadow: 0 4px 8px 0 rgb(255 255 255 / 16%), 0 4px 5px 0 rgb(110 110 110 / 44%);
+    color: var(--darkblue);
+}
+.custom-nav .header-nav .dropdown-menu[data-bs-popper] {
+    left: -40px;
+}
+
+.banner__section{
+   padding: 30px;
+}
+
+.banner__section .left-col {
+    position: relative;
+    background-size: cover;
+}
+
+.video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: initial;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.intake-banner__section .left-col {
+    background: url('../images/intake-banner.png') no-repeat right;
+    background-size: cover;
+}
+
+.right-col {
+    background: url('../images/bg-icon1.png') center no-repeat;
+}
+
+.main-banner {
+    padding: 5rem;
+}
+
+.intake-banner__section .main-banner h1 {
+    font-size: 4rem;
+}
+
+.intake-banner__section .main-banner h2 {
+    font-size: 3rem;
+}
+
+.intake-banner__section .main-banner {
+    padding: 2rem;
+    border-radius: 50px 0px 0px 50px;
+    margin-block: 8rem;
+    background-color: #fff;
+    box-shadow: 0 4px 8px 0 rgba(163, 163, 163, 0.30), 0 4px 8px 0 rgba(119, 119, 119, 0.3);
+    margin-right: -10px;
+}
+
+h2.header-dark {
+    background-color: var(--darkblue);
+    text-align: center;
+    padding: 1.2rem;
+    font-size: 3rem;
+    color: #fff;
+}
+
+.main-banner h1 {
+    font-size: 3rem;
+    color: var(--blue);
+    font-weight: 600;
+}
+
+.main-banner p {
+    margin: 2rem 0.5rem 1rem 0;
+}
+
+.color-black {
+    color: var(--darkblue);
+}
+
+.profile-dropdown {
+    background: var(--blue);
+    padding: 0px 5px;
+    border-radius: 5px;
+}
+
+.profile-dropdown img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50px;
+}
+
+.login-btn {
+    background: linear-gradient(105deg, rgb(3, 49, 61) 0%, rgb(3, 49, 61) 100%);
+    border: none;
+    color: #fff;
+    padding: 0.6rem 2.5rem;
+    border-radius: 20px;
+}
+
+.login-btn:hover {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.work {
+    padding: 2rem;
+}
+
+.side-border {
+    background: url('../images/shadow.png') no-repeat left;
+    background-size: 8px;
+    padding: 0 0 0 1rem;
+}
+
+.gray-border {
+    background: url(../images/gray-border.png') no-repeat left;
+    background-size: 8px;
+    padding: 0 0 0 1rem;
+}
+
+.work-bg {
+    background: var(--darkblue);
+}
+
+.work h2 {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+.work {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.hire-bg {
+    background: var(--blue);
+}
+
+.hire {
+    padding: 2.1rem;
+}
+
+.hire h2 {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+.hire {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.hire .custom-text {
+    padding-left: 15px;
+}
+
+.white-btn {
+    background: var(--white);
+    padding: 0.5rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--blue);
+    font-weight: 600;
+    font-size: 16px;
+    margin-left: 15px;
+}
+
+.white-btn:hover {
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    color: var(--blue);
+}
+
+.custom-container {
+    margin: 2.5rem;
+}
+
+.plan h2 {
+    font-size: 3rem;
+    font-weight: 600;
+    color: var(--blue);
+}
+
+.card-items .card-list {
+    border-radius: 10px;
+    border-top-right-radius: 50px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 10px;
+    border-top-right-radius: 50px;
+    transition: all .3s;
+    padding-bottom: 10px;
+}
+
+.service-img .service-main {
+    width: 100%;
+    border-top-right-radius: 50px;
+    border-bottom-left-radius: 50px;
+}
+
+.card-list h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 15px 15px;
+}
+
+.img-icon {
+    width: 60px;
+    position: absolute;
+    left: 15px;
+    bottom: 80px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.img-icon img {
+    width: 100%;
+}
+
+#plan .service-col .medical-info{
+    transition: all 2s ease;
+}
+.medical-info{
+    position: absolute;
+    display: none;
+    background: var(--gray);
+    font-size: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    width: 550px;
+    margin-top: 40px;
+    margin-left: 20px;
+    position: relative;
+}
+.service-col:hover .medical-info{
+    display: block;
+}
+.terms-col:hover .medical-info{
+    display: block;
+}
+.plans-col:hover .medical-info{
+    display: block;
+}
+.non-col:hover .medical-info{
+    display: block;
+}
+.service-col, .terms-col, .plans-col, .non-col{
+    cursor: pointer;
+}
+.medical-info p{
+    margin-bottom: 0;
+}
+.medical-info::after{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: -18px;
+    z-index: -1;
+    border-bottom-right-radius: 43px;
+    right: auto;
+    top: 0px;
+    transform: skewY(40deg);
+    transition: translate(90);
+    bottom: auto;
+    border: 28px solid;
+    border-color: var(--gray) transparent transparent transparent;
+}
+.hidden {
+    display: none;
+}
+
+
+
+.main-footer {
+    background: var(--darkblue);
+    color: #fff;
+}
+
+ul.custom-icon {
+    list-style-type: none;
+}
+
+ul.custom-icon li {
+    background: url('../images/white_flex_icon-01.png')  no-repeat left center;
+    background-size: 16px;
+    padding-left: 1.5em;
+}
+
+.tax-banner {
+    background: url('../images/tax-img.png') no-repeat;
+    background-size: 100%;
+    position: relative;
+}
+
+.tax-banner .tax-img {
+    position: absolute;
+    width: 200px;
+    bottom: 50px;
+    padding: 5px;
+    left: 0;
+}
+
+.tax-banner .tax-img img {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Enrollment CSS start */
+
+.secondary-header {
+    background: url('../images/header-bg.png') no-repeat;
+    padding: 25px 0;
+    background-size: cover;
+    background-position: center;
+}
+
+.secondary-header h3 {
+    text-align: center;
+    background: rgb(5, 104, 136);
+    background: radial-gradient(circle, rgba(5, 104, 136, 1) 0%, rgb(9, 129, 169) 49%, rgba(5, 104, 136, 1) 100%);
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 10px;
+    box-shadow: 0 2px 4px 0 rgba(4, 58, 76, .2), 0 1px 4px 0 rgba(4, 58, 76, .4);
+}
+
+.enroll-banner {
+    padding: 25px 0;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.container-card {
+    border-radius: 20px;
+    padding: 20px;
+}
+
+#tabcontent_section {
+    margin-top: 0px;
+    padding: 30px;
+    position: relative;
+}
+
+.nav-tabs#enrolTabs li .nav-link {
+    border-radius: 50px 0px 50px 50px;
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 4px 0 rgba(163, 163, 163, 0.16), 0 4px 5px 0 rgb(110 110 110 / 30%);
+    color: #000000;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 10px 10px 10px 0;
+    min-width: 160px;
+    margin-right: 10px;
+    text-align: left;
+}
+
+.nav-tabs#enrolTabs li .nav-link img {
+    width: 30px;
+    height: 30px;
+}
+
+.enroll-banner .nav {
+    border-bottom: 0;
+}
+
+.nav-tabs#enrolTabs li .nav-link.active {
+    background-color: #0fa2d5;
+    color: #fff;
+}
+
+#tabcontent_section h1 {
+    color: #03313d;
+}
+
+ul.star-icon {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Style for each list item */
+ul.star-icon li {
+    background: url('../images/bg-icon.png') no-repeat left center; /* Set background image */
+    background-size: 25px; /* Adjust background size */
+    padding-left: 35px; /* Adjust padding to accommodate the background image */
+    margin-bottom: 10px; /* Optional: Add some space between list items */
+    line-height: 1.5; /* Optional: Adjust line height for better readability */
+}
+
+.medical__Services img.star_img {
+    width: 20px;
+    height: 20px;
+    margin-left: 63px;
+    margin-top: -23px;
+}
+
+.medical__Services .card {
+    border-radius: 30px 30px 0px 30px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .2), 0 1px 4px 0 rgba(0, 0, 0, .4);
+}
+
+.medical__Services .card h4 {
+    font-weight: 400;
+    font-size: 20px;
+    padding-left: 65px;
+    padding-bottom: 20px;
+    margin-top: 15px;
+}
+
+.insurance-list {
+    background-color: #0fa2d5;
+    padding: 20px;
+}
+
+.table--custom thead {
+    background-color: #0FA2D5;
+    color: #ffffff;
+    font-size: 18px;
+}
+
+.card.card-policy>.card-header {
+    background-color: #0FA2D5;
+    color: #fff;
+}
+
+#medicalModelContent {
+    border-radius: calc(0.3rem - 1px);
+    border: 1px solid #dee2e6;
+}
+
+#medicalModelContent .modal-header {
+    background-color: var(--gray);
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: calc(0.3rem - 1px);
+    border-top-right-radius: calc(0.3rem - 1px);
+}
+
+.policydetails-row .table thead {
+    background-color: #90e3ff;
+}
+
+.table.inner-table thead {
+    font-size: 14px;
+    background-color: transparent;
+}
+
+.table.inner-table,
+.table.summary-table {
+    font-size: 14px;
+    border-collapse: separate;
+}
+
+.table.inner-table tbody td {
+    padding: 10px;
+}
+
+.card .card-sub {
+    background-color: #e5e5e5;
+    border: 0;
+}
+
+.table.inner-table tbody td:nth-child(1) {
+    background-color: #aceaff;
+}
+
+.table.inner-table tbody td:nth-child(2) {
+    background-color: #89d9f4;
+}
+
+.table.inner-table tbody td:nth-child(3) {
+    background-color: #71dbff;
+}
+
+.card .card-sub .card-header {
+    background-color: #bfbfbf;
+    color: #03313d;
+    font-weight: 600;
+}
+
+.card .card-sub .card-header h5 {
+    font-size: 18px;
+}
+
+#medicalModelContent .modal-footer .btn {
+    background-color: var(--blue);
+    color: #fff;
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+a#medicalModel {
+    cursor: pointer;
+}
+
+/* Claim pages styling */
+
+.btn.seconday-btn {
+    background-color: #03313d;
+    color: #fff;
+}
+
+.btn:hover {
+    opacity: .8;
+}
+
+.form-label {
+    background-color: var(--blue);
+    color: #fff;
+    padding: 5px 10px;
+    margin-bottom: 0;
+    border-radius: 5px 5px 0 0;
+}
+
+.hospital-card .active>.page-link,
+.page-link.active {
+    background-color: var(--blue);
+}
+
+.card.hospital-card .card-header {
+    background-color: var(--blue);
+}
+
+.card.hospital-card .card-header h5 {
+    color: #fff;
+}
+
+.card.hospital-card .table>thead th {
+    background-color: var(--darkblue);
+    color: #fff;
+}
+
+/*===========================================
+Dependent page styling
+============================================*/
+
+.banner__section.dependent__banner .left-col {
+    background: url(../images/dependent-banner.png) no-repeat right;
+}
+
+.card-dependent {
+    border-radius: 50px;
+    padding: 2rem;
+    background-color: #fff;
+    box-shadow: 0 4px 8px 0 rgba(163, 163, 163, 0.30), 0 4px 8px 0 rgba(119, 119, 119, 0.3);
+    position: relative;
+}
+
+.card-dependent img {
+    position: absolute;
+    right: -105px;
+    width: 224px;
+    top: -15px;
+}
+
+.card-dependent.card-dependent__event img {
+    left: -55px;
+    top: -15px;
+}
+
+.card-dependent h2 {
+    color: var(--blue);
+    font-style: italic;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card-dependent .btn.seconday-btn {
+    margin-inline: auto;
+    display: block;
+    min-width: 200px;
+}
+
+
+.card-dep__details {
+    background: rgb(15, 160, 210);
+    background: linear-gradient(90deg, rgba(15, 160, 210, 1) 0%, rgba(3, 52, 65, 1) 100%);
+    border-radius: 30px;
+}
+
+.card-dep__details img {
+    width: 200px;
+    opacity: .2;
+    position: absolute;
+    top: 30%;
+    left: 40%;
+}
+
+.card-dep__details .card-header {
+    background-color: #fff;
+    padding: 20px;
+    margin-inline: 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+
+}
+
+.card-dep__details .card-header h2 {
+    color: var(--darkblue);
+    font-weight: 600;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+/*=============dendent model popup=========*/
+
+#exampleModal .modal-header {
+    background-color: var(--blue);
+    color: #fff;
+    margin-inline: 20px;
+    border-radius: 0px 0px 20px 20px;
+    display: block;
+}
+
+#exampleModal .modal-header h5.modal-title {
+    text-align: center;
+}
+
+#exampleModal .modal-footer {
+    border-top: 2px solid var(--blue);
+    justify-self: center
+}
+
+#editModal .modal-header {
+    background-color: var(--blue);
+    color: #fff;
+    margin-inline: 20px;
+    border-radius: 0px 0px 20px 20px;
+    display: block;
+}
+
+#editModal .modal-header h5.modal-title {
+    text-align: center;
+}
+
+#editModal .modal-footer {
+    border-top: 2px solid var(--blue);
+    justify-self: center
+}
+
+.action-img {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+.life-event-about h2 {
+    border-bottom: 3px solid #fff;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.modal-backdrop {
+    background-color: #0b87a2;
+    filter: drop-shadow(2px 4px 6px #09728a);
+}
+
+.modal-overlay {
+    background-color: var(--blue);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: -23px;
+    left: -25px;
+    z-index: -1;
+}
+
+#loginModal .modal-content {
+    border-radius: 0px;
+    border: 0px solid transparent;
+    background-color: #ececec;
+}
+
+#loginModal .modal-content .modal-body {
+    padding: 3rem;
+}
+
+.user-cicle {
+    font-size: 66px;
+    overflow: hidden;
+    text-align: center;
+    border-radius: 50%;
+    background-color: var(--blue);
+    color: #fff;
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin-inline: auto;
+}
+
+
+/* Styles for the hamburger icon */
+.hamburger {
+    display: none;
+    cursor: pointer;
+}
+
+/* Login Page */
+#loginModal .modal-content {
+    border-radius: 0px;
+    border: 0px solid transparent;
+    background-color: #ececec;
+}
+
+#loginModal .modal-content .modal-body {
+    padding: 3rem;
+}
+
+.login-label{
+    font-size: 13px;
+}
+.custom-form .form-control{
+    padding-left: 33px;
+    height: 45px;
+}
+.pass-icon{
+    width: 20px;
+    position: absolute;
+    left: 55px;
+    bottom: 170px;
+}
+
+.pass-eye{
+    width: 20px;
+    position: absolute;
+    right: 55px;
+    bottom: 170px;
+}
+.login-icon{
+    width: 20px;
+    position: absolute;
+    bottom: 232px;
+    left: 55px;
+}
+.login-icon img{
+    width: 100%;
+}
+.pass-icon img{
+    width: 100%;
+}
+
+.pass-eye img{
+    width: 100%;
+}
+#logoutModal .modal-content {
+    border-radius: 0px;
+    border: 0px solid transparent;
+    background-color: #ececec;
+}
+
+#logoutModal .modal-content .modal-body {
+    padding: 3rem;
+}
+.logout-text h3{
+    font-weight: 400;
+    color: var(--blue);
+    border-bottom: 1px solid #dbd7d7;
+    padding-bottom: 15px;
+}
+.btns{
+    gap: 2rem;
+}
+.btn.cancel--btn{
+    border: 1px solid var(--blue);
+    background: #fff;
+    color: var(--blue);
+    width: 100px;
+}
+/* End  Login Page */
+.user-cicle {
+    font-size: 66px;
+    overflow: hidden;
+    text-align: center;
+    border-radius: 50%;
+    background-color: var(--blue);
+    color: #fff;
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin-inline: auto;
+}
+
+.life-event__banner .left-col {
+    background: url(../images/life-vent-banner.png) no-repeat right;
+    background-size: cover;
+}
+
+
