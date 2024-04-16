@@ -27,13 +27,18 @@ use Illuminate\Support\Facades\Crypt;
 use App\Traits\EnrollmentTraitMethods;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules\Password;
+use App\Traits\dependantTraitMethods;
+use Illuminate\Support\Facades\Log;
+
 
 class ApiController extends Controller
 {
+    use EnrollmentTraitMethods;
+    use dependantTraitMethods;
+
     public $secret_key = 'x409z636R3vFRPttwT26jkdwbdewidJN1bncwi2gpT';
     public function getAllUsers(Request $request)
     {
-        $api_key = trim($request->api_key);
 
         if (empty($api_key)) {
             $response = [
@@ -229,7 +234,7 @@ class ApiController extends Controller
 
                 $formattedData['user'][$jsonRow['Details']['Id']]['dob'] = htmlspecialchars($jsonRow['Details']['Birthdate']);
                 $formattedData['user'][$jsonRow['Details']['Id']]['hire_date'] = htmlspecialchars($jsonRow['Details']['Hire_Date__c']);
-                // $formattedData['user'][$jsonRow['Details']['Id']]['salary'] = htmlspecialchars($jsonRow['Details']['Annual_CTC__c']);
+                $formattedData['user'][$jsonRow['Details']['Id']]['salary'] = htmlspecialchars($jsonRow['Details']['Annual_CTC__c']);
                 $formattedData['user'][$jsonRow['Details']['Id']]['points_used'] = 0;
                 $formattedData['user'][$jsonRow['Details']['Id']]['points_available'] = (int)$jsonRow['Details']['Points_Allotted__c'];
                 $formattedData['user'][$jsonRow['Details']['Id']]['mobile_number'] = array_key_exists('Phone', $jsonRow['Details']) ? htmlspecialchars($jsonRow['Details']['Phone']) : '';
@@ -284,14 +289,14 @@ class ApiController extends Controller
                             $email = $formattedData['user'][$jsonRow['Details']['Id']]['email'];
                             $users = $formattedData['user'][$jsonRow['Details']['Id']]['fname'];
 
-                            Mail::to($email)->send(new NewJoiningCredentials($users));
+                            // Mail::to($email)->send(new NewJoiningCredentials($users));
                             echo '<br>' . __FUNCTION__ . ':INFO:New user(' . implode(' ', [
                                 $formattedData['user'][$jsonRow['Details']['Id']]['fname'],
                                 $formattedData['user'][$jsonRow['Details']['Id']]['lname'],
                                 $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']
                             ]) . ') added with Id:' . $userId;
 
-                            // create default policy entries for new user
+                           
                             $this->generateBaseDefaultPolicyMapping(
                                 [['id' => $userId]],
                                 $enrollmentData['autoSubmit'],
@@ -393,8 +398,7 @@ class ApiController extends Controller
             die(__FUNCTION__ . ':ERROR:Invalid Gender for ' . $entryType . ' record: ' . $entryName);
         }
     }
-    private function _saveDependantData($userInsertData, $jsonData)
-    {
+    private function _saveDependantData ($userInsertData, $jsonData) {
         if (count($userInsertData) && count($jsonData)) {
             foreach ($jsonData as $userExtId => $jsonRow) {
                 if (
@@ -406,40 +410,31 @@ class ApiController extends Controller
                     $lowerCaseApprovalStatus = array_map('strtolower', config('constant.approval_status'));
                     $lowerCaseBoolean = array_map('strtolower', config('constant.booleanArr'));
                     foreach ($jsonRow['Dependants'] as $depRow) {
-                        // dd($userInsertData['user'][$userExtId]['id']);'
-                        
-                    
-
                         $depData = [];
                         $depData['external_id'] = $depRow['Id'];
                         $depData['dependent_name'] = htmlspecialchars($depRow['Name__c']);
-                        // $depData['dob'] = date('Y-m-d', strtotime($depRow['Date_of_Birth__c']));
+                        if(!isset($depRow['Date_of_Birth__c'])){
+                            dd($depRow);
+                        }
+                        $depData['dob'] = date('Y-m-d', strtotime($depRow['Date_of_Birth__c']));
                         $depData['gender'] = $this->_getGenderId(htmlspecialchars($depRow['Gender__c']), $depRow, true);
                         $depData['nominee_percentage'] = array_key_exists('Nominee_Percentage__c', $depRow) ? $depRow['Nominee_Percentage__c'] : 0;
-                        $depData['relationship_type'] = array_search(strtolower($depRow['Relationship_Type__c']), $lowerCaseRltnNames);
-                        $depData['approval_status'] = array_search(strtolower($depRow['Approval_Status__c']), $lowerCaseApprovalStatus);
+                        $depData['relationship_type'] = array_search(strtolower($depRow['Relationship_Type__c']),$lowerCaseRltnNames);
+                        $depData['approval_status'] = array_search(strtolower($depRow['Approval_Status__c']),$lowerCaseApprovalStatus);      
                         $depData['is_active'] = config('constant.$_YES');
-                        $depData['is_deceased'] = array_search(strtolower($depRow['Deceased__c']), $lowerCaseBoolean);
-                        // echo $this->validatedUpsertDependant($depData, $userInsertData['user'][$userExtId], $depRow);
-                        $depandant = Dependant::where('dependent_name', htmlspecialchars($depRow['Name__c']))
-                        ->where('user_id_fk',$userInsertData['user'][$userExtId]['id'])
-                        ->where('relationship_type',array_search(strtolower($depRow['Relationship_Type__c']), $lowerCaseRltnNames))
-                        ->first();
-                        if ($depandant) {
-                            // Update the existing dependent
-                            $depandant->update($depData);
-                            echo "Dependent updated successfully: " . $depData['external_id'];
-                        } 
+                        $depData['is_deceased'] = array_search(strtolower($depRow['Deceased__c']),$lowerCaseBoolean);
+                        echo $this->validatedUpsertDependant($depData, $userInsertData['user'][$userExtId], $depRow);
                     }
                 } else {
-                    echo '<br>----------' . __FUNCTION__ . ':INFO:No dependant found for user ' .
-                        $jsonRow['Details']['Name'];
+                    echo '<br>----------' . __FUNCTION__ . ':INFO:No dependant found for user ' . 
+                    $jsonRow['Details']['Name'];
                 }
-            }
+            }            
         } else {
             die(__FUNCTION__ . ':ERROR: EMPTY JSON OR USER DATA RECEIVED');
         }
     }
+    
     public function getUserEnrollmentData(Request $request)
     {
         // dd(base64_encode('a9#Bc2$eDfGhIjK4LmNpQr6StUvWxYz' . date('d-m-Y')));
@@ -507,13 +502,14 @@ class ApiController extends Controller
                     $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['points_used'] = $submissionRow['points_used'];
                     $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['selected_dependent'] = $submissionRow['selected_dependent'];
                     $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['encoded_summary'] = $submissionRow['encoded_summary'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['is_submitted'] = $submissionRow['is_submitted'];
 
                     // user data
                     $userData = $submissionRow['user'];
                     // dd($userData);
                     $finalData['user'][$submissionRow['user_id_fk']]['id'] = $userData['id'];
                     $finalData['user'][$submissionRow['user_id_fk']]['external_id'] = $userData['external_id'];
-                    $finalData['user'][$submissionRow['user_id_fk']]['fname'] = $userData['fname'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['fname'] = $userData['fname'] !== "" ? $userData['fname'] : null;
                     $finalData['user'][$submissionRow['user_id_fk']]['lname'] = $userData['lname'];
                     $finalData['user'][$submissionRow['user_id_fk']]['hire_date'] = $userData['hire_date'];
                     $finalData['user'][$submissionRow['user_id_fk']]['points_used'] = $userData['points_used'];
@@ -563,12 +559,12 @@ class ApiController extends Controller
             if (count($dependantData)) {
                 foreach ($dependantData as $depRow){
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['user_ext_id'] = $depRow['user']['user_ext_id'];
-                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['external_id'] = $depRow['external_id'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['external_id'] = $depRow['external_id'] !== "" ? $depRow['external_id'] : null;
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['user_id_fk'] = $depRow['user_id_fk'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_code'] = config('constant.dependant_code_ui')[$depRow['dependent_code']];
-                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dob'] = strlen(str_replace([0,'-',':', ' '], '', $depRow['dob'])) ? $depRow['dob'] : '';
-                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['doe'] = strlen(str_replace([0,'-',':', ' '], '', $depRow['doe'])) ? $depRow['doe'] : '';
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dob'] = strlen(str_replace([0,'-',':', ' '], '', $depRow['dob'])) ? $depRow['dob'] : null;
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['doe'] = strlen(str_replace([0,'-',':', ' '], '', $depRow['doe'])) ? $depRow['doe'] : null;
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['gender'] = $depRow['gender'] ? config('constant.gender')[$depRow['gender']] : null;
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['nominee_percentage'] = $depRow['nominee_percentage'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['relationship_type'] = config('constant.relationship_type')[$depRow['relationship_type']];

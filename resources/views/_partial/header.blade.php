@@ -4,7 +4,8 @@
         margin: 10px;
         border-radius: 6px;
         color: white;
-        background-image: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)); /* White gradient */
+        background-image: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
+        /* White gradient */
 
     }
 
@@ -13,7 +14,28 @@
         margin: 10px;
         border-radius: 6px;
         color: white;
+        text-align: center;
+    }
 
+    .dropdown-item-wallet {
+        display: block;
+        width: 100%;
+        clear: both;
+        font-weight: 400;
+        color: var(--bs-dropdown-link-color);
+        text-align: inherit;
+        text-decoration: none;
+        white-space: nowrap;
+        background-color: transparent;
+        border: 0;
+    }
+
+    .wallet-score {
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
     }
 </style>
 
@@ -79,15 +101,25 @@
                             <li><span class="dropdown-item-text flex-avl">FlexPoints Allocated: 5000</span></li>
                             <li><span class="dropdown-item-text flex-uti">FlexPoints Utilized</span></li>
                             <hr>
-                            <li><span class="dropdown-item">Term Life: 456</span></li>
-                            <hr>
-                            <li><span class="dropdown-item">Medical: 456</span></li>
-                            <hr>
-                            <li><span class="dropdown-item">Accidental: 456</span></li>
-                            <hr>
-                            <li><span class="dropdown-item">Non-insured: 456</span></li>
-                            <hr>
-                            <li><span class="dropdown-item-text">Total: 1824</span></li>
+                            <div class="wallet-score">
+                                <li><span class="dropdown-item-wallet">Term Life: 456</span></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><span class="dropdown-item-wallet">Medical: 456</span></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><span class="dropdown-item-wallet">Accidental: 456</span></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><span class="dropdown-item-wallet">Non-insured: 456</span></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><span class="dropdown-item-text">Total: 1824</span></li>
+                            </div>
                         </ul>
                     </li>
 
