@@ -5,6 +5,9 @@ use App\Models\Grade;
 use App\Models\Account;
 use App\Models\FinancialYear;
 use App\Models\CountryCurrency;
+use App\Models\InsuranceCategory;
+use App\Models\InsurancePolicy;
+use App\Models\InsuranceSubCategory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -41,7 +44,8 @@ trait accountTraitMethods {
                 foreach (array_values($validator->errors()->messages()) as $item) {
                     $error.= '<li>' . $item[0] . '</li>';
                 }
-                echo '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>Account:</b><ul>' . $error . '</ul></div>';
+                echo '<br>----------' . __FUNCTION__ . 
+                    ':ERROR:<div class="fs-12"><br><b>Account:</b><ul>' . $error . '</ul></div>';
             }
         }
         //return $result['Message'];
@@ -84,7 +88,8 @@ trait financialYearTraitMethods {
             if (!$validator->fails()) {
                 echo __FUNCTION__ . ':INFO:Financial Year [Name:' . $fy['name'] . '] with details[Ext ID:' . 
                 $fy['external_id'] . ',FY Start Date:' . $fy['start_date'] . 
-                ',FY End Date:' . $fy['end_date'] . ', FY Last Enrollment Date:' . $fy['last_enrollment_date'] . '] to be created/updated ';
+                ',FY End Date:' . $fy['end_date'] . ', FY Last Enrollment Date:' . $fy['last_enrollment_date'] . 
+                '] to be created/updated ';
 
                 session('confirmUpdate') ? FinancialYear::updateOrCreate(['external_id' => $fy['external_id']],$fy) : '';
             } else {   
@@ -144,7 +149,8 @@ trait gradeTraitMethods {
                 foreach (array_values($validator->errors()->messages()) as $item) {
                     $error.= '<li>' . $item[0] . '</li>';
                 }
-                echo '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>Grade:</b><ul>' . $error . '</ul></div>';
+                echo '<br>----------' . __FUNCTION__ . 
+                    ':ERROR:<div class="fs-12"><br><b>Grade:</b><ul>' . $error . '</ul></div>';
             }
         }        
     }
@@ -184,14 +190,15 @@ trait insuranceCategoryMethods {
                     echo __FUNCTION__ . ':INFO:Insurance Category [Name:' . $insCategory['name'] . '] with details[Ext ID:' . 
                     $insCategory['external_id'] . ' to be created/updated ';
 
-                    session('confirmUpdate') ? Grade::updateOrCreate(['external_id' => $insCategory['external_id']],$insCategory) : '';
+                    session('confirmUpdate') ? InsuranceCategory::updateOrCreate(['external_id' => $insCategory['external_id']],$insCategory) : '';
                 }
             } else {   
                 $error = '';             
                 foreach (array_values($validator->errors()->messages()) as $item) {
                     $error.= '<li>' . $item[0] . '</li>';
                 }
-                echo '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>Insurance Category:</b><ul>' . $error . '</ul></div>';
+                echo '<br>----------' . __FUNCTION__ . 
+                    ':ERROR:<div class="fs-12"><br><b>Insurance Category:</b><ul>' . $error . '</ul></div>';
             }
         }
                
@@ -212,91 +219,137 @@ trait insuranceCategoryMethods {
 }
 
 trait insuranceSubCategoryMethods {
-    public function upsertInsuranceSubCategory($insSubCategoryData) {
+    public function upsertInsuranceSubCategory($jsonData) {
+        $insCategories = InsuranceCategory::select(['id', 'external_id'])
+            ->where('is_active', true)
+            ->get()->toArray();
         $rules = [
-            'name' => 'required',
+            '*.name' => 'required',
+            '*.ins_category_id_fk' => 'required|numeric|min:1',
         ];
-        foreach ($insSubCategoryData as $insSubCategoryDataRow) {
-            // update or create insSubCategoryData
-            $validator = Validator::make($input, $rules, $messages = [
+        foreach ($jsonData as $accRow) {
+            $insuranceSubCategories = [];
+            foreach ($accRow['Response']['Client']['FY_InsurancePolicy']['PolicyCluster'] as $policyClusterRow) {
+                // only unique subcategories to be created by sub-category NAME match as externl system doesn't have external ID
+                if (!array_key_exists($policyClusterRow['InsurancePolicy']['Policy_Type__c'], $insuranceSubCategories)) {
+                    $insuranceSubCategories[$policyClusterRow['InsurancePolicy']['Policy_Type__c']] = 
+                        $this->_extractInsSubCatData($policyClusterRow['InsurancePolicy'], 
+                        array_search($policyClusterRow['InsurancePolicy']['RecordTypeId'], $insCategories));
+                }
+            }
+        
+            // update or create insSubCategory
+            $validator = Validator::make($insuranceSubCategories, $rules, $messages = [
                 'required' => 'The :attribute field is required',
+                'numeric' => 'The :attribute field should be numbers only',
+                'min' => 'The :attribute field should be greater than ID 0. Shows no matching category found in DB'
             ]);
 
             if (!$validator->fails()) {
-                $insSubCategoryData = [];            
-                $insSubCategoryData['ins_category_id_fk'] = 0;    
-                $insSubCategoryData['name'] = 0;
-                $insSubCategoryData['fullname'] = 0;
-                $insSubCategoryData['description'] = 0;
-                $insSubCategoryData['details'] = 0;
-                $insSubCategoryData['is_active'] = true;    
-                $insSubCategoryData['created_by'] = 0;    // admin
-                $insSubCategoryData['modified_by'] = 0;    // admin
+                foreach ($insuranceSubCategories as $insSubCategory) {
+                    echo __FUNCTION__ . ':INFO:Insurance Sub Category [Name:' . $insSubCategory['name'] . '] with category[ID:' . 
+                    $insSubCategory['ins_category_id_fk'] . ' to be created/updated ';
 
-                echo __FUNCTION__ . ':INFO:Insurance Sub Category [Name:' . $insSubCategoryData['name'] . '] to be created/updated ';
+                    session('confirmUpdate') ? InsuranceSubCategory::updateOrCreate(
+                        [
+                            'ins_category_id_fk' => $insSubCategory['ins_category_id_fk'],
+                            'ins_category_id_fk' => $insSubCategory['name']
+                        ],
+                        $insSubCategory) : '';
+                }
             } else {   
                 $error = '';             
                 foreach (array_values($validator->errors()->messages()) as $item) {
                     $error.= '<li>' . $item[0] . '</li>';
                 }
-                echo '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>Insurance Sub Category:</b><ul>' . $error . '</ul></div>';
+                echo '<br>----------' . __FUNCTION__ . 
+                    ':ERROR:<div class="fs-12"><br><b>Insurance Sub Category:</b><ul>' . $error . '</ul></div>';
             }
-        }        
+        }       
+    }
+
+    private function _extractInsSubCatData($jsonData, $categoryId) {
+        return [
+            'ins_category_id_fk' => $categoryId,
+            'name' => $jsonData['Policy_Type__c'],
+            //@todo 'fullname' => $jsonData['Description__c'],
+            //@todo 'description' => '',
+            //@todo 'details' => $jsonData['Description__c'],
+            'is_active' => true,
+            'created_by' => 0,
+            'modified_by' => 0,
+        ];
     }
 }
 
 trait insuancePolicyMethods {
-    public function upsertinsuancePolicy($insPolicyData) {
+    public function upsertinsuancePolicy($jsonData) {
+        $insSubCat = InsuranceSubCategory::select(['id','name'])->get()->toArray();
         $rules = [
-            'name' => 'required',
-            'sum_insured' => 'required|numeric',
+            '*.name' => 'required',
+            '*.sum_insured' => 'required|numeric',
         ];
-        foreach ($insPolicyData as $insPolicyDataRow) {
-            // update or create insPolicyData
-            $validator = Validator::make($input, $rules, $messages = [
+        foreach ($jsonData as $accRow) {
+            $insurancePolicies = [];
+            foreach ($accRow['Response']['Client']['FY_InsurancePolicy']['PolicyCluster'] as $policyClusterRow) {
+                $insurancePolicies[] = $this->_extractPolicyData($policyClusterRow,
+                array_search($policyClusterRow['InsurancePolicy']['Policy_Type__c'], $insSubCat));
+            }
+        
+            // update or create insCategory
+            $validator = Validator::make($insurancePolicies, $rules, $messages = [
                 'required' => 'The :attribute field is required',
                 'numeric' => 'The :attribute field should be numbers only'
             ]);
 
             if (!$validator->fails()) {
-                $insPolicyData = [];            
-                $insPolicyData['external_id'] = 0;    
-                $insPolicyData['name'] = 0;
-                $insPolicyData['sum_insured'] = 0;
-                $insPolicyData['ins_subcategory_id_fk'] = 0;
-                $insPolicyData['description'] = 0;
-                $insPolicyData['price_tag'] = 0;
-                $insPolicyData['points'] = 0;
-                $insPolicyData['dependent_structure'] = 0;
-                $insPolicyData['is_parent_sublimit'] = 0;
-                $insPolicyData['parent_sublimit_amount'] = 0;
-                //$insPolicyData['replacement_of_policy_id'] = null;
-                //$insPolicyData['replacement_of_policy_sfdc_id'] = null;
-                $insPolicyData['currency_id_fk'] = 0;
-                $insPolicyData['is_active'] = true;
-                $insPolicyData['si_factor'] = 0;
-                $insPolicyData['is_base_plan'] = 0;
-                $insPolicyData['is_default_selection'] = 0;
-                $insPolicyData['is_point_value_based'] = null;
-                $insPolicyData['base_plan_id_sfdc'] = null;
-                $insPolicyData['base_plan_text'] = null;
-                $insPolicyData['is_multi_selectable'] = 0;
-                $insPolicyData['show_value_column'] = 0;
-                $insPolicyData['created_by'] = 0;    // admin
-                $insPolicyData['modified_by'] = 0;    // admin
+                foreach ($insurancePolicies as $insPolicyData) {
+                    echo __FUNCTION__ . ':INFO:Insurance Policy [Name:' . $insPolicyData['name'] . '] with details[Sum Insured:' . 
+                    $insPolicyData['sum_insured'] . ',Is Base Plan:'.$insPolicyData['is_base_plan'] .',Is Default Selection:' . 
+                    $insPolicyData['is_default_selection'] . ',Is Multi Selectable:' . $insPolicyData['is_multi_selectable'] . 
+                    ',Is Value based:' . $insPolicyData['show_value_column'] . '] to be created/updated ';
 
-                echo __FUNCTION__ . ':INFO:Insurance Policy [Name:' . $insPolicyData['name'] . '] with details[Sum Insured:' . 
-                $insPolicyData['sum_insured'] . ',Is Base Plan:'.$insPolicyData['is_base_plan'] .',Is Default Selection:' . 
-                $insPolicyData['is_default_selection'] . ',Is Multi Selectable:' . $insPolicyData['is_multi_selectable'] . 
-                ',Is Value based:' . $insPolicyData['show_value_column'] . '] to be created/updated ';
+                    session('confirmUpdate') ? InsurancePolicy::updateOrCreate(['external_id' => $insPolicyData['external_id']],$insPolicyData) : '';
+                }
             } else {   
                 $error = '';             
                 foreach (array_values($validator->errors()->messages()) as $item) {
                     $error.= '<li>' . $item[0] . '</li>';
                 }
-                echo '<br>----------' . __FUNCTION__ . ':ERROR:<div class="fs-12"><br><b>Insurance Sub Category:</b><ul>' . $error . '</ul></div>';
+                echo '<br>----------' . __FUNCTION__ . 
+                    ':ERROR:<div class="fs-12"><br><b>Insurance Policy:</b><ul>' . $error . '</ul></div>';
             }
-        }        
+        }       
+    }
+
+    private function _extractPolicyData($jsonData, $subCatId) {
+        return [                   
+            'external_id' => $jsonData['Id'],    
+            'name'=> $jsonData['Insurance_Policy_Name__c'],
+            'sum_insured' => $jsonData['Plan_Sum_Assured__c'],
+            'ins_subcategory_id_fk' => $subCatId,
+            // @todo 'description' => $jsonData['Id'],
+            // @todo 'price_tag' => $jsonData['Id'],
+            'points' => $jsonData['Flex_Points__c'],
+            'dependent_structure' => $jsonData['Family_Structure__c'],
+            'is_parent_sublimit' => $jsonData['InsurancePolicy']['Parents_Sub_Limit_Applicable__c'],
+            'parent_sublimit_amount' => $jsonData['InsurancePolicy']['Parents_Sub_Limit_Amount__c'],
+            // @todo 'replacement_of_policy_id' => null,
+            // @todo 'replacement_of_policy_sfdc_id' => null,
+            'currency_id_fk' => CountryCurrency::where(DB::raw('UPPER(name)'),strtoupper($jsonData['Client']['ShippingCountry']))
+                ->select('id')->first()->toArray()['id'],
+            'is_active' => true,
+            'si_factor' => $jsonData['Id'],
+            'is_base_plan' => $jsonData['Is_Base_Plan__c'],
+            'is_default_selection' => $jsonData['Is_Default__c'],
+            // @todo 'is_point_value_based' => $jsonData['Is_Multiselect__c'],
+            // @todo 'base_plan_id_sfdc' => $jsonData['Is_Multiselect__c'],
+            // @todo 'base_plan_text' => $jsonData['Is_Multiselect__c'],
+            'is_multi_selectable' => $jsonData['Is_Multiselect__c'],
+            // @todo 'show_value_column' => $jsonData['Id'],
+            'created_by' => 0,    // admin
+            'modified_by' => 0,    // admin
+        ];
     }
 }
 ?>
