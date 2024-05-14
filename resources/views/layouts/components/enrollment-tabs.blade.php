@@ -3,36 +3,108 @@ $formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
 @endphp
 
 <style>
-    .custom-heading .section-heading{
+    .custom-heading .section-heading {
         background: var(--blue);
         padding: 6px;
         margin-bottom: 5px;
     }
-    .custom-heading .section-heading h4{
+
+    .custom-heading .section-heading h4 {
         font-size: 20px;
         color: var(--white);
     }
-    .custom-heading dl{
+
+    .custom-heading dl {
         background-color: #d4f2ff;
         padding: 10px;
         margin-bottom: 5px;
     }
-    .custom-heading .col-4 dl{
+
+    .custom-heading .col-4 dl {
         background-color: #d4f2ff;
         padding: 10px;
         height: 100%;
     }
-    .custom-heading .col-4{
+
+    .custom-heading .col-4 {
         margin-bottom: 5px;
     }
-    .custom-heading .col-left dl{
-      margin-right: 5px;
+
+    .custom-heading .col-left dl {
+        margin-right: 5px;
     }
-    .custom-heading .col-right dl{
-      margin-left: 5px;
+
+    .custom-heading .col-right dl {
+        margin-left: 5px;
     }
-    .additional-table .table{
+
+    .additional-table .table {
         --bs-table-border-color: #0fa2d5;
+    }
+
+    .container1 {
+        position: relative;
+
+
+    }
+
+    .horizontal-list {
+        list-style-type: none;
+        margin: 0;
+        padding-bottom: 5px;
+        display: flex;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+
+    .horizontal-list li {
+        display: inline-block;
+        /* margin-right: 10px; */
+        /* Adjust spacing between items */
+    }
+
+    .nav-item button:hover {
+        -webkit-transform: scale(1.09);
+        -ms-transform: scale(1.09);
+        transform: scale(1.09);
+        transition: 1s ease;
+    }
+
+    .nav-tabs#enrolTabs li .nav-link {
+        transition: 1s ease;
+    }
+
+
+
+    .arrow:hover {
+        opacity: 1;
+
+    }
+
+    /* .arrow.disabled {
+        cursor: default;
+        
+    }  */
+
+    .left-arrow,
+    .right-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #EEEBEB;
+        border: none;
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .left-arrow {
+        left: -3vw;
+    }
+
+    .right-arrow {
+        right: -3vw;
     }
 </style>
 <!-- <a id="enrollmentModal_trigger" style="display:none;" href="#launchEnrollmentModal">modalEnrollment</a> -->
@@ -57,45 +129,44 @@ $formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
 </div>
 
 
-<section class="enroll-banner px-2 px-md-0">
+<section class="enroll-banner  px-2 px-md-0" style="padding-bottom: 10px;">
     <div class="container bg-white container-card">
-        <ul class="nav nav-tabs" id="enrolTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="howwork-tab" data-bs-toggle="tab" data-bs-target="#howwork"
-                    type="button" role="tab" aria-controls="howwork" aria-selected="true">
-                    <img src="{{ asset('assets/images/icon1.png') }}" alt="query icon" />
-                    How It Works
-                </button>
-            </li>
-            @if (Auth::check())
+        <div class="container1">
+            <ul class="nav nav-tabs horizontal-list" id="enrolTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="howwork-tab" data-bs-toggle="tab" data-bs-target="#howwork" type="button" role="tab" aria-controls="howwork" aria-selected="true">
+                        <img src="{{ asset('assets/images/icon1.png') }}" alt="query icon" />
+                        How It Works
+                    </button>
+                </li>
+                @if (Auth::check())
                 @if ($data['is_enrollment_window'])
                 @foreach ($data['category'] as $item)
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tabLink{{ $item['id'] }}" data-bs-toggle="tab"
-                            data-bs-target="#content-tab-{{ $item['id'] }}" type="button" role="tab" aria-controls="content-tab-{{ $item['id'] }}"
-                            aria-selected="false">
-                            <img src="{{ asset('assets/images/icon-plus.png') }}" alt="query icon" />
-                            {{ $item['name'] }}
-                        </button>
-                    </li>
-                @endforeach
-            @endif
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="Summary-tab" data-bs-toggle="tab" data-bs-target="#summary"
-                        type="button" role="tab" aria-controls="summary" aria-selected="false">
+                    <button class="nav-link" id="tabLink{{ $item['id'] }}" data-bs-toggle="tab" data-bs-target="#content-tab-{{ $item['id'] }}" type="button" role="tab" aria-controls="content-tab-{{ $item['id'] }}" aria-selected="false">
+                        <img src="{{ asset('assets/images/icon-plus.png') }}" alt="query icon" />
+                        {{ $item['name'] }}
+                    </button>
+                </li>
+                @endforeach
+                @endif
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab" aria-controls="summary" aria-selected="false">
                         <img src="{{ asset('assets/images/icon-img5.png') }}" alt="query icon" />
                         Summary
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#enrollment-history"
-                        type="button" role="tab" aria-controls="enrollment-history" aria-selected="false">
+                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#enrollment-history" type="button" role="tab" aria-controls="enrollment-history" aria-selected="false">
                         <img src="{{ asset('assets/images/icon-plus.png') }}" alt="query icon" />
                         Enrollment History
                     </button>
                 </li>
-            @endif
-        </ul>
+                @endif
+            </ul>
+            <button class="arrow left-arrow">&lt;</button>
+            <button class="arrow right-arrow">&gt;</button>
+        </div>
     </div>
 </section>
 
@@ -853,6 +924,80 @@ $('#Summary-tab').on('click', function(){
         
     });
 }); 
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('#enrolTabs');
+        const list = document.querySelector('.horizontal-list');
+        const leftArrow = document.querySelector('.left-arrow');
+        const rightArrow = document.querySelector('.right-arrow');
+
+        leftArrow.addEventListener('click', function() {
+            container.scrollBy({
+                left: -200,
+                behavior: 'smooth'
+            });
+            window.addEventListener('resize', hideOverflowingItems);
+            hideOverflowingItems();
+
+        });
+
+        rightArrow.addEventListener('click', function() {
+            container.scrollBy({
+                left: 200,
+                behavior: 'smooth'
+            });
+            window.addEventListener('resize', hideOverflowingItems);
+            hideOverflowingItems();
+
+        });
+
+
+        var button = document.getElementById("howwork-tab");
+
+        // Add the 'active' class to the button
+        button.classList.add("active");
+
+        // function hideOverflowingItems() {
+        //     const containerWidth = container.clientWidth;
+        //     const listWidth = list.scrollWidth;
+        //     const containerScrollLeft = container.scrollLeft;
+        //     const containerScrollRight = containerScrollLeft + containerWidth;
+
+        //     // Check if the last <li> is fully visible
+        //     const lastLi = list.lastElementChild;
+        //     const lastLiRight = lastLi.offsetLeft + lastLi.offsetWidth;
+        //     const lastLiVisible = lastLiRight <= containerScrollRight;
+
+        //     // Check if the first <li> is fully visible
+        //     const firstLi = list.firstElementChild;
+        //     const firstLiLeft = firstLi.offsetLeft;
+        //     const firstLiVisible = firstLiLeft >= containerScrollLeft;
+
+        //     // Show/hide or enable/disable arrows based on visibility
+        //     if (lastLiVisible) {
+        //         rightArrow.style.display = 'none';
+        //         rightArrow.disabled = true;
+        //     } else {
+        //         rightArrow.style.display = 'block';
+        //         rightArrow.disabled = false;
+        //     }
+
+        //     if (firstLiVisible) {
+        //         leftArrow.style.display = 'none';
+        //         leftArrow.disabled = true;
+        //     } else {
+        //         leftArrow.style.display = 'block';
+        //         leftArrow.disabled = false;
+        //     }
+        // }
+
+        // window.addEventListener('resize', hideOverflowingItems);
+        // hideOverflowingItems();
+
+
     });
 </script>
 

@@ -10,9 +10,7 @@
 
 /* // Small devices (landscape phones, less than 768px) */
 @media (max-width: 767.98px) { 
-    .profile-dropdown{
-        margin-top: 20px;
-    }
+  
     .plan h2 {
         font-size: 1.5rem;
     }
@@ -52,6 +50,7 @@ box-shadow: none;
     .plan h2 {
         font-size: 1.5rem;
     }
+
     #medicalModelContent .modal-footer .btn {
         width: 100%;
         margin: 5px;
@@ -92,6 +91,11 @@ box-shadow: none;
         width: 300px;
         padding: 20px;
         height: 100%;
+    }
+    
+    .custom-video{
+        flex-wrap: wrap;
+        justify-content: center;
     }
  }
 

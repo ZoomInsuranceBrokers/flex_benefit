@@ -32,24 +32,25 @@
   @component('layouts.components.footer') @endcomponent
 
   <script>
-    function showLoader() {
+    window.showLoader = function() {
       document.querySelector('.loader').style.display = 'block';
       document.querySelector('.overlay').style.display = 'block';
     }
 
-    function hideLoader() {
+    window.hideLoader = function() {
       document.querySelector('.loader').style.display = 'none';
       document.querySelector('.overlay').style.display = 'none';
     }
 
     window.addEventListener('load', function() {
-      showLoader();
+      hideLoader();
     });
 
-    setTimeout(function() {
-      hideLoader();
-    }, 3000);
-  </script>
+    // setTimeout(function() {
+    //   hideLoader();
+    // }, 1000);
+</script>
+
 
   </script>
   <script src="{{ asset('assets/js/all.min.js') }}"></script>

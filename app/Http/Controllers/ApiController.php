@@ -289,7 +289,7 @@ class ApiController extends Controller
                             $email = $formattedData['user'][$jsonRow['Details']['Id']]['email'];
                             $users = $formattedData['user'][$jsonRow['Details']['Id']]['fname'];
 
-                            // Mail::to($email)->send(new NewJoiningCredentials($users));
+                            Mail::to($email)->send(new NewJoiningCredentials($users));
                             echo '<br>' . __FUNCTION__ . ':INFO:New user(' . implode(' ', [
                                 $formattedData['user'][$jsonRow['Details']['Id']]['fname'],
                                 $formattedData['user'][$jsonRow['Details']['Id']]['lname'],
