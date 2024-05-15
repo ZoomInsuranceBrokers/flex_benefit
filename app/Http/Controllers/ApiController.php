@@ -515,7 +515,12 @@ class ApiController extends Controller
                     $finalData['user'][$submissionRow['user_id_fk']]['points_used'] = $userData['points_used'];
                     $finalData['user'][$submissionRow['user_id_fk']]['points_available'] = $userData['points_available'];
                     $finalData['user'][$submissionRow['user_id_fk']]['gender'] = config('constant.gender')[$userData['gender']];
-                    $finalData['user'][$submissionRow['user_id_fk']]['email'] = $userData['email'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['enrollment_submit_date'] = $userData['enrollment_submit_date'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['is_enrollment_submitted'] = $userData['is_enrollment_submitted'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['submission_by'] = $userData['submission_by'] != null ? 
+                        ($userData['submission_by'] == 0 ? 
+                            'Auto-Submitted' : 'Submitted' ) : 
+                        'Open';
 
                     // dependant data
                     /*$dependantData = $submissionRow['user']['dependant'];
