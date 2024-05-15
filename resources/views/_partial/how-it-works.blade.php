@@ -203,7 +203,7 @@
                                   <div class="card-items">
                                       <div class="card-list">
                                           <div class="service-img">
-                                              <img src="{{ asset('assets/images/col-img3.jpg') }}" alt=""
+                                              <img src="{{ asset('assets/images/close-up-doctor-paper-family.jpg') }}" alt=""
                                                   class="service-main m-0 p-0" />
                                           </div>
                                           <!-- <div class="img-icon">
@@ -220,7 +220,7 @@
                                   <div class="card-items">
                                       <div class="card-list">
                                           <div class="service-img">
-                                              <img src="{{ asset('assets/images/main-banner2.jpg') }}" alt=""
+                                              <img src="{{ asset('assets/images/col-img4.jpg') }}" alt=""
                                                   class="service-main m-0 p-0" />
                                           </div>
                                           <!-- <div class="img-icon">
@@ -238,7 +238,7 @@
                                   <div class="card-items">
                                       <div class="card-list">
                                           <div class="service-img">
-                                              <img src="{{ asset('assets/images/col-img1-1.png') }}" alt=""
+                                              <img src="{{ asset('assets/images/term-life.jpg') }}" alt=""
                                                   class="service-main m-0 p-0" />
                                           </div>
                                           <!-- <div class="img-icon">
@@ -255,7 +255,7 @@
                                   <div class="card-items">
                                       <div class="card-list">
                                           <div class="service-img">
-                                              <img src="{{ asset('assets/images/col-img1.png') }}" alt=""
+                                              <img src="{{ asset('assets/images/main-banner3.jpeg') }}" alt=""
                                                   class="service-main m-0 p-0" />
                                           </div>
                                           <!-- <div class="img-icon">

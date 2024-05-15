@@ -24,7 +24,7 @@
 @if(Auth::check())
   @if(request()->path() == 'enrollment')
   <div id="points-header" class="float-left text-center slideInDown animated">
-      <div class="row pt-1" style="height:40px;">
+      <div class="row pt-1" style="height:40px; margin-bottom: 30px;">
           <div id="points-header-l" class="col-2 offset-3">
             Total Points:
             <label id="points-head-tot">{{ Auth::user()->points_used + Auth::user()->points_available }}</label>

@@ -173,7 +173,7 @@
                 </table>
 
                 <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" class="btn seconday-btn mx-auto d-block">
-                    add dependant
+                    Add Dependant
                 </button>
             </div>
             @if(count($dependants) == 0 )
