@@ -4,7 +4,9 @@
     <div class="row">
       <div class="col-xl-6 left-col">
         <div class="video-container" style="left:5vw">
-            <video autoplay loop muted>
+            <video autoplay loop muted style="    overflow: hidden;
+    outline: 5px solid white;
+    outline-offset: -5px;">
               <source src="{{asset('assets/videos/home-video.mp4') }}" type="video/mp4">
               Your browser does not support the video tag.
             </video>   

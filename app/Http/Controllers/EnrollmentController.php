@@ -1048,6 +1048,7 @@ class EnrollmentController extends Controller
     
             .light-text {
                 font-weight: lighter;
+                white-space: nowrap;
             }
     
             .first-part {
@@ -1057,7 +1058,7 @@ class EnrollmentController extends Controller
     
             .first-part img {
                 width: 100%;
-                height: 30vh;
+                height: 30%;
             }
     
             .left-image {
@@ -1068,7 +1069,7 @@ class EnrollmentController extends Controller
     
             .second-part {
                 width: 100%;
-                height: 10vh;
+                height: 10%;
                 display: flex;
                 justify-content: space-between;
                 width: 100%;
@@ -1076,7 +1077,7 @@ class EnrollmentController extends Controller
             }
     
             .lines {
-                margin-right: 20vh;
+                margin-right: 10%;
                 display: flex;
             }
     
@@ -1086,29 +1087,31 @@ class EnrollmentController extends Controller
     
             .semi-circle {
                 position: relative;
-                width: 4vh;
-                height: 7vh;
+                width: 20%;
+                height: 35%;
                 border-width: 15px 15px 15px 0;
                 border-style: solid;
                 border-color: #B5B5B5;
                 border-top-right-radius: 60px;
                 border-bottom-right-radius: 60px;
+                flex-shrink: 0;
             }
     
             .right-semi-circle {
                 position: relative;
-                width: 5vh;
-                height: 8vh;
+                width: 3%;
+                height: 50%;
                 border-width: 15px 0 15px 15px;
                 border-style: solid;
                 border-color: #03313D;
                 border-top-left-radius: 60px;
                 border-bottom-left-radius: 60px;
+                flex-shrink: 0;
             }
     
             .diagonal-line {
                 width: 2px;
-                height: 14vh;
+                height: 100%;
                 background-color: #03313D;
                 transform: rotate(45deg);
                 transform-origin: 0 100%;
@@ -1121,7 +1124,7 @@ class EnrollmentController extends Controller
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 7vh;
+                height: 7%;
                 border-radius: 10px;
                 text-align: center;
                 font-weight: 900;
@@ -1164,7 +1167,7 @@ class EnrollmentController extends Controller
             .inner-li img {
                 vertical-align: middle;
                 margin-right: 5px;
-                width: 3vh;
+                width: 3%;
             }
     
             .third-part {
@@ -1173,7 +1176,7 @@ class EnrollmentController extends Controller
     
             .forth-part {
                 width: 100%;
-                height: 20vh;
+                height: 75px;
                 display: flex;
                 flex-direction: column-reverse;
                 align-items: flex-end;
@@ -1181,20 +1184,20 @@ class EnrollmentController extends Controller
     
             .fifth-part {
                 width: 100%;
-                margin-top: 3vh;
+                margin-top: 3%;
                 height: auto;
             }
     
             .fifth-part img {
                 width: 100%;
-                height: 20vh;
+                height: 20%;
             }
     
     
             @media (max-width: 600px) {
                 .first-part {
                     width: 100%;
-                    height: 10vh;
+                    height: 10%;
                 }
     
                 .first-part img {
@@ -1203,20 +1206,20 @@ class EnrollmentController extends Controller
                 }
             }
     
-            .top-div {
-                width: 70%;
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
-            }
+            // .top-div {
+            //     width: 70%;
+            //     position: absolute;
+            //     left: 50%;
+            //     transform: translateX(-50%);
+            // }
     
-            .first-part,
-            .second-part,
-            .third-part,
-            .forth-part,
-            .fifth-part {
-                text-align: center;
-            }
+            // .first-part,
+            // .second-part,
+            // .third-part,
+            // .forth-part,
+            // .fifth-part {
+            //     text-align: center;
+            // }
         </style>
         </head>
         <body>
@@ -1228,8 +1231,8 @@ class EnrollmentController extends Controller
                     <div class="second1">
                         <div class="semi-circle"></div>
                         <div class="">
-                            <h3 class="light-text" style="margin-left:7vh;">'. $user->fname . ' ' . $user->lname .'</h3>
-                            <h3 class="light-text" style="margin-left:7vh;">'. $user->employee_id .'</h3>
+                            <h3 class="light-text" style="margin-left:25%;">'. $user->fname . ' ' . $user->lname .'</h3>
+                            <h3 class="light-text" style="margin-left:25%;">'. $user->employee_id .'</h3>
                         </div>
                     </div>
                     <div class="lines">
@@ -1245,22 +1248,22 @@ class EnrollmentController extends Controller
                     </div>
                     </div>
                     <div class="third-part">
-                        <div style="display: flex;margin-top: 5vh;">
+                        <div style="display: flex;margin-top: 5%;">
                             <div class="bold-text box box1">Name</div>
                             <div class="bold-text box box2">Detail</div>
                         </div>';
     
     foreach ($summaryData as $item) {
         $html .= '
-                        <div style="display: flex;margin-top: 1vh; border-bottom: 3px solid #B5B5B5;">
+                        <div style="display: flex;margin-top: 1%; border-bottom: 3px solid #B5B5B5;">
                             <div class="box1 bold-text">
                                 <ul>
                                     <li>' . $item['category'] . '
-                                        <ul class="inner-li" style="margin-top: 2vh;">
+                                        <ul class="inner-li" style="margin-top: 2%;">
                                             <li>
                                                 <img  src="data:image/png;base64,'. $forward_image_base64 .'" alt="Invoice">
                                                 ' . $item['subcategory'] . '
-                                                <ul class="inner-li" style="margin-top: 2vh;">
+                                                <ul class="inner-li" style="margin-top: 2%;">
                                                     <li>
                                                         <img src="data:image/png;base64,'. $forward_image_base64 .'" alt="Invoice">
                                                         ' . $item['policy'] . '
@@ -1282,7 +1285,7 @@ class EnrollmentController extends Controller
                         </div>';
     }
 
-           $html .= '   <div style="display: flex;justify-content: center;flex-direction: column; height:30vh;  border-bottom: 3px solid #B5B5B5; " class="bold-text">
+           $html .= '   <div style="display: flex;justify-content: center;flex-direction: column; height:30%;  border-bottom: 3px solid #B5B5B5; " class="bold-text">
            <p style="margin:0px; margin-left: 47%;  display: inline;">Total Points Used: 31100</p>
                 <p style="margin:0px; margin-left: 47%; display: inline;">Salary Contribuation: 26900</p>
                 <p style="margin:0px; margin-left: 47%; display: inline;">Monthly Installment:
@@ -1300,15 +1303,25 @@ class EnrollmentController extends Controller
            </div>
         </body>
         </html>';
+
+        // echo $html;
+        // exit;
         
         // Generate PDF
         $dompdf = new Dompdf();
+
+        // Load HTML content 
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
+
+        // (Optional) Setup the paper size and orientation 
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
         $dompdf->render();
-        
-        // Download the PDF file
-        return $dompdf->stream('summary.pdf');
+
+        $output = $dompdf->output();
+
+        $dompdf->stream("Membership Form", array("Attachment" => 1));
         
     }
 

@@ -57,7 +57,7 @@ section {
 .loginModal .modal-body input.login-input {
     height: 45px;
     border: 1px solid #5772ed57;
-    border-radius: 5px;
+    border-radius: 0px;
 }
 
 .loginModal .modal-dialog {
@@ -927,6 +927,15 @@ Dependent page styling
     background-color: #ececec;
 }
 
+#sessionModal .modal-content {
+    border-radius: 0px;
+    border: 0px solid transparent;
+    background-color: #ececec;
+}
+
+#sessionModal .modal-content .modal-body {
+    padding: 3rem;
+}
 #logoutModal .modal-content .modal-body {
     padding: 3rem;
 }

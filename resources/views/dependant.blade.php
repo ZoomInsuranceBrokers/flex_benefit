@@ -64,7 +64,7 @@
 <!-- Banner Section End -->
 
 <!--dependent detail start-->
-<section>
+<section style="overflow-x:clip;">
     <div class="container">
         <div class="row">
             <div class="col-12 card-dep__details">

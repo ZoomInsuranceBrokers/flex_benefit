@@ -9,10 +9,11 @@
     .bold {
         font-weight: bold;
     }
+
 </style>
 
 @if(session('error'))
-<script>
+<!-- <script>
     // Display Swal dialog with the error message
     Swal.fire({
         icon: 'error',
@@ -21,27 +22,46 @@
         error ') }}',
 
     });
-</script>
+</script> -->
 @endif
-@if(!session('is_submitted'))
+<div class="modal fade" id="sessionMessage" tabindex="-1" aria-labelledby="errorModallabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 0px; padding:15px; background-color: #ececec;">
+            <div class="modal-overlay"></div>
+            <div class="modal-body">
+                <div class="col-12 logout-text" >
+                    <h3 class="errorModallabel">Error</h3>
+                    <p>Currently you have an open enrollment portal you can add or edit your dependents there!</p>
+                </div>
+                <div class="mt-3 d-flex btns">
+                    <button type="submit" class="btn cancel--btn d-block" data-bs-dismiss="modal" id="error-btn">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<script>
-    // Display Swal dialog with the error message
-    Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'Currently you have a open enrollment portal you can add or edit your dependents there!',
-    });
-</script>
+@php
+$isSubmitted = session('is_submitted');
+@endphp
+
+@if(!$isSubmitted)
+    <script>
+        $(document).ready(function() {
+            $('#sessionMessage').modal('show');
+        });
+    </script>
 @endif
+
 @if(session('success'))
 <script>
     // Display Swal dialog with the success message
     Swal.fire({
         icon: 'success',
         title: 'Success!',
-        text: '{{ session('
-        success ') }}',
+        text: '{{ session('success') }}',
     });
 </script>
 @endif
@@ -305,14 +325,21 @@
                 </div>
             </div>
             <div class="modal-footer mx-3">
-                <button type="button" class="btn primary--btn" data-dismiss="modal" id="cancelButton">Cancel</button>
-                <button type="button" class="btn primary--btn" id="saveDependantBtn">Save</button>
+                <button type="button" class="btn primary--btn" data-dismiss="modal" id="cancelButton" style="background-color: #0FA2D5;">Cancel</button>
+                <button type="button" class="btn primary--btn" id="saveDependantBtn" style="background-color: #0FA2D5;">Save</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+
+    //For Error Message
+    document.getElementById('error-btn').addEventListener('click', function() {
+        document.getElementById("sessionMessage").style.display="none";
+    });                         
+
+
     // For  Data Table
     document.getElementById('cancelButton').addEventListener('click', function() {
         $('#exampleModal').modal('hide');
@@ -513,3 +540,4 @@
 </script>
 
 @stop
+
