@@ -27,13 +27,18 @@ use Illuminate\Support\Facades\Crypt;
 use App\Traits\EnrollmentTraitMethods;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules\Password;
+use App\Traits\dependantTraitMethods;
+use Illuminate\Support\Facades\Log;
+use App\Mail\SubmitEnrollment;
 
 class ApiController extends Controller
 {
+    use EnrollmentTraitMethods;
+    use dependantTraitMethods;
+
     public $secret_key = 'x409z636R3vFRPttwT26jkdwbdewidJN1bncwi2gpT';
     public function getAllUsers(Request $request)
     {
-        $api_key = trim($request->api_key);
 
         if (empty($api_key)) {
             $response = [
@@ -210,9 +215,9 @@ class ApiController extends Controller
             // user data
             foreach ($jsonData as $jsonRow) {
                 $formattedData['user'][$jsonRow['Details']['Id']]['external_id'] = htmlspecialchars($jsonRow['Details']['Id']);
-                if(isset($jsonRow['Details']['FirstName'])){
+                if (isset($jsonRow['Details']['FirstName'])) {
                     $formattedData['user'][$jsonRow['Details']['Id']]['fname'] = htmlspecialchars($jsonRow['Details']['FirstName']);
-                }else{
+                } else {
                     $formattedData['user'][$jsonRow['Details']['Id']]['fname'] = htmlspecialchars($jsonRow['Details']['LastName']);
                 }
                 $formattedData['user'][$jsonRow['Details']['Id']]['lname'] = htmlspecialchars($jsonRow['Details']['LastName']);
@@ -229,7 +234,7 @@ class ApiController extends Controller
 
                 $formattedData['user'][$jsonRow['Details']['Id']]['dob'] = htmlspecialchars($jsonRow['Details']['Birthdate']);
                 $formattedData['user'][$jsonRow['Details']['Id']]['hire_date'] = htmlspecialchars($jsonRow['Details']['Hire_Date__c']);
-                // $formattedData['user'][$jsonRow['Details']['Id']]['salary'] = htmlspecialchars($jsonRow['Details']['Annual_CTC__c']);
+                $formattedData['user'][$jsonRow['Details']['Id']]['salary'] = htmlspecialchars($jsonRow['Details']['Annual_CTC__c']);
                 $formattedData['user'][$jsonRow['Details']['Id']]['points_used'] = 0;
                 $formattedData['user'][$jsonRow['Details']['Id']]['points_available'] = (int)$jsonRow['Details']['Points_Allotted__c'];
                 $formattedData['user'][$jsonRow['Details']['Id']]['mobile_number'] = array_key_exists('Phone', $jsonRow['Details']) ? htmlspecialchars($jsonRow['Details']['Phone']) : '';
@@ -291,7 +296,7 @@ class ApiController extends Controller
                                 $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']
                             ]) . ') added with Id:' . $userId;
 
-                            // create default policy entries for new user
+
                             $this->generateBaseDefaultPolicyMapping(
                                 [['id' => $userId]],
                                 $enrollmentData['autoSubmit'],
@@ -406,30 +411,20 @@ class ApiController extends Controller
                     $lowerCaseApprovalStatus = array_map('strtolower', config('constant.approval_status'));
                     $lowerCaseBoolean = array_map('strtolower', config('constant.booleanArr'));
                     foreach ($jsonRow['Dependants'] as $depRow) {
-                        // dd($userInsertData['user'][$userExtId]['id']);'
-                        
-                    
-
                         $depData = [];
                         $depData['external_id'] = $depRow['Id'];
                         $depData['dependent_name'] = htmlspecialchars($depRow['Name__c']);
-                        // $depData['dob'] = date('Y-m-d', strtotime($depRow['Date_of_Birth__c']));
+                        if (!isset($depRow['Date_of_Birth__c'])) {
+                            dd($depRow);
+                        }
+                        $depData['dob'] = date('Y-m-d', strtotime($depRow['Date_of_Birth__c']));
                         $depData['gender'] = $this->_getGenderId(htmlspecialchars($depRow['Gender__c']), $depRow, true);
                         $depData['nominee_percentage'] = array_key_exists('Nominee_Percentage__c', $depRow) ? $depRow['Nominee_Percentage__c'] : 0;
                         $depData['relationship_type'] = array_search(strtolower($depRow['Relationship_Type__c']), $lowerCaseRltnNames);
                         $depData['approval_status'] = array_search(strtolower($depRow['Approval_Status__c']), $lowerCaseApprovalStatus);
                         $depData['is_active'] = config('constant.$_YES');
                         $depData['is_deceased'] = array_search(strtolower($depRow['Deceased__c']), $lowerCaseBoolean);
-                        // echo $this->validatedUpsertDependant($depData, $userInsertData['user'][$userExtId], $depRow);
-                        $depandant = Dependant::where('dependent_name', htmlspecialchars($depRow['Name__c']))
-                        ->where('user_id_fk',$userInsertData['user'][$userExtId]['id'])
-                        ->where('relationship_type',array_search(strtolower($depRow['Relationship_Type__c']), $lowerCaseRltnNames))
-                        ->first();
-                        if ($depandant) {
-                            // Update the existing dependent
-                            $depandant->update($depData);
-                            echo "Dependent updated successfully: " . $depData['external_id'];
-                        } 
+                        echo $this->validatedUpsertDependant($depData, $userInsertData['user'][$userExtId], $depRow);
                     }
                 } else {
                     echo '<br>----------' . __FUNCTION__ . ':INFO:No dependant found for user ' .
@@ -440,6 +435,7 @@ class ApiController extends Controller
             die(__FUNCTION__ . ':ERROR: EMPTY JSON OR USER DATA RECEIVED');
         }
     }
+
     public function getUserEnrollmentData(Request $request)
     {
         // dd(base64_encode('a9#Bc2$eDfGhIjK4LmNpQr6StUvWxYz' . date('d-m-Y')));
@@ -447,9 +443,9 @@ class ApiController extends Controller
         Log::info('Request received for getUserEnrollmentData', ['request' => $request->all()]);
 
         if (
-             $request->isMethod('get') && $request->has('authKey') &&
-             $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
-         )
+            $request->isMethod('get') && $request->has('authKey') &&
+            $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
+        )
         // if (1)
         {
             $filters = ['output' => 'json', 'active' => true];
@@ -507,19 +503,25 @@ class ApiController extends Controller
                     $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['points_used'] = $submissionRow['points_used'];
                     $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['selected_dependent'] = $submissionRow['selected_dependent'];
                     $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['encoded_summary'] = $submissionRow['encoded_summary'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['policy'][$submissionRow['id']]['is_submitted'] = $submissionRow['is_submitted'];
 
                     // user data
                     $userData = $submissionRow['user'];
                     // dd($userData);
                     $finalData['user'][$submissionRow['user_id_fk']]['id'] = $userData['id'];
                     $finalData['user'][$submissionRow['user_id_fk']]['external_id'] = $userData['external_id'];
-                    $finalData['user'][$submissionRow['user_id_fk']]['fname'] = $userData['fname'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['fname'] = $userData['fname'] !== "" ? $userData['fname'] : null;
                     $finalData['user'][$submissionRow['user_id_fk']]['lname'] = $userData['lname'];
                     $finalData['user'][$submissionRow['user_id_fk']]['hire_date'] = $userData['hire_date'];
                     $finalData['user'][$submissionRow['user_id_fk']]['points_used'] = $userData['points_used'];
                     $finalData['user'][$submissionRow['user_id_fk']]['points_available'] = $userData['points_available'];
                     $finalData['user'][$submissionRow['user_id_fk']]['gender'] = config('constant.gender')[$userData['gender']];
-                    $finalData['user'][$submissionRow['user_id_fk']]['email'] = $userData['email'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['enrollment_submit_date'] = $userData['enrollment_submit_date'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['is_enrollment_submitted'] = $userData['is_enrollment_submitted'];
+                    $finalData['user'][$submissionRow['user_id_fk']]['status'] = $userData['submission_by'] != null ?
+                        ($userData['submission_by'] == 0 ?
+                            'Auto-Submitted' : 'Submitted') :
+                        'Open';
 
                     // dependant data
                     /*$dependantData = $submissionRow['user']['dependant'];
@@ -543,7 +545,7 @@ class ApiController extends Controller
 
             // enrollment/submission date filter
             $depData = Dependant::select('*')->with('user');
-            if (array_key_exists('colName', $filters)) {//dd('here');
+            if (array_key_exists('colName', $filters)) { //dd('here');
                 if (array_key_exists('sdate', $filters) && array_key_exists('edate', $filters)) {
                     $depData->where($filters['colName'], '>=', $filters['sdate']);
                     $depData->where($filters['colName'], '<=', $filters['edate']);
@@ -561,14 +563,14 @@ class ApiController extends Controller
             $dependantData = $depData->get()->toArray();
             //dd($dependantData);
             if (count($dependantData)) {
-                foreach ($dependantData as $depRow){
+                foreach ($dependantData as $depRow) {
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['user_ext_id'] = $depRow['user']['user_ext_id'];
-                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['external_id'] = $depRow['external_id'];
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['external_id'] = $depRow['external_id'] !== "" ? $depRow['external_id'] : null;
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['user_id_fk'] = $depRow['user_id_fk'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_name'] = $depRow['dependent_name'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dependent_code'] = config('constant.dependant_code_ui')[$depRow['dependent_code']];
-                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dob'] = strlen(str_replace([0,'-',':', ' '], '', $depRow['dob'])) ? $depRow['dob'] : '';
-                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['doe'] = strlen(str_replace([0,'-',':', ' '], '', $depRow['doe'])) ? $depRow['doe'] : '';
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['dob'] = strlen(str_replace([0, '-', ':', ' '], '', $depRow['dob'])) ? $depRow['dob'] : null;
+                    $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['doe'] = strlen(str_replace([0, '-', ':', ' '], '', $depRow['doe'])) ? $depRow['doe'] : null;
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['gender'] = $depRow['gender'] ? config('constant.gender')[$depRow['gender']] : null;
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['nominee_percentage'] = $depRow['nominee_percentage'];
                     $finalData['dependent'][$depRow['user_id_fk']][$depRow['id']]['relationship_type'] = config('constant.relationship_type')[$depRow['relationship_type']];
@@ -589,89 +591,43 @@ class ApiController extends Controller
                     }
             }
         } else {
-            return response()->json(['status' => false, 'Message' => 'Invalid Request'], );
+            return response()->json(['status' => false, 'Message' => 'Invalid Request'],);
         }
     }
 
-    public function autoSubmitEnrollment(Request $request)
+    public function autoSubmitEnrollment()
     {
-        $todayDate = new DateTime(); // Today
-        $dates = Account::select(['enrollment_end_date'])->get()->toArray();
-        if ($todayDate > $dates[0]['enrollment_end_date']) {
-            $nonSubmittedEnrollmentEntries = MapUserFYPolicy::where('is_active', true)
-                ->where('is_submitted', false)
-                ->select(['id as MapId', 'user_id_fk'])
-                ->with(['user:id,fname,lname,employee_id,email']);
 
-            // emp only submission
-            $request->has('eid') && $request['eid'] > 0 ?
-                $nonSubmittedEnrollmentEntries->where('user_id_fk', $request['eid']) : '';
+        $currentDate = date('Y-m-d');
 
-            $nonSubmittedEnrollmentEntries = $nonSubmittedEnrollmentEntries->get()->toArray();
-            //dd($nonSubmittedEnrollmentEntries);
-            $ids = $userData =  [];       // ids which will be auto submitted in map_user_fypolicy table
-            $userDataCount = 0;
-            if ($nonSubmittedEnrollmentEntries) {
-                foreach ($nonSubmittedEnrollmentEntries as $enrolRow) {
-                    $ids[] = $enrolRow['MapId'];
-                    if (!array_key_exists($enrolRow['user_id_fk'], $userData)) {
-                        $userDataCount++;
-                        if ($request->has('output') && $request['output'] == 'html') {
-                            $userData[$enrolRow['user_id_fk']] = '<tr>
-                            <td>' . $userDataCount . '</td>
-                            <td>' . $enrolRow['user']['employee_id'] . '</td>
-                            <td>' . $enrolRow['user']['fname']  . ' ' . $enrolRow['user']['lname'] . '</td>
-                            <td>' . $enrolRow['user']['email'] . '</td>
-                            </tr>';
-                        } else {
-                            $userData[$enrolRow['user_id_fk']] =  implode('###', [
-                                $userDataCount, $enrolRow['user']['employee_id'],
-                                $enrolRow['user']['fname'] . ' ' . $enrolRow['user']['lname'],
-                                $enrolRow['user']['email']
-                            ]);
-                        }
-                    }
-                }
-                if (count($ids)) {
-                    $updateData = [
-                        'is_submitted' => true,
-                        'modified_by' => 0,
-                        'updated_at' => now()
-                    ];
-                    $userUpdateData = [
-                        'is_enrollment_submitted' => true,
-                        'enrollment_submit_date' => now(),
-                        'submission_by' => '0'
-                    ];
+        $nonSubmittedEnrollmentEntries = User::where('is_enrollment_submitted', 0)
+            ->where('enrollment_end_date', '<', $currentDate)
+            ->get();
+         
+            $updateData = [
+                'is_submitted' => true,
+                'modified_by' => 0,
+                'updated_at' => now()
+            ];
+            $userUpdateData = [
+                'is_enrollment_submitted' => true,
+                'enrollment_submit_date' => now(),
+                'submission_by' => '0'
+            ];
+            
+        if ($nonSubmittedEnrollmentEntries) {
+            foreach ($nonSubmittedEnrollmentEntries as $enrolRow) {
+                MapUserFYPolicy::where('user_id_fk', $enrolRow['id'])->update($updateData);
+                User::where('id', $enrolRow['id'])->update($userUpdateData);
+                $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', $enrolRow['id'])
+                    ->with(['fyPolicy'])
+                    ->get()
+                    ->toArray();
 
-                    if ($request->has('confirmUpdate') && $request['confirmUpdate'] == 1) {
-                        MapUserFYPolicy::whereIn('id', $ids)->update($updateData);
-                        User::whereIn('id', array_keys($userData))->update($userUpdateData);
-                    }
-                }
-                if ($request->has('output') && $request['output'] == 'html') {
-                    echo '<style>table th,tr,td {
-                        border:1px solid #222;
-                        padding:0 10px;
-                    }</style><table style="border:1px solid #000;">
-                        <thead>
-                            <th>S. No.</th>
-                            <th>Employee ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                        </thead>
-                        <tbody>
-                        ' . implode('', $userData) . '
-                        </tbody>
-                    </table>';
-                } else {
-                    return json_encode(['status' => true, 'message' => json_encode($userData)]);
-                }
-            } else {
-                return json_encode(['message' => 'No entries present for auto submission!!']);
+                Mail::to($enrolRow['email'])->send(new SubmitEnrollment($enrolRow, $mapUserFYPolicyData));
             }
         } else {
-            return json_encode(['message' => 'Auto Submission not possible before enrollment window end date']);
+            return json_encode(['message' => 'No entries present for auto submission!!']);
         }
     }
 }

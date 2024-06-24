@@ -5,14 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summary</title>
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <style>
-        body {
-            font-family: 'Calibri', sans-serif;
+            body {
+                font-family: 'Calibri', sans-serif;
+            /* display:flex;
+            flex-direction: column; */
+            }
+
+        .container{
+            max-width: 100vw;
+            display:flex;
+            flex-direction: column; 
+            justify-content:end;
+            align-items:center;
+            min-height:100vh;
+        }
+
+        .top-div {
+            /* width: 70%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%); */
+
+            max-width:70%;
         }
 
         .bold-text {
             font-weight: bold;
-            font-size: 1.5rem;
+            /* font-size: 1.5rem; */
+            font-size: 22px;
+
             /* Adjust the font size as needed */
         }
 
@@ -21,32 +46,31 @@
         }
 
         .first-part {
-            width: 100%;
-            height: auto;
+            max-width: 100%;
+            max-height: 240px;
         }
 
         .first-part img {
             width: 100%;
-            height: 30vh;
+            height: 100%; /* Converted from 30vh */
         }
 
-        .left-image {
+        /* .left-image {
             width: 3%;
             height: inherit;
             float: left;
-        }
+        } */
 
         .second-part {
-            width: 100%;
-            height: 10vh;
+            max-height: 70px; /* Converted from 10vh */
             display: flex;
             justify-content: space-between;
-            width: 100%;
+            max-width: 100%;
             margin-top: 20px;
         }
 
         .lines {
-            margin-right: 20vh;
+            margin-right: 75px; /* Converted from 20vh */
             display: flex;
         }
 
@@ -56,8 +80,8 @@
 
         .semi-circle {
             position: relative;
-            width: 4vh;
-            height: 7vh;
+            width: 30px; /* Converted from 4vh */
+            height: 52px; /* Converted from 7vh */
             border-width: 15px 15px 15px 0;
             border-style: solid;
             border-color: #B5B5B5;
@@ -67,8 +91,8 @@
 
         .right-semi-circle {
             position: relative;
-            width: 5vh;
-            height: 8vh;
+            width: 37px; /* Converted from 5vh */
+            height: 60px; /* Converted from 8vh */
             border-width: 15px 0 15px 15px;
             border-style: solid;
             border-color: #03313D;
@@ -78,7 +102,8 @@
 
         .diagonal-line {
             width: 2px;
-            height: 14vh;
+            /* height: 14vh; */
+            height:90px;
             background-color: #03313D;
             transform: rotate(45deg);
             transform-origin: 0 100%;
@@ -91,7 +116,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 7vh;
+            height: 52px; /* Converted from 7vh */
             border-radius: 10px;
             text-align: center;
             font-weight: 900;
@@ -99,13 +124,15 @@
         }
 
         .box1 {
-            width: 38%;
-            margin: 0 1%;
+            /* width: 38%;
+            margin: 0 1%; */
+            min-width: 350px; /* 38% equivalent to 304px (38 * 800 / 100) */
+            margin: 0 8px;
         }
 
         .box2 {
-            width: 59%;
-            margin-right: 1%;
+            width:calc(100% - 350px);
+            /* margin-right: 1%; */
         }
 
         .box1 ul {
@@ -134,7 +161,7 @@
         .inner-li img {
             vertical-align: middle;
             margin-right: 5px;
-            width: 3vh;
+            width: 30px; /* Converted from 3vh */
         }
 
         .third-part {
@@ -143,42 +170,36 @@
 
         .forth-part {
             width: 100%;
-            height: 20vh;
+            height: 150px; /* Converted from 20vh */
             display: flex;
             flex-direction: column-reverse;
             align-items: flex-end;
         }
 
         .fifth-part {
-            width: 100%;
-            margin-top: 3vh;
-            height: auto;
+            max-width: 100%;
+            margin-top: 30px; /* Converted from 3vh */
+            /* height: auto; */
         }
 
         .fifth-part img {
             width: 100%;
-            height: 20vh;
+            /* height: 200px; Converted from 20vh */
         }
 
 
         @media (max-width: 600px) {
             .first-part {
                 width: 100%;
-                height: 10vh;
+                height: 100px; /* Converted from 10vh */
             }
 
             .first-part img {
                 width: 100%;
-                height: auto;
+                height: 210px;
             }
         }
 
-        .top-div {
-            width: 70%;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
 
         /* Adjust child elements as needed */
         .first-part,
@@ -189,7 +210,25 @@
             text-align: center;
             /* Center the content within each section */
         }
+
+        .download-btn > button{
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .download-btn >button:hover {
+            background-color: #0056b3;
+            border:0.5px solid black;
+        }
+
     </style>
+    
+
 </head>
 
 <body>
@@ -240,10 +279,10 @@
     @endphp
     @if(count($summaryData))
     <!-- <button id="download-summary-pdf">Download PDF</button> -->
-
+    <div class="container" id="top-div">
     <div class="top-div">
         <div class="first-part">
-            <img src="{{asset('assets/images/invoice-01.jpg')}}" alt="">
+            <img src="{{asset('https://uat-flexibenefit.hyperx.cloud/assets/images/invoice-01.jpg')}}" alt="">
         </div>
         <div class="second-part">
             <div class="second1">
@@ -267,7 +306,7 @@
         </div>
 
         <div class="third-part">
-            <div style="display: flex;margin-top: 5vh;">
+            <div style="display: flex;margin-top: 40px;">
                 <div class="bold-text box box1">Name</div>
                 <div class="bold-text box box2">Detail</div>
             </div>
@@ -351,7 +390,7 @@
             @endforeach
 
 
-            <div style="display: flex;justify-content: center;flex-direction: column; height:30vh;  border-bottom: 3px solid #B5B5B5; " class="bold-text">
+            <div style="display: flex;justify-content: center;flex-direction: column; height:200px;  border-bottom: 3px solid #B5B5B5; " class="bold-text">
                 <p style="margin:0px; margin-left: 47%;  display: inline;">Total Points Used: {{number_format(Auth::user()->points_used,2) }}</p>
                 <p style="margin:0px; margin-left: 47%; display: inline;">Salary Contribuation: {{ number_format(max(Auth::user()->points_used - 5000, 0), 2) }}</p>
                 <p style="margin:0px; margin-left: 47%; display: inline;">Monthly Installment:
@@ -371,39 +410,17 @@
             <img src="{{asset('assets/images/bottom-design.png')}}" alt="">
         </div>
 
-
     </div>
+    </div>
+
+
+    <div class="download-btn" id="download-btn">
+        <button type="button" id="download-summary-pdf">Download Summary</button>
+    </div>
+
     @else
     echo 'Enrollment details not found. Please select appropriate policies and submit before <Enrollment Date>';
-        @endif
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('download-summary-pdf').addEventListener('click', function() {
-                    // Get the target div
-                    const claimData = document.getElementById('top-div');
-
-                    // Use html2canvas to capture the div's content as an image
-                    html2canvas(claimData).then(canvas => {
-                        // Convert the canvas to a data URL
-                        const imgData = canvas.toDataURL('image/png');
-
-                        // Create a temporary link element
-                        const downloadLink = document.createElement('a');
-                        downloadLink.href = imgData;
-                        downloadLink.download = 'claim.png';
-
-                        // Trigger a click event on the link to start the download
-                        document.body.appendChild(downloadLink);
-                        downloadLink.click();
-                        document.body.removeChild(downloadLink);
-                    });
-                });
-            });
-        </script>
-
+   
 
 
 </body>

@@ -15,7 +15,7 @@
         position: relative;
         left: 1vw;
         border-bottom-left-radius: 150px;
-        background-image: url('{{ asset('assets/images/bg-image.jpeg') }}');
+        background-image: url('{{ asset('assets/images/bg-image.jpg') }}');
         background-size: cover;
         margin-bottom: 5px;
     }
@@ -24,7 +24,7 @@
         width: 43%;
         position: absolute;
         left: 52%;
-        top: 14%;
+        top: 22%;
         border-radius: 30px;
         background-color: #FFFFFF;
         z-index: 1;
@@ -32,7 +32,7 @@
 
     .left-content {
         position: absolute;
-        top: 20%;
+        top: 22%;
         left: 6%;
         color: #ffffff;
         width: 40%;
@@ -42,9 +42,9 @@
     .form_name {
         margin: 0px;
         color: #03313E;
-        font-family: sans-serif;
         margin: 2vh 0vh 2vh 5%;
-        font-size: 30px;
+        font-size: 2rem;
+        font-weight: 500;
     }
 
 
@@ -60,15 +60,15 @@
 
     .inputs-div {
         width: 48%;
-        margin-bottom: 10px;
+        margin-bottom: 3vh;
     }
 
     .inputs-div input,
     .inputs-div select {
-        font-family: Calibri;
+       
         /* font-style: italic; */
         padding: 8px;
-        font-size: 16px;
+        font-size: 14px;
         border-radius: 10px;
         border: 1px solid #03313E;
         width: 100%;
@@ -87,47 +87,46 @@
         color: #ffffff;
         border: none;
         padding: 10px 20px;
-        font-size: 16px;
+        font-size: 14px;
         cursor: pointer;
         border-radius: 10px;
         transition: background-color 0.3s ease;
         box-shadow: 0px 4px 6px rgba(128, 128, 128, 0.3);
     }
-
     .main-heading {
-        font-family: Calibri, sans-serif;
-        font-weight: bold;
-        font-size: 50px;
+       
+        font-weight:600;
+        font-size: 2rem;
         margin: 0px;
     }
 
     .sub-heading {
-        font-family: Calibri, sans-serif;
-        font-weight: bold;
-        font-size: 30px;
+       
+        font-weight: 500;
+        font-size: 1rem;
         margin: 0px;
         margin-top: 1vh;
         margin-bottom: 2vh;
     }
 
     .des-content {
-        font-family: Calibri, sans-serif;
+        
         font-weight: normal;
-        font-size: 18px;
+        font-size: 12px;
         margin: 0px;
     }
 
     .disclaimer {
-        font-family: Calibri, sans-serif;
+        color: #BABABA;
         font-weight: normal;
-        margin-top: 5px;
+        margin-top: 3vh;
 
     }
 
     .error {
         display: inline;
         color: red;
-        font-family: Calibri, sans-serif;
+        
         font-size: 11px;
     }
 
@@ -137,15 +136,15 @@
         }
 
         .main-heading {
-            font-size: 37px;
+            font-size: 1.5rem;
         }
 
         .sub-heading {
-            font-size: 20px;
+            font-size: 1rem;
         }
 
         .des-content {
-            font-size: 15px;
+            font-size: 0.8rem;
         }
 
         .left-content {
@@ -263,7 +262,7 @@
                 <div class="submit">
                     <button type="submit" class="claim-button">Reimbursement Claim</button>
                 </div>
-                <p class="disclaimer"><span style="font-weight: bold; font-family: calibri;">Disclaimer:</span> By submitting this claim intimation form, you acknowledge and agree that the information provided is accurate and complete to the best of your knowledge. Any false or misleading information may result in delays or denial of your claim. Our team will review your submission and contact you for further details if necessary. Please note that submitting this form does not guarantee approval or processing of your claim
+                <p class="disclaimer"><span style="font-weight: bold;">Disclaimer:</span> By submitting this claim intimation form, you acknowledge and agree that the information provided is accurate and complete to the best of your knowledge. Any false or misleading information may result in delays or denial of your claim. Our team will review your submission and contact you for further details if necessary. Please note that submitting this form does not guarantee approval or processing of your claim
                 </p>
             </div>
         </form>

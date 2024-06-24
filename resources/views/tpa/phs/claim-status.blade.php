@@ -39,11 +39,12 @@
     .footer {
         display: flex;
     }
-    .left_side_fotter{
+
+    .left_side_fotter {
         width: 50%;
     }
 
-    .right_side_fotter{
+    .right_side_fotter {
         width: 50%;
         margin-right: -1px;
     }
@@ -103,16 +104,18 @@
     }
 
     @media screen and (max-width: 768px) {
-        .heading_table{
+        .heading_table {
             font-size: 9px;
         }
-        .table1 td{
+
+        .table1 td {
             font-size: 9px;
         }
-        .table1 tr td:last-child{
+
+        .table1 tr td:last-child {
             font-size: 9px;
         }
-        
+
     }
 </style>
 
@@ -120,9 +123,7 @@
     <div class="top-part">
         <h2 class="heading">Track Claim</h2>
         <p class="para_text">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum nulla nobis mollitia tempora autem hic maiores
-            beatae quisquam ducimus, iusto, delectus laboriosam molestias accusamus ullam deserunt nesciunt, rem
-            exercitationem doloribus!
+            Get instant updates on all your raised claims. This menu provides a centralized view of your claim history. See the latest status of each claim at a glance, allowing you to easily track progress and stay informed throughout the resolution process.
         </p>
         <div style="display: flex; justify-content: center;">
             <div style="width: 93%;">
@@ -170,14 +171,14 @@
 </div>
 
 <div class="down-part">
-<div class="footer">
-    <div class="left_side_fotter"></div>
-    <div class="right_side_fotter">
-        <video autoplay loop muted width="800" height="300">
-            <source src="{{ asset('assets/videos/trackclaim2.mp4') }}" type="video/mp4" />
-        </video>
+    <div class="footer">
+        <div class="left_side_fotter"></div>
+        <div class="right_side_fotter">
+            <video autoplay loop muted width="800" height="300">
+                <source src="{{ asset('assets/videos/trackclaim2.mp4') }}" type="video/mp4" />
+            </video>
+        </div>
     </div>
-</div>
 </div>
 <script>
     $(document).ready(function() {

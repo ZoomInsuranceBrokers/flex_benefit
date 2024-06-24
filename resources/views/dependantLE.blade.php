@@ -5,28 +5,56 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-@if(session('error'))
-<script>
-    // Display Swal dialog with the error message
-    Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: '{{ session('error') }}',
-       
-    });
-</script>
-@endif
-@if(!session('is_submitted'))
+<style>
+    .bold {
+        font-weight: bold;
+    }
 
-<script>
+</style>
+
+@if(session('error'))
+<!-- <script>
     // Display Swal dialog with the error message
     Swal.fire({
         icon: 'error',
         title: 'Error!',
-        text: 'Currently you have a open enrollment portal you can add or edit your dependents there!',
+        text: '{{ session('
+        error ') }}',
+
     });
-</script>
+</script> -->
 @endif
+<div class="modal fade" id="sessionMessage" tabindex="-1" aria-labelledby="errorModallabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 0px; padding:15px; background-color: #ececec;">
+            <div class="modal-overlay"></div>
+            <div class="modal-body">
+                <div class="col-12 logout-text" >
+                    <h3 class="errorModallabel">Error</h3>
+                    <p>Currently you have an open enrollment portal you can add or edit your dependents there!</p>
+                </div>
+                <div class="mt-3 d-flex btns">
+                    <button type="submit" class="btn cancel--btn d-block" data-bs-dismiss="modal" id="error-btn">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@php
+$isSubmitted = session('is_submitted');
+@endphp
+
+@if(!$isSubmitted)
+    <script>
+        $(document).ready(function() {
+            $('#sessionMessage').modal('show');
+        });
+    </script>
+@endif
+
 @if(session('success'))
 <script>
     // Display Swal dialog with the success message
@@ -37,16 +65,16 @@
     });
 </script>
 @endif
-<section class="banner__section life-event__banner">
+<section class="banner__section life-event__banner" style="padding-bottom: 0px;">
     <div class="container-fluid">
         <div class="row h-100">
-            <div class="col-xl-6 ms-auto right-col">
-                <div class="main-banner">
+            <div class="col-xl-6 ms-auto right-col" style="background-size: auto 100%;">
+                <div class="main-banner" style="padding: 5rem 0 5rem 0;position: relative;left: 10vw;">
                     <h1>
-                        <span class="color-black">keep Your</span>
+                        <span class="color-black">Keep Your</span>
                     </h1>
                     <h1>Life Event Updated</h1>
-                    <p>
+                    <p style="margin-top: 0.8rem;">
                         The system has already uploaded your details based on the
                         information available from the company's records. If you need to
                         make any changes to the dependant information, please use the
@@ -54,14 +82,14 @@
                     </p>
                 </div>
             </div>
-            <div class="col-xl-6 left-col"></div>
+            <div class="col-xl-6 left-col" style="z-index: -1; border-radius: 20px;position:relative;right:5vw"></div>
         </div>
     </div>
 </section>
 <!-- Banner Section End -->
 <!--about dependent start-->
 <section>
-    <div class="container py-3 py-md-5 my-0 my-xl-5">
+    <div class="container py-3 py-md-5 my-0">
         <div class="row">
             <!--after record added table-->
             <div class="col-12 table-responsive{{ count($dependants) > 0 ? '' : ' d-none' }}">
@@ -158,27 +186,27 @@
                                 @endphp
                                 {{ $approval_status }}
                             </td>
-                           
+
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
 
                 <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" class="btn seconday-btn mx-auto d-block">
-                    add dependant
+                    Add Dependant
                 </button>
             </div>
             @if(count($dependants) == 0 )
             <div class="col-lg-8 col-md-9 card-dependent card-dependent__event mx-auto">
                 <div>
-                    <h2>Click on the button to add Dependants.</h2>
+                    <h2 style="text-indent:10vw;">Click on the button to add Dependants.</h2>
                     @if(session('is_submitted'))
-                    <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" class="btn seconday-btn">
-                        add dependant
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" class="btn seconday-btn" style="margin-left: 22vw;">
+                        Add Dependant
                     </button>
                     @else
-                    <button type="button" class="btn seconday-btn" onclick="showbox()">
-                        add dependant
+                    <button type="button" class="btn seconday-btn" onclick="showbox()" style="margin-left: 22vw;">
+                        Add Dependant
                     </button>
                     @endif
                 </div>
@@ -193,25 +221,29 @@
 <section class="life-event-about">
     <div class="row">
         <div class="col-lg-6 m-0 p-0 hire-bg">
-            <div class="hire">
+            <div class="hire" style="padding-left: 5rem;">
                 <div>
                     <h2 class="text-center">How It Works ?</h2>
-                    <ul class="custom-icon text-white">
+                    <ul class="custom-icon text-white star-icon white-icon" style="padding-left:0px;">
                         <li>
-                            Health insurance for self, spouse, children, and parents falls
-                            under section 80D.
+                            You can add the dependants within 30 days of the occurrence of the Life Event.
                         </li>
                         <li>
-                            To add newly married spouse or a new born baby after the
-                            closure of enrollment window.
+                            <span class="bold"> Select your Life Event:</span> Choose "Spouse" or "Child" from the available options.
+
                         </li>
                         <li>
-                            To add newly married spouse or a new born baby after the
-                            closure of enrollment window.
+                            <span class="bold">Enter Details:</span> Fill out the online form with the necessary information about the qualifying event, including your spouse's/child's details.
+
                         </li>
                         <li>
-                            To add newly married spouse or a new born baby after the
-                            closure of enrollment window.
+                            <span class="bold"> Upload Documents:</span> Attach a copy of your marriage certificate or birth certificate (depending on the event) for verification.
+                        </li>
+                        <li>
+                            <span class="bold"> Submit Request:</span> After submitting the form, request will be sent for HR review.
+                        </li>
+                        <li>
+                            <span class="bold"> Status Update:</span> You will receive an email notification regarding the approval or rejection of your request.
                         </li>
                     </ul>
                 </div>
@@ -221,14 +253,12 @@
             <div class="work p-5">
                 <div>
                     <h2 class="text-center">Who can be added ?</h2>
-                    <ul class="custom-icon text-white">
+                    <ul class="custom-icon text-white star-icon white-icon">
                         <li>
-                            Health insurance for self, spouse, children, and parents falls
-                            under section 80D.
+                            <span class="bold">Spouse:</span> You can add your spouse as a dependent after you get married.
                         </li>
                         <li>
-                            To add newly married spouse or a new born baby after the
-                            closure of enrollment window.
+                            <span class="bold">Child:</span> You can add your biological or legally adopted child as a dependent.
                         </li>
                     </ul>
                 </div>
@@ -247,7 +277,7 @@
             </div>
             <div class="modal-body">
                 <div class="col-12">
-                    <form id="dependentForm" action="/dependants/saveLifeEvent" method="post">
+                    <form id="dependentForm" action="/dependants/saveLifeEvent" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label for="dependant-name" class="col-form-label">Dependant Name</label>
@@ -273,12 +303,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="dob-name" class="col-form-label">Date of Birth</label>
-                            <input type="date" name="dob" class="form-control "max="<?php echo date('Y-m-d'); ?>" id="dob-name" />
+                            <input type="date" name="dob" class="form-control " max="<?php echo date('Y-m-d'); ?>" id="dob-name" />
                             <div id="dob-errorMessage" class="text-danger"></div>
                         </div>
                         <div class="mb-3" style="display: none;" id="doe-box">
                             <label for="doe-name" class="col-form-label">Date of Event</label>
-                            <input type="date" name="doe" class="form-control" id="doe" max="<?php echo date('Y-m-d'); ?>"  value="<?php echo date('Y-m-d'); ?>"/>
+                            <input type="date" name="doe" class="form-control" id="doe" max="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" />
                             <div id="doe-errorMessage" class="text-danger"></div>
                         </div>
                         <div class="mb-3">
@@ -286,18 +316,30 @@
                             <input type="number" name="nominee_percentage" class="form-control" id="percentage-name" placeholder="Max 100" max="100" />
                         </div>
                         <div id="nomine-errorMessage" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label for="percentage-name" class="col-form-label">Uplaod Document <span class="text-danger">(add supported document i.e. birth certifcate, marriage certificate, etc)</span></label>
+                            <input type="file" name="upload_document" class="form-control" id="upload_document" placeholder="Max 100" max="100" />
+                        </div>
+                        <div id="upload-document-errorMessage" class="text-danger"></div>
                     </form>
                 </div>
             </div>
             <div class="modal-footer mx-3">
-                <button type="button" class="btn primary--btn" data-dismiss="modal" id="cancelButton">Cancel</button>
-                <button type="button" class="btn primary--btn" id="saveDependantBtn">Save</button>
+                <button type="button" class="btn primary--btn" data-dismiss="modal" id="cancelButton" style="background-color: #0FA2D5;">Cancel</button>
+                <button type="button" class="btn primary--btn" id="saveDependantBtn" style="background-color: #0FA2D5;">Save</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+
+    //For Error Message
+    document.getElementById('error-btn').addEventListener('click', function() {
+        document.getElementById("sessionMessage").style.display="none";
+    });                         
+
+
     // For  Data Table
     document.getElementById('cancelButton').addEventListener('click', function() {
         $('#exampleModal').modal('hide');
@@ -324,12 +366,12 @@
         var selectedValue = selectElement.value;
         var divToShow = document.getElementById("doe-box");
         console.log(selectedValue);
-            if (selectedValue === "6") {
-                divToShow.style.display = "block";
-            } else {
-                divToShow.style.display = "none";
-            }
-        });
+        if (selectedValue === "6") {
+            divToShow.style.display = "block";
+        } else {
+            divToShow.style.display = "none";
+        }
+    });
 
 
     $(document).ready(function() {
@@ -343,12 +385,12 @@
         });
     });
 
-    function showbox(){
+    function showbox() {
         Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'Currently you have a open enrollment portal you can add or edit your dependents there!',
-    });
+            icon: 'error',
+            title: 'Error!',
+            text: 'Currently you have a open enrollment portal you can add or edit your dependents there!',
+        });
     }
 
     function loadRelations() {
@@ -444,6 +486,19 @@
             isValid = checkNominationAllocation($('#percentage-name'));
         }
 
+        const fileInput = $('#upload_document');
+        const file = fileInput[0].files[0];
+        if (!file) {
+            $('#upload-document-errorMessage').text('Please upload a document.');
+            isValid = false;
+        } else {
+            const fileSizeMB = file.size / (1024 * 1024); // Convert bytes to MB
+            if (fileSizeMB > 100) { // Max file size 100 MB
+                $('#upload-document-errorMessage').text('File size exceeds 100 MB.');
+                isValid = false;
+            }
+        }
+
         return isValid;
     }
 
@@ -485,3 +540,4 @@
 </script>
 
 @stop
+

@@ -302,10 +302,7 @@
                 claims, the bills will be directly taken care of between the network
                 hospital and your health insurer
             </p>
-            <p class="para_footer_text">
-                At Digit, we have a network of 16400+ network hospitals where you
-                can opt for cashless treatments
-            </p>
+            
         </div>
     </div>
 </div>
@@ -316,6 +313,7 @@
 
         $('#search').click(function(e) {
             e.preventDefault(); // Prevent the default form submission
+            showLoader();
 
             var pincode = $('#pincode').val(); // Get the pincode from the input field
             var policy_no = $('input[name="policy_no"]').val(); // Get the policy number from the input field
@@ -329,6 +327,7 @@
                     policy_no: policy_no
                 },
                 success: function(response) {
+                    hideLoader();
                     jsonResponse = JSON.parse(response); // Assign response to jsonResponse
 
                     // Log the parsed response for debugging
@@ -405,6 +404,9 @@
             var bgColourHeight = topPartHeight + (0.08 * $(window).height());
             $('.bg-colour').css('height', bgColourHeight + 'px');
         }
+        setHeight();
+
+
 
         // function set_hight_leftcontainer(){
         //     var topPartHeight = $('.myVideo1').outerHeight();

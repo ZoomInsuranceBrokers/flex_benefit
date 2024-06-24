@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Traits\accountTraitMethods;
+use App\Models\Grade;
 use App\Models\Account;
 use Illuminate\Http\Request;
+use App\Models\InsuranceCategory;
+use App\Traits\accountTraitMethods;
 
 class AccountController extends Controller
 {
@@ -23,34 +25,34 @@ class AccountController extends Controller
 
         $jsonData = json_decode(json_decode($testJson, true)['details'], true);
 
-        dd($jsonData);
+        //dd([$jsonData]);
 
         
         //if ($request->has('accId') && strlen(trim($request->accId))) {
             session(['confirmUpdate' => $request->has('confirmUpdate') ? $request->confirmUpdate : 0 ]);
             $this->upsertAccount($jsonData);
-            die;
+
 
             // financial year
-            $this->upsertFY();
-
+            $this->upsertFY($jsonData);
+            
             // grade
-            $this->upsertGrade();
+            $this->upsertGrade($jsonData);
 
-            // insurance category
-            $this->upsertInsuranceCategory();
-
+            // insurance category + map_grade_category
+            $this->upsertInsuranceCategory($jsonData);
+die;
             // map_grade_category
-            $this->upsertGradeCategory();
+            //$this->upsertGradeCategory();
 
             // insurance subcategory
-            $this->upsertInsuranceSubCategory();
+            $this->upsertInsuranceSubCategory($jsonData);
 
             // insurance policy
-            $this->upsertinsuancePolicy();
+            $this->upsertInsurancePolicy($jsonData);
 
             // map_financial_year_policy
-            $this->upsertInsuranceCategory();
+            $this->upsertInsuranceCategory($jsonData);
 
         // } else {
         //     die(__FUNCTION__ . ':ERROR:' . 'No Account ID detail found. Setup Failed!!');

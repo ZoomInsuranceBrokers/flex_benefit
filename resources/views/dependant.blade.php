@@ -2,6 +2,17 @@
 
 @section('content')
 
+<style>
+    .left-banner{
+        position: relative;
+        left: 5vw;
+        z-index: -1;
+        width: 50%;
+        border-radius: 15px;
+    
+    }
+</style>
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -24,14 +35,16 @@
         text: '{{ session('success') }}',
     });
 </script>
+
+
 @endif
 <section class="banner__section dependent__banner">
     <div class="container-fluid">
         <div class="row h-100">
-            <div class="col-xl-6 left-col"></div>
+            <div class="col-xl-6 left-col left-banner"></div>
 
             <div class="col-xl-6 ms-auto right-col">
-                <div class="main-banner">
+                <div class="main-banner" style="padding: 5rem 2rem 5rem 2rem;">
                     <h1>
                         <span class="color-black">Secure Your Loved Ones And Avail</span>
                     </h1>
@@ -49,6 +62,60 @@
     </div>
 </section>
 <!-- Banner Section End -->
+
+<!--dependent detail start-->
+<section style="overflow-x:clip;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 card-dep__details">
+                <div class="card-header">
+                    <h2 style="font-size:1.2rem;">
+                        Please read following important instructions to add/review your
+                        dependent details
+                    </h2>
+                </div>
+                <ul class="star-icon text-white white-icon">
+                    <li style="margin-top: 10px;">
+                        Existing dependants information is already added. You can add new dependents by clicking the "Add Dependant" button.
+                    </li>
+                    <li style="margin-top: 10px;">
+                        To modify any dependent detail, please click on the “Edit Icon" under "Action" Column.
+                    </li>
+                    <li style="margin-top: 10px;">
+                        The nominee percentage determines how proceeds from group term life and accident insurance are allocated among your chosen dependents.
+                    </li>
+                    <li style="margin-top: 10px;">
+                        It is essential that the total nominee percentage for all selected dependents adds up to 100.
+                    </li>
+                    <li style="margin-top: 10px;">
+                        You can add dependants with zero nomination percentage.
+                    </li>
+                    <li style="margin-top: 10px;">
+                        Adding dependents does not automatically enroll them in the policy. Please ensure to select the dependents in the respective insurance option under the section"Enrollment" while filling the enrollment.
+                    </li>
+                    <!-- <li>
+                        To add newly married spouse or a new born baby after the closure
+                        of enrollment window, you can use the "Life Events" section.
+                    </li>
+                    <li>
+                        To add newly married spouse or a new born baby after the closure
+                        of enrollment window, you can use the "Life Events" section.
+                    </li>
+                    <li>
+                        To add newly married spouse or a new born baby after the closure
+                        of enrollment window, you can use the "Life Events" section.
+                    </li>
+                    <li>
+                        To add newly married spouse or a new born baby after the closure
+                        of enrollment window, you can use the "Life Events" section.
+                    </li> -->
+                </ul>
+                <img src="{{asset('assets/images/brand-img.png') }}" alt="brand img" />
+            </div>
+        </div>
+    </div>
+</section>
+
 <!--about dependent start-->
 <section>
     <div class="container py-3 py-md-5">
@@ -177,58 +244,6 @@
     </div>
 </section>
 <!--about dependent end-->
-<!--dependent detail start-->
-<section>
-    <div class="container">
-        <div class="row">
-            <div class="col-12 card-dep__details">
-                <div class="card-header">
-                    <h2>
-                        Please read following important instructions to add/review your
-                        dependent details
-                    </h2>
-                </div>
-                <ul class="star-icon text-white">
-                    <li style="margin-top: 10px;">
-                        Existing dependants information is already added. You can add new dependents by clicking the "Add Dependant" button.
-                    </li>
-                    <li style="margin-top: 10px;">
-                        To modify any dependent detail, please click on the “Edit Icon" under "Action" Column.
-                    </li>
-                    <li style="margin-top: 10px;">
-                        The nominee percentage determines how proceeds from group term life and accident insurance are allocated among your chosen dependents.
-                    </li>
-                    <li style="margin-top: 10px;">
-                        It is essential that the total nominee percentage for all selected dependents adds up to 100.
-                    </li>
-                    <li style="margin-top: 10px;">
-                        You can add dependants with zero nomination percentage.
-                    </li>
-                    <li style="margin-top: 10px;">
-                        Adding dependents does not automatically enroll them in the policy. Please ensure to select the dependents in the respective insurance option under the section"Enrollment" while filling the enrollment.
-                    </li>
-                    <!-- <li>
-                        To add newly married spouse or a new born baby after the closure
-                        of enrollment window, you can use the "Life Events" section.
-                    </li>
-                    <li>
-                        To add newly married spouse or a new born baby after the closure
-                        of enrollment window, you can use the "Life Events" section.
-                    </li>
-                    <li>
-                        To add newly married spouse or a new born baby after the closure
-                        of enrollment window, you can use the "Life Events" section.
-                    </li>
-                    <li>
-                        To add newly married spouse or a new born baby after the closure
-                        of enrollment window, you can use the "Life Events" section.
-                    </li> -->
-                </ul>
-                <img src="{{asset('assets/images/brand-img.png') }}" alt="brand img" />
-            </div>
-        </div>
-    </div>
-</section>
 
 <!--add dependent model popup start-->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -243,7 +258,7 @@
                         @csrf
                         <div class="mb-3">
                             <label for="dependant-name" class="col-form-label">Dependant Name</label>
-                            <input type="text" name="dependent_name" class="form-control" id="dependant-name" />
+                            <input type="text" name="dependent_name" class="form-control" id="dependant-name" placeholder="Dependant Name" />
                             <div id="dependent-errorMessage" class="text-danger"></div>
                         </div>
                         <div class="mb-3">
@@ -276,9 +291,9 @@
                     </form>
                 </div>
             </div>
-            <div class="modal-footer mx-3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="cancelButton">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveDependantBtn">Save</button>
+            <div class="modal-footer mx-3" style="padding: 30px 0;justify-content:space-around;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" style="padding: 3px;width: 30%;background: #0FA2D5;" id="cancelButton">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveDependantBtn" style="padding: 3px;width: 30%;background: #0FA2D5;">Save</button>
             </div>
         </div>
     </div>
@@ -314,8 +329,8 @@
                 </div>
             </div>
             <div class="modal-footer mx-3">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="cancelButton2">Cancel</button>
-                <button type="button" class="btn btn-primary" id="editDependantBtn">Update</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="cancelButton2" style="background:var(--blue); color:white">Cancel</button>
+                <button type="button" class="btn btn-primary" id="editDependantBtn" style="background:var(--blue); color:white">Update</button>
             </div>
         </div>
     </div>

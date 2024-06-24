@@ -64,6 +64,14 @@ class UserController extends Controller
     }
 
 
+    public function getUsedPoints()
+    {
+        $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy']);
+        
+        $mapUserFYPolicyData = $mapUserFYPolicyData->get()->toArray();
+
+        return response()->json(['mapUserFYPolicyData' =>  $mapUserFYPolicyData]);
+    }
     public function home(Request $request)
     {
         //echo bcrypt('1234567890');

@@ -44,7 +44,7 @@
                         </div>
 
                         <div class="mt-3">
-                            <button type="submit" class="btn btn-primary d-block mx-auto">
+                            <button type="submit" class="btn btn-primary d-block mx-auto" style="background:var(--blue); color:white">
                                 Login
                             </button>
                         </div>

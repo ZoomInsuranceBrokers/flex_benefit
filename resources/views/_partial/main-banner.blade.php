@@ -3,16 +3,18 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-xl-6 left-col">
-        <div class="video-container">
-            <video autoplay loop muted>
+        <div class="video-container" style="left:5vw">
+            <video autoplay loop muted style="    overflow: hidden;
+    outline: 5px solid white;
+    outline-offset: -5px;">
               <source src="{{asset('assets/videos/home-video.mp4') }}" type="video/mp4">
               Your browser does not support the video tag.
             </video>   
         </div>
       </div>
 
-      <div class="col-xl-6 ms-auto right-col">
-        <div class="main-banner">
+      <div class="col-xl-6 ms-auto right-col" style="background-size: auto 100%;">
+        <div class="main-banner" style="position: relative;right:2vw">
           <h1><span class="color-black">My Benefits,</span> My Way</h1>
           <p>
             Empower your choices with MyBenefits@Zoom, offering enhanced
@@ -37,7 +39,7 @@
 <section>
   <div class="row">
     <div class="col-lg-6 m-0 p-0 work-bg">
-      <div class="work p-5">
+      <div class="work">
         <div>
           <h2 class="text-center">How it works?</h2>
           <p class="side-border">
@@ -64,7 +66,7 @@
             based on the joining date.
           </p>
           <p class="custom-text">To know more please reach out to us at</p>
-          <a href="#" class="white-btn">support_mybenefits@zoominsurancebrokers.com</a>
+          <div style="margin-top: 4vh;"><a href="#" class="white-btn">support_mybenefits@zoominsurancebrokers.com</a></div>
         </div>
       </div>
     </div>

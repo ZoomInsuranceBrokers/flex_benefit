@@ -15,7 +15,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('salesforce:data')->everyMinute();
+        $schedule->command('salesforce:data')->daily();
+        $schedule->command('send:enrollment-reminders')->daily();
+        $schedule->command('enrollment:auto-submit')->daily();
+
     }
 
 

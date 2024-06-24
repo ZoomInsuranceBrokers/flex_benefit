@@ -15,6 +15,8 @@ use App\Mail\LifeEventAcknowledgement;
 use App\Models\User;
 use DateTime;
 use DateInterval;
+use Illuminate\Support\Facades\Storage;
+
 
 class DependantController extends Controller
 {
@@ -46,7 +48,7 @@ class DependantController extends Controller
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
             ->where('user_id_fk', Auth::user()->id)
             ->where('relationship_type', '<>', config('constant.$_RLTN_SELF'))
-            ->where('approval_status',1)
+            ->where('approval_status', 1)
             ->orderBy('dependent_name', 'ASC')
             ->get();
 
@@ -439,19 +441,19 @@ class DependantController extends Controller
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
             ->where('user_id_fk', Auth::user()->id)
             ->where('relationship_type', '<>', config('constant.$_RLTN_SELF'))
-            ->where('is_life_event',1)
+            ->where('is_life_event', 1)
             ->orderBy('dependent_name', 'ASC')
             ->get();
-      
+
         $relationLE_Table = implode(',', $relationLE_Table);
         $relation_Table = implode(',', $relation_Table);
 
-        return view('dependantLE', compact('relationLE_Table', 'relation_Table','dependants'));
+        return view('dependantLE', compact('relationLE_Table', 'relation_Table', 'dependants'));
     }
 
     public function createLE(Request $request)
     {
-      
+
         if ($request->isMethod('post')) {
             $input = $request->all();
             $rules = [
@@ -461,6 +463,7 @@ class DependantController extends Controller
                 'gender' => 'required|min:0|max:3',
                 'nominee_percentage' => 'required|numeric|digits_between:0,100',
                 'relationship_type'  => 'required|min:1|max:12',
+                'upload_document' => 'required|file', // Adjust max file size as needed
             ];
 
             $validator = Validator::make($input, $rules, $messages = [
@@ -471,6 +474,8 @@ class DependantController extends Controller
                 'date_format' => 'The :attribute should follow date format of YYYY-MM-DD',
                 'min' => 'The :attribute field value is invalid',
                 'max' => 'The :attribute field value is invalid',
+                'file' => 'The :attribute must be a file.',
+
             ]);
 
             if (!$validator->fails()) {
@@ -479,8 +484,8 @@ class DependantController extends Controller
                     $oneMonthLater = (new DateTime())->sub(new DateInterval('P1M'));
                     if ($inputDob < $oneMonthLater) {
                         $error = 'Date of Event not greater than one month.';
-                       
-                        return redirect()->back()->with('error', $error );
+
+                        return redirect()->back()->with('error', $error);
                     }
                     $relation = "Spouse";
                 } else {
@@ -488,11 +493,17 @@ class DependantController extends Controller
                     $oneMonthLater = (new DateTime())->sub(new DateInterval('P1M'));
                     if ($inputDob < $oneMonthLater) {
                         $error = 'Date of Birth not greater than one month for new born baby.';
-                       
-                        return redirect()->back()->with('error', $error );
+
+                        return redirect()->back()->with('error', $error);
                     }
                     $relation = "Child";
                 }
+
+                $uploadedFile = $request->file('upload_document');
+                $fileName = time() . '_' . $uploadedFile->getClientOriginalName();
+                $temporaryFilePath = 'uploads/' . $fileName; // Path relative to the public directory
+                Storage::disk('public')->put($temporaryFilePath, file_get_contents($uploadedFile));
+    
 
                 $dependant = new Dependant();
                 $dependant->external_id = null;
@@ -516,31 +527,29 @@ class DependantController extends Controller
                 $dependant->is_active = config('constant.$_YES');
                 $dependant->is_deceased = config('constant.$_NO');
                 $dependant->is_life_event = 1;
+                $dependant->supported_document = $temporaryFilePath;
                 $dependant->created_by = Auth::user()->id;
                 $dependant->modified_by = Auth::user()->id;
                 //dd($dependant);    
                 $dependant->save();
 
-                
+
 
                 $user = User::where('id', Auth::user()->id)->first();
 
                 Mail::to(Auth::user()->email)->send(new LifeEventAcknowledgement($user, $relation));
 
                 return redirect()->back()->with('success', 'Dependent Added Successfully');
-
             } else {
                 $error = '';
                 $jTableResult['Result'] = "ERROR";
                 foreach (array_values($validator->errors()->messages()) as $item) {
                     $error .= '<li>' . $item[0] . '</li>';
                 }
-                return redirect()->back()->with('error', $error );
-
+                return redirect()->back()->with('error', $error);
             }
         } else {
-            return redirect()->back()->with('error', "error" );
-
+            return redirect()->back()->with('error', "error");
         }
     }
 

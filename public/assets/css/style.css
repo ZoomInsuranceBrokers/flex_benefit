@@ -12,7 +12,7 @@
     top: 0;
     left: 0;
     background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    display: none; /* Hide the overlay by default */
+    display: block; /* Hide the overlay by default */
     z-index: 9999; /* Ensure the overlay is on top */
 }
 
@@ -33,7 +33,7 @@
 body {
     color: var(--black);
     font-family: 'Poppins', sans-serif !important;
-    font-size: 16px;
+    font-size: 12px;
     overflow-x: hidden;
 }
 
@@ -57,7 +57,7 @@ section {
 .loginModal .modal-body input.login-input {
     height: 45px;
     border: 1px solid #5772ed57;
-    border-radius: 5px;
+    border-radius: 0px;
 }
 
 .loginModal .modal-dialog {
@@ -102,7 +102,7 @@ section {
 }
 .profile-dropdown .dropdown-toggle{
     color: #fff;
-    font-size: 14px;
+    font-size: 11px;
 }
 .custom-nav .navbar-brand {
     width: 300px;
@@ -134,6 +134,18 @@ section {
 .banner__section{
    padding: 30px;
 }
+
+.videoModal img{
+    display: block;
+    margin: auto;
+    width: 510px;
+    margin-bottom: 25px;
+    box-shadow: rgba(17, 17, 26, 0.5) 0px 0px 30px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+    }
+
+    .m-ul{
+    margin-top: -10px;
+    }
 
 .banner__section .left-col {
     position: relative;
@@ -167,7 +179,7 @@ section {
 }
 
 .main-banner {
-    padding: 5rem;
+    padding: 5rem 0 5rem 0;
 }
 
 .intake-banner__section .main-banner h1 {
@@ -196,7 +208,7 @@ h2.header-dark {
 }
 
 .main-banner h1 {
-    font-size: 3rem;
+    font-size: 2rem;
     color: var(--blue);
     font-weight: 600;
 }
@@ -234,7 +246,7 @@ h2.header-dark {
 }
 
 .work {
-    padding: 2rem;
+    padding:3rem 1rem 3rem 5rem;
 }
 
 .side-border {
@@ -254,7 +266,7 @@ h2.header-dark {
 }
 
 .work h2 {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 600;
     color: #fff;
     text-transform: capitalize;
@@ -262,7 +274,7 @@ h2.header-dark {
 
 .work {
     color: #fff;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 300;
 }
 
@@ -271,11 +283,11 @@ h2.header-dark {
 }
 
 .hire {
-    padding: 2.1rem;
+    padding: 3rem 5rem 2rem 1rem;
 }
 
 .hire h2 {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 600;
     color: #fff;
     text-transform: capitalize;
@@ -283,10 +295,14 @@ h2.header-dark {
 
 .hire {
     color: #fff;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 300;
 }
 
+.swal2-confirm {
+background:#0FA2D5!important;
+
+}
 .hire .custom-text {
     padding-left: 15px;
 }
@@ -308,11 +324,11 @@ h2.header-dark {
 }
 
 .custom-container {
-    margin: 2.5rem;
+    margin: 2.5rem 4rem;
 }
 
 .plan h2 {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 600;
     color: var(--blue);
 }
@@ -337,8 +353,8 @@ h2.header-dark {
 }
 
 .card-list h3 {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
     margin: 15px 15px;
 }
 
@@ -365,10 +381,11 @@ h2.header-dark {
     font-size: 12px;
     padding: 10px;
     border-radius: 10px;
-    width: 550px;
+    width: 40vw;
     margin-top: 40px;
     margin-left: 20px;
     position: relative;
+    
 }
 .service-col:hover .medical-info{
     display: block;
@@ -382,6 +399,16 @@ h2.header-dark {
 .non-col:hover .medical-info{
     display: block;
 }
+
+.popup-leftside {
+    right:24vw;
+}
+
+.popup-leftside::after {
+    left: 508px !important;
+    transform: skewY(-35deg) !important;
+}
+
 .service-col, .terms-col, .plans-col, .non-col{
     cursor: pointer;
 }
@@ -429,6 +456,7 @@ ul.custom-icon li {
     background: url('../images/tax-img.png') no-repeat;
     background-size: 100%;
     position: relative;
+    right:5vw;
 }
 
 .tax-banner .tax-img {
@@ -489,7 +517,7 @@ ul.custom-icon li {
     color: #000000;
     font-weight: 500;
     font-size: 15px;
-    padding: 10px 10px 10px 0;
+    padding: 5px 5px 5px 0;
     min-width: 160px;
     margin-right: 10px;
     text-align: left;
@@ -521,10 +549,15 @@ ul.star-icon {
 /* Style for each list item */
 ul.star-icon li {
     background: url('../images/bg-icon.png') no-repeat left center; /* Set background image */
-    background-size: 25px; /* Adjust background size */
+    background-size: 20px; /* Adjust background size */
     padding-left: 35px; /* Adjust padding to accommodate the background image */
     margin-bottom: 10px; /* Optional: Add some space between list items */
     line-height: 1.5; /* Optional: Adjust line height for better readability */
+}
+
+ul.white-icon li{
+background: url('../images/white-icon.png') no-repeat left center !important;
+ background-size: 20px !important;
 }
 
 .medical__Services img.star_img {
@@ -679,7 +712,7 @@ Dependent page styling
 ============================================*/
 
 .banner__section.dependent__banner .left-col {
-    background: url(../images/dependent-banner.png) no-repeat right;
+    background: url(../images/dependent-banner.png) no-repeat;
 }
 
 .card-dependent {
@@ -727,13 +760,13 @@ Dependent page styling
     width: 200px;
     opacity: .2;
     position: absolute;
-    top: 30%;
+    top: 22%;
     left: 40%;
 }
 
 .card-dep__details .card-header {
     background-color: #fff;
-    padding: 20px;
+    padding: 10px;
     margin-inline: 20px;
     border-radius: 20px;
     margin-bottom: 20px;
@@ -894,6 +927,15 @@ Dependent page styling
     background-color: #ececec;
 }
 
+#sessionModal .modal-content {
+    border-radius: 0px;
+    border: 0px solid transparent;
+    background-color: #ececec;
+}
+
+#sessionModal .modal-content .modal-body {
+    padding: 3rem;
+}
 #logoutModal .modal-content .modal-body {
     padding: 3rem;
 }
