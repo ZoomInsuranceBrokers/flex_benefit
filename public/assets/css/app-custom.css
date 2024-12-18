@@ -21,26 +21,22 @@
 
 /** Header Points*/
 #points-header{
-  width:100%;z-index:99;clear:both;position:fixed;top:75px;
   color:#FFF;
-  animation-duration: 1s;
   font-size:18px;
 }
 #points-header-l{
   background: linear-gradient(105deg, rgba(91,104,235,1) 0%, rgba(40,225,253,1) 100%);
-  border-bottom-left-radius: 20px;
-  box-shadow: 10px -10px 20px #333 inset;
+  box-shadow: inset 10px -10px 20px rgba(0, 0, 0, 0.5);
   padding-top:3px;
 }
 #points-header-m{
   background: linear-gradient(0deg, rgba(91,104,235,1) 0%, rgba(40,225,253,1) 100%);
-  box-shadow: 0px -10px 20px #333 inset;
+  box-shadow: inset 0px -10px 20px rgba(0, 0, 0, 0.5);
   padding-top:3px;
 }
 #points-header-r{
   background: linear-gradient(-105deg, rgba(91,104,235,1) 0%, rgba(40,225,253,1) 100%);
-  box-shadow: -10px -10px 20px #333 inset;
-  border-bottom-right-radius: 20px;
+  box-shadow: inset -10px -10px 20px rgba(0, 0, 0, 0.5);
   padding-top:3px;
 }
 

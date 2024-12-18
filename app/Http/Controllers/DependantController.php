@@ -15,37 +15,44 @@ use App\Mail\LifeEventAcknowledgement;
 use App\Models\User;
 use DateTime;
 use DateInterval;
+use Illuminate\Support\Facades\Storage;
+
 
 class DependantController extends Controller
 {
     public function loadDependants()
     {
-        // all relation possible in case fo Life Event
         $relation_Table = config('constant.relationshipDep_type_jTable');
-        // check logged in user's existing dependants
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
             ->where('user_id_fk', Auth::user()->id)
             ->where('relationship_type', '<>', config('constant.$_RLTN_SELF'))
             ->get()->toArray();
 
-        // if (count($dependants)){
-        //     foreach ($dependants as $depItem) {                    
-        //         if (array_key_exists($depItem['relationship_type'], $relation_Table)) {
-        //             unset($availableRelations[$depItem['relationship_type']]);
-        //         }
-        //     }
-        // }
-        $is_submitted = MapUserFYPolicy::where('user_id_fk', Auth::user()->id)->where('is_submitted', true)->get();
-        if ($is_submitted->count()) {
+        $activeFinancialYear = DB::table('financial_years')
+            ->where('is_active', 1)
+            ->first();
+
+        $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy']);
+        $is_submitted = $mapUserFYPolicyData->whereRelation('fyPolicy.financialYears', 'id', $activeFinancialYear->id)
+            ->where('is_submitted', 1)->get()->toArray();
+        if (count($is_submitted) > 0) {
             $is_submitted = TRUE;
         } else {
             $is_submitted = FALSE;
         }
+
         session(['is_submitted' => $is_submitted]);
 
         $relation_Table = implode(',', $relation_Table);
 
-        return view('dependant', compact('relation_Table'));
+        $dependants = Dependant::where('is_active', config('constant.$_YES'))
+            ->where('user_id_fk', Auth::user()->id)
+            ->where('relationship_type', '<>', config('constant.$_RLTN_SELF'))
+            ->where('approval_status', 1)
+            ->orderBy('dependent_name', 'ASC')
+            ->get();
+
+        return view('dependant', compact('relation_Table', 'dependants'));
     }
 
     public function getAvailableRelations(Request $request)
@@ -100,8 +107,6 @@ class DependantController extends Controller
 
     public function create(Request $request)
     {
-        //Return result to jTable
-        $jTableResult = array();
         if ($request->isMethod('post')) {
             $input = $request->all();
             $rules = [
@@ -126,9 +131,7 @@ class DependantController extends Controller
                 $dependant->external_id = null;
                 $dependant->dependent_name = $input['dependent_name'];
                 $dependant->user_id_fk = Auth::user()->id;
-                // find dependant code from relationship type
                 foreach (config('constant.dependant_code') as $code => $rltnArr) {
-                    //print_r([$code,$rltnArr,$input['relationship_type']]);
                     if (in_array($input['relationship_type'], $rltnArr)) {
                         $dependant->dependent_code = $code;
                         break;
@@ -140,92 +143,70 @@ class DependantController extends Controller
                 $dependant->relationship_type = $input['relationship_type'];
                 $dependant->approval_status = config('constant.$_APPR_STATUS_APPROVED');
                 $dependant->is_active = config('constant.$_YES');
-                $dependant->is_deceased = config('constant.$_NO');
+                $dependant->is_deceased = 0;
                 $dependant->created_by = Auth::user()->id;
                 $dependant->modified_by = Auth::user()->id;
                 $dependant->save();
 
-                $jTableResult['Result'] = "OK";
-                $jTableResult['Record'] = $dependant->toArray();
+                return redirect()->back()->with('success', 'Dependent Added Successfully');
             } else {
-                $error = '';
-                $jTableResult['Result'] = "ERROR";
-                foreach (array_values($validator->errors()->messages()) as $item) {
-                    $error .= '<li>' . $item[0] . '</li>';
-                }
-                //dd($validator->errors()->messages());
-                $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
+                return redirect()->back()->with('error', 'All Fields are required');
             }
         } else {
-            // throw error
-
-            $jTableResult['Result'] = "ERROR";
-            $jTableResult['Message'] = 0;
+            return redirect()->back()->with('error', 'Only POST method is allowed');
         }
         return json_encode($jTableResult);
     }
 
+
+    public function findDependent(Request $request)
+    {
+
+        $dependentId = $request->input('id');
+
+        $dependent = Dependant::find($dependentId);
+
+        if (!$dependent) {
+            return response()->json(['error' => 'Dependent not found'], 404);
+        }
+
+        return response()->json(['dependent' => $dependent]);
+    }
     public function update(Request $request)
     {
-        //Return result to jTable
-        $jTableResult = array();
+
         if ($request->isMethod('post')) {
             $input = $request->all();
-            // dd($input);
             $rules = [
-                'dependent_name' => 'required|between:3,32|',
-                'dob' => 'required|date_format:d-m-Y',
-                'nominee_percentage' => 'required|numeric|digits_between:0,100',
+                'edit_dependent_name' => 'required|between:3,32|',
+                'edit_dob' => 'required|date_format:d-m-Y',
+                'edit_nominee_percentage' => 'required|numeric|digits_between:0,100',
             ];
 
-            $validator = Validator::make($input, $rules, $messages = [
-                'required' => 'The :attribute field is required.',
-                'numeric' => 'The :attribute field should be numbers only',
-                'boolen' => 'The :attribute field should be Yes or No.',
-                'date_format' => 'The :attribute should follow date format of YYYY-MM-DD',
-            ]);
 
-            if (!$validator->fails()) {
-                $dependant = Dependant::find($input['id']);
-                $dependant->id = $input['id'];
-                $dependant->dependent_name = $input['dependent_name'];
-                // // find dependant code from relationship type
-                // foreach (config('constant.dependent_code') as $code => $rltnArr) {
-                //     //print_r([$code,$rltnArr,$input['relationship_type']]);
-                //     if(in_array($input['relationship_type'], $rltnArr))
-                //     {
-                //         $dependant->dependent_code = $code;
-                //         break;
-                //     }
-                // }
-                $dependant->dob = date('Y-m-d', strtotime($input['dob']));
-                //$dependant->gender = $input['gender'];
-                $dependant->nominee_percentage = $input['nominee_percentage'];
-                //$dependant->relationship_type = $input['relationship_type'];
-                //$dependant->approval_status = 1;      
-                //$dependant->is_deceased = $input['is_deceased'];                
-                $dependant->is_active = config('constant.$_YES');
-                $dependant->modified_by = Auth::user()->id;
-                $dependant->save();
+            $dependants = Dependant::where('is_active', config('constant.$_YES'))
+                ->where('user_id_fk', Auth::user()->id)
+                ->where('relationship_type', '<>', config('constant.$_RLTN_SELF'))
+                ->orderBy('dependent_name', 'ASC')
+                ->get();
 
-                $jTableResult['Result'] = "OK";
-                $jTableResult['Record'] = $dependant->toArray();
-            } else {
-                $error = '';
-                $jTableResult['Result'] = "ERROR";
-                foreach (array_values($validator->errors()->messages()) as $item) {
-                    $error .= '<li>' . $item[0] . '</li>';
-                }
-                //dd($validator->errors()->messages());
-                $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
+
+            $dependant = Dependant::find($input['id']);
+            $totalNomineePercentage = ($dependants->sum('nominee_percentage') -  $dependant->nominee_percentage + $input['edit_nominee_percentage']);
+            if ($totalNomineePercentage > 100) {
+                return redirect()->back()->with('error', 'Total nominee percentage exceeds 100%');
             }
-        } else {
-            // throw error
+            $dependant->id = $input['id'];
+            $dependant->dependent_name = $input['edit_dependent_name'];
 
-            $jTableResult['Result'] = "ERROR";
-            $jTableResult['Message'] = 0;
+            $dependant->dob = date('Y-m-d', strtotime($input['edit_dob']));
+            $dependant->nominee_percentage = $input['edit_nominee_percentage'];
+            $dependant->modified_by = Auth::user()->id;
+            $dependant->save();
+            return redirect()->back()->with('success', 'Dependent Edit Successfully');
+        } else {
+            return redirect()->back()->with('error', 'Only post method is allowed.');
         }
-        return json_encode($jTableResult);
     }
 
     public function updateLE(Request $request)
@@ -333,8 +314,6 @@ class DependantController extends Controller
                 $dependant = Dependant::find($input['id']);
                 $dependant->id = $input['id'];
                 $dependant->dependent_name = $input['dependent_name'];
-                $dependant->nominee_percentage = $input['nominee_percentage'];
-
                 // // find dependant code from relationship type
                 // foreach (config('constant.dependent_code') as $code => $rltnArr) {
                 //     //print_r([$code,$rltnArr,$input['relationship_type']]);
@@ -344,7 +323,7 @@ class DependantController extends Controller
                 //         break;
                 //     }
                 // }
-                $dependant->gender = $input['gender'];
+                //$dependant->gender = $input['gender'];
                 //$dependant->relationship_type = $input['relationship_type'];
                 //$dependant->approval_status = 1;      
                 //$dependant->is_deceased = $input['is_deceased'];                
@@ -428,11 +407,9 @@ class DependantController extends Controller
      * **/
     public function loaddependantsLE()
     {
-        // all relation possible in case fo Life Event
         $relationLE_Table = config('constant.relationshipLE_type_jTable');
         $relation_Table = config('constant.relationshipDep_type_jTable');
-        // dd($relationLE_Table);
-        // check logged in user's existing dependants
+
         $dependants = Dependant::where('is_active', config('constant.$_YES'))
             ->where('user_id_fk', Auth::user()->id)
             ->whereIn('relationship_type', [config('constant.$_RLTN_SPOUSE')])
@@ -445,25 +422,48 @@ class DependantController extends Controller
                 }
             }
         }
+        $activeFinancialYear = DB::table('financial_years')
+            ->where('is_active', 1)
+            ->first();
+
+        $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy']);
+        $is_submitted = $mapUserFYPolicyData->whereRelation('fyPolicy.financialYears', 'id', $activeFinancialYear->id)
+            ->where('is_submitted', 1)->get()->toArray();
+        if (count($is_submitted) > 0) {
+            $is_submitted = TRUE;
+        } else {
+            $is_submitted = FALSE;
+        }
+
+        session(['is_submitted' => $is_submitted]);
+
+
+        $dependants = Dependant::where('is_active', config('constant.$_YES'))
+            ->where('user_id_fk', Auth::user()->id)
+            ->where('relationship_type', '<>', config('constant.$_RLTN_SELF'))
+            ->where('is_life_event', 1)
+            ->orderBy('dependent_name', 'ASC')
+            ->get();
+
         $relationLE_Table = implode(',', $relationLE_Table);
         $relation_Table = implode(',', $relation_Table);
 
-        return view('dependantLE', compact('relationLE_Table', 'relation_Table'));
+        return view('dependantLE', compact('relationLE_Table', 'relation_Table', 'dependants'));
     }
 
     public function createLE(Request $request)
     {
-        //Return result to jTable
-        $jTableResult = array();
+
         if ($request->isMethod('post')) {
             $input = $request->all();
             $rules = [
                 'dependent_name' => 'required|between:3,32|',
-                'dob' => 'required|date_format:d-m-Y',
+                'dob' => 'required',
                 'doe' => 'required_if:relationship_type,==,' . config('constant.$_RLTN_SPOUSE'),
                 'gender' => 'required|min:0|max:3',
                 'nominee_percentage' => 'required|numeric|digits_between:0,100',
                 'relationship_type'  => 'required|min:1|max:12',
+                'upload_document' => 'required|file', // Adjust max file size as needed
             ];
 
             $validator = Validator::make($input, $rules, $messages = [
@@ -474,6 +474,8 @@ class DependantController extends Controller
                 'date_format' => 'The :attribute should follow date format of YYYY-MM-DD',
                 'min' => 'The :attribute field value is invalid',
                 'max' => 'The :attribute field value is invalid',
+                'file' => 'The :attribute must be a file.',
+
             ]);
 
             if (!$validator->fails()) {
@@ -482,10 +484,8 @@ class DependantController extends Controller
                     $oneMonthLater = (new DateTime())->sub(new DateInterval('P1M'));
                     if ($inputDob < $oneMonthLater) {
                         $error = 'Date of Event not greater than one month.';
-                        $jTableResult['Result'] = "ERROR";
-                        //dd($validator->errors()->messages());
-                        $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
-                        return json_encode($jTableResult);
+
+                        return redirect()->back()->with('error', $error);
                     }
                     $relation = "Spouse";
                 } else {
@@ -493,13 +493,17 @@ class DependantController extends Controller
                     $oneMonthLater = (new DateTime())->sub(new DateInterval('P1M'));
                     if ($inputDob < $oneMonthLater) {
                         $error = 'Date of Birth not greater than one month for new born baby.';
-                        $jTableResult['Result'] = "ERROR";
-                        //dd($validator->errors()->messages());
-                        $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
-                        return json_encode($jTableResult);
+
+                        return redirect()->back()->with('error', $error);
                     }
                     $relation = "Child";
                 }
+
+                $uploadedFile = $request->file('upload_document');
+                $fileName = time() . '_' . $uploadedFile->getClientOriginalName();
+                $temporaryFilePath = 'uploads/' . $fileName; // Path relative to the public directory
+                Storage::disk('public')->put($temporaryFilePath, file_get_contents($uploadedFile));
+    
 
                 $dependant = new Dependant();
                 $dependant->external_id = null;
@@ -523,33 +527,30 @@ class DependantController extends Controller
                 $dependant->is_active = config('constant.$_YES');
                 $dependant->is_deceased = config('constant.$_NO');
                 $dependant->is_life_event = 1;
+                $dependant->supported_document = $temporaryFilePath;
                 $dependant->created_by = Auth::user()->id;
                 $dependant->modified_by = Auth::user()->id;
                 //dd($dependant);    
                 $dependant->save();
 
-                $jTableResult['Result'] = "OK";
-                $jTableResult['Record'] = $dependant->toArray();
+
 
                 $user = User::where('id', Auth::user()->id)->first();
 
                 Mail::to(Auth::user()->email)->send(new LifeEventAcknowledgement($user, $relation));
+
+                return redirect()->back()->with('success', 'Dependent Added Successfully');
             } else {
                 $error = '';
                 $jTableResult['Result'] = "ERROR";
                 foreach (array_values($validator->errors()->messages()) as $item) {
                     $error .= '<li>' . $item[0] . '</li>';
                 }
-                //dd($validator->errors()->messages());
-                $jTableResult['Message'] = '<div class="fs-12"><ul>' . $error . '</ul></div>';
+                return redirect()->back()->with('error', $error);
             }
         } else {
-            // throw error
-
-            $jTableResult['Result'] = "ERROR";
-            $jTableResult['Message'] = 0;
+            return redirect()->back()->with('error', "error");
         }
-        return json_encode($jTableResult);
     }
 
     public function getRelationshipTypes(Request $request)

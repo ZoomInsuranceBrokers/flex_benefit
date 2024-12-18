@@ -25,11 +25,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Crypt;
 use App\Traits\EnrollmentTraitMethods;
+use App\Traits\dependantTraitMethods;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules\Password;
 
 class SalesforceDataCommand extends Command
 {
+
+    use EnrollmentTraitMethods;
+    use dependantTraitMethods;
     /**
      * The name and signature of the console command.
      *
@@ -59,7 +63,6 @@ class SalesforceDataCommand extends Command
     {
         try {
             
-            session(['confirmUpdate' => true]);
             $accessToken = $this->getAccessToken();
 
             $salesforceData = $this->getSalesforceDependentDataUsingToken($accessToken);
@@ -132,40 +135,6 @@ class SalesforceDataCommand extends Command
         }
     }
 
-    private function _saveDependantData($userInsertData, $jsonData)
-    {
-        if (count($userInsertData) && count($jsonData)) {
-            foreach ($jsonData as $userExtId => $jsonRow) {
-                if (
-                    1
-                    //&& $userExtId ==  '003UN000001Ov2UYAS'
-                    && count($jsonRow['Dependants'])
-                ) {
-                    $lowerCaseRltnNames = array_map('strtolower', config('constant.relationship_type'));
-                    $lowerCaseApprovalStatus = array_map('strtolower', config('constant.approval_status'));
-                    $lowerCaseBoolean = array_map('strtolower', config('constant.booleanArr'));
-                    foreach ($jsonRow['Dependants'] as $depRow) {
-                        $depData = [];
-                        $depData['external_id'] = $depRow['Id'];
-                        $depData['dependent_name'] = htmlspecialchars($depRow['Name__c']);
-                        $depData['dob'] = date('Y-m-d', strtotime($depRow['Date_of_Birth__c']));
-                        $depData['gender'] = $this->_getGenderId(htmlspecialchars($depRow['Gender__c']), $depRow, true);
-                        $depData['nominee_percentage'] = array_key_exists('Nominee_Percentage__c', $depRow) ? $depRow['Nominee_Percentage__c'] : 0;
-                        $depData['relationship_type'] = array_search(strtolower($depRow['Relationship_Type__c']), $lowerCaseRltnNames);
-                        $depData['approval_status'] = array_search(strtolower($depRow['Approval_Status__c']), $lowerCaseApprovalStatus);
-                        $depData['is_active'] = config('constant.$_YES');
-                        $depData['is_deceased'] = array_search(strtolower($depRow['Deceased__c']), $lowerCaseBoolean);
-                        echo $this->validatedUpsertDependant($depData, $userInsertData['user'][$userExtId], $depRow);
-                    }
-                } else {
-                    echo '<br>----------' . __FUNCTION__ . ':INFO:No dependant found for user ' .
-                        $jsonRow['Details']['Name'];
-                }
-            }
-        } else {
-            die(__FUNCTION__ . ':ERROR: EMPTY JSON OR USER DATA RECEIVED');
-        }
-    }
     private function _saveUserData($jsonData)
     {
         $formattedData = [];
@@ -174,9 +143,9 @@ class SalesforceDataCommand extends Command
             // user data
             foreach ($jsonData as $jsonRow) {
                 $formattedData['user'][$jsonRow['Details']['Id']]['external_id'] = htmlspecialchars($jsonRow['Details']['Id']);
-                if(isset($jsonRow['Details']['FirstName'])){
+                if (isset($jsonRow['Details']['FirstName'])) {
                     $formattedData['user'][$jsonRow['Details']['Id']]['fname'] = htmlspecialchars($jsonRow['Details']['FirstName']);
-                }else{
+                } else {
                     $formattedData['user'][$jsonRow['Details']['Id']]['fname'] = htmlspecialchars($jsonRow['Details']['LastName']);
                 }
                 $formattedData['user'][$jsonRow['Details']['Id']]['lname'] = htmlspecialchars($jsonRow['Details']['LastName']);
@@ -225,7 +194,7 @@ class SalesforceDataCommand extends Command
                 $formattedData['user'][$jsonRow['Details']['Id']]['modified_by'] = 0;    // admin
                 $formattedData['user'][$jsonRow['Details']['Id']]['created_at'] = now();
                 $formattedData['user'][$jsonRow['Details']['Id']]['updated_at'] = now();
-                $formattedData['user'][$jsonRow['Details']['Id']]['is_active'] = $jsonRow['Details']['Is_Active__c'];
+                // $formattedData['user'][$jsonRow['Details']['Id']]['is_active'] = $jsonRow['Details']['Is_Active__c'];
 
 
 
@@ -255,7 +224,7 @@ class SalesforceDataCommand extends Command
                                 $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']
                             ]) . ') added with Id:' . $userId;
 
-                            // create default policy entries for new user
+
                             $this->generateBaseDefaultPolicyMapping(
                                 [['id' => $userId]],
                                 $enrollmentData['autoSubmit'],
@@ -300,34 +269,6 @@ class SalesforceDataCommand extends Command
         }
     }
 
-    private function _getGenderId($genderText, $rowData, $isDependant = false)
-    {
-        if (strlen($genderText)) {
-            $genderCode = config('constant.$_GENDER_OTHER');
-            switch (strtolower($genderText)) {
-                case 'm':
-                case 'male': {
-                        $genderCode = config('constant.$_GENDER_MALE');
-                        break;
-                    }
-                case 'f':
-                case 'female': {
-                        $genderCode = config('constant.$_GENDER_FEMALE');
-                        break;
-                    }
-            }
-            return $genderCode;
-        } else {
-            $entryType = 'user';
-            $entryName = $rowData['FirstName'] . ' ' . $rowData['LastName'] . '[' . $rowData['Employee_Id_c'] . ']';
-            if ($isDependant) {
-                $entryType = 'dependant';
-                $entryName = $rowData['Name__c'] . '[EMPID:' . $rowData['Employee__c'] . ', DEPID:' . $rowData['Id'] . ']';
-            }
-            die(__FUNCTION__ . ':ERROR:Invalid Gender for ' . $entryType . ' record: ' . $entryName);
-        }
-    }
-
     private function _getEnrollmentData($userData, $fyData, $hireDate, $startDate, $endDate)
     {
         $enrollmentData = [];
@@ -356,6 +297,70 @@ class SalesforceDataCommand extends Command
                 $userData['LastName'],
                 $userData['Employee_Id__c']
             ]));
+        }
+    }
+    private function _getGenderId($genderText, $rowData, $isDependant = false)
+    {
+        if (strlen($genderText)) {
+            $genderCode = config('constant.$_GENDER_OTHER');
+            switch (strtolower($genderText)) {
+                case 'm':
+                case 'male': {
+                        $genderCode = config('constant.$_GENDER_MALE');
+                        break;
+                    }
+                case 'f':
+                case 'female': {
+                        $genderCode = config('constant.$_GENDER_FEMALE');
+                        break;
+                    }
+            }
+            return $genderCode;
+        } else {
+            $entryType = 'user';
+            $entryName = $rowData['FirstName'] . ' ' . $rowData['LastName'] . '[' . $rowData['Employee_Id_c'] . ']';
+            if ($isDependant) {
+                $entryType = 'dependant';
+                $entryName = $rowData['Name__c'] . '[EMPID:' . $rowData['Employee__c'] . ', DEPID:' . $rowData['Id'] . ']';
+            }
+            die(__FUNCTION__ . ':ERROR:Invalid Gender for ' . $entryType . ' record: ' . $entryName);
+        }
+    }
+    private function _saveDependantData($userInsertData, $jsonData)
+    {
+        if (count($userInsertData) && count($jsonData)) {
+            foreach ($jsonData as $userExtId => $jsonRow) {
+                if (
+                    1
+                    //&& $userExtId ==  '003UN000001Ov2UYAS'
+                    && count($jsonRow['Dependants'])
+                ) {
+                    $lowerCaseRltnNames = array_map('strtolower', config('constant.relationship_type'));
+                    $lowerCaseApprovalStatus = array_map('strtolower', config('constant.approval_status'));
+                    $lowerCaseBoolean = array_map('strtolower', config('constant.booleanArr'));
+                    foreach ($jsonRow['Dependants'] as $depRow) {
+                        $depData = [];
+                        $depData['external_id'] = $depRow['Id'];
+                        $depData['dependent_name'] = htmlspecialchars($depRow['Name__c']);
+                        if (!isset($depRow['Date_of_Birth__c'])) {
+                            dd($depRow);
+                        }
+                        $depData['dob'] = date('Y-m-d', strtotime($depRow['Date_of_Birth__c']));
+                        $depData['gender'] = $this->_getGenderId(htmlspecialchars($depRow['Gender__c']), $depRow, true);
+                        $depData['nominee_percentage'] = array_key_exists('Nominee_Percentage__c', $depRow) ? $depRow['Nominee_Percentage__c'] : 0;
+                        $depData['relationship_type'] = array_search(strtolower($depRow['Relationship_Type__c']), $lowerCaseRltnNames);
+                        $depData['approval_status'] = array_search(strtolower($depRow['Approval_Status__c']), $lowerCaseApprovalStatus);
+                        $depData['is_active'] = config('constant.$_YES');
+                        $depData['is_deceased'] = array_search(strtolower($depRow['Deceased__c']), $lowerCaseBoolean);
+                        echo $this->validatedUpsertDependant($depData, $userInsertData['user'][$userExtId], $depRow);
+                    }
+                } else {
+                    echo '<br>----------' . __FUNCTION__ . ':INFO:No dependant found for user ' .
+                        $jsonRow['Details']['Name'];
+                }
+            }
+        } else {
+            die(__FUNCTION__ . ':ERROR: EMPTY JSON OR USER DATA RECEIVED');
         }
     }
 }

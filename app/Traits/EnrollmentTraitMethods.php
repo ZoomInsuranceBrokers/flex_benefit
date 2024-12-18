@@ -110,6 +110,7 @@ trait dependantTraitMethods {
     }
 }
 
+/*
 trait accountTraitMethods {
 
     public function upsertAccount($accountData) {
@@ -358,5 +359,5 @@ trait insuancePolicyMethods {
             }
         }        
     }
-}
+}*/
 ?>

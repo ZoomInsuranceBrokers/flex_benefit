@@ -39,8 +39,11 @@ Route::group(['middleware' => 'auth'], function () {
     // lots of routes that require auth middleware
 
     Route::get('password-reset', [UserController::class, 'passworReset'])->name('previous.form.route');
+    Route::get('get-points', [UserController::class, 'getUsedPoints'])->name('get-points');
+
     Route::post('/password/authupdate', [UserController::class, 'updatePassword'])->name('password.authupdate');
     Route::post('/dependants/create', [DependantController::class, 'create']);
+    Route::post('/dependants/edit', [DependantController::class, 'findDependent'])->name('dependants.edit');;
     Route::post('/dependants/update', [DependantController::class, 'update']);
     Route::post('/dependants/updateLE', [DependantController::class, 'updateLE']);
     Route::post('/dependants/updateAfterSubmission', [DependantController::class, 'updateAfterSubmission']);
@@ -61,6 +64,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/enrollment/resetCategory', [EnrollmentController::class, 'resetCategory']);
     Route::get('/enrollment/summary', [EnrollmentController::class, 'loadSummary']);
     Route::get('/enrollment/summaryDownload', [EnrollmentController::class, 'downloadSummary']);
+    Route::get('/download-pdf', [EnrollmentController::class, 'downloadByBackend']);
+
     Route::get('/enrollment/getPolicybySubCategory', [EnrollmentController::class, 'getInsuranceListBySubCategory']);
     Route::get('/enrollment', [EnrollmentController::class, 'home']);
 
@@ -68,6 +73,8 @@ Route::group(['middleware' => 'auth'], function () {
     // Route::post('/claim/update', [DependantController::class, 'update']);
     Route::any('/claim/loadHospital', [ClaimController::class, 'loadNetworkHospital']);
     Route::post('/claim/searchHospital', [ClaimController::class, 'searchNetworkHospital']);
+    Route::post('/claim/phsHospitalList', [ClaimController::class, 'phs_network_hospital']);
+
 
     Route::get('/claim/initiate', [ClaimController::class, 'loadClaimIntimation']);
     Route::get('/claim/submit', [ClaimController::class, 'loadClaimSubmission']);

@@ -65,7 +65,7 @@ Route::post('/users', function (Request $request) {
     return response()->json($response);
 });
 Route::post('/salesforce-data', [ApiController::class, 'getSalesforceData']);
-Route::post('/execute-salesforce-data-api', [ApiController::class, 'executeSalesforceAPI']);
+Route::post('/dependent-salesforce-data', [ApiController::class, 'getdependentSalesforceData']);
 
 
 Route::get('/currency/create', function (Request $request) {

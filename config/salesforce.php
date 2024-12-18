@@ -3,10 +3,10 @@
 // config/salesforce.php
 
 return [
-    'username' => 'integrationuser@zoominsurancebrokers.com.prd.dw',
-    'password' => 'Br@rnov23',
-    'client_id' => '3MVG9ifmAKCHISbbKbXC7piiENFnRxP72BoWo4EB.tR34zcMyx3VfjefWj6fYD4OA5QBDLs9m_jyeKbiViMrw',
-    'client_secret' => '3FF40568FC3FA4DFC0451009AF9ECC445BCB5C21EFF0206325A003055404AE97',
+    'username' => 'integrationuser@zoominsurancebrokers.com.prd.pc',
+    'password' => 'Br@rjan23us04aKOQAouFcbeC8NZOJzL5',
+    'client_id' => '3MVG9HB6vm3GZZR9f8R5Eq7q4kxAWXz12nME4QnxUIfm9wJc1n3YD5nHD7FRiUCc1S0JFWZuAlcYJDvuWuLVs',
+    'client_secret' => 'C10E00DE2DEA8336B77EF348E0CBB97060C956398F818A16C6D2A89FD3442C48',
     'login_url' => 'https://test.salesforce.com',
     'api_version' => 'v59.0',
 ];

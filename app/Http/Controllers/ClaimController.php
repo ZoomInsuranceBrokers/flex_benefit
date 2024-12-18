@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\ClaimIntimation;
-use App\Mail\ClaimSubmission;
 use Illuminate\Support\Facades\Mail;
 
 class ClaimController extends Controller
@@ -335,6 +334,8 @@ class ClaimController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+
+
         $cli = 0;
         cli:
 
@@ -357,6 +358,11 @@ class ClaimController extends Controller
                 "CLAIM_TYPE" => $request->claim_type
             )
         );
+
+        echo '<pre>';
+        print_r($data2);
+        echo '</pre>';
+        exit;
 
         curl_setopt_array(
             $curl,
@@ -395,10 +401,10 @@ class ClaimController extends Controller
         }
     }
 
-    public function phs_network_hospital($request)
+    public function phs_network_hospital(Request $request)
     {
-        $pageSize = $request->query('jtPageSize');
-        $startIndex = $request->query('jtStartIndex');
+        // $pageSize = $request->query('jtPageSize');
+        // $startIndex = $request->query('jtStartIndex');
         $pincode = $request->pincode;
 
         $policy_no = $request->policy_no;
@@ -563,7 +569,7 @@ class ClaimController extends Controller
             'document' => 'required|mimes:jpg,png,jpeg,pdf|max:2048', // Assuming max file size is 2MB
         ]);
 
-        $employee = Auth::user(); 
+        $employee = Auth::user();
 
         $data2 = [
             "USERNAME" => "ZOOM-ADMIN",
@@ -571,12 +577,16 @@ class ClaimController extends Controller
             "PATIENT_TYPE" => "IPD",
             "POLICY_NO" => $validatedData['policy_no'],
             "MEMBER_ID" => $request->phs_tpa_id,
-            "EMPLOYEE_NO" => $employee->employee_id ,
+            "EMPLOYEE_NO" => $employee->employee_id,
             "TPA_ID" => "62",
             "DT_OF_ADMISSION" => date('d M Y', strtotime($validatedData['claim_date_of_admission'])),
             "DT_OF_DISCHARGE" => date('d M Y', strtotime($validatedData['claim_date_of_discharge'])),
             "base64string" => base64_encode($request->file('document')->get()),
         ];
+        echo '<pre>';
+        print_r($data2);
+        echo '</pre>';
+        exit;
 
         $curl = curl_init();
 
@@ -604,7 +614,7 @@ class ClaimController extends Controller
 
         if (isset($response->UploadMainClaimDocumentsResult[0]->INWARD_NO)) {
 
-            $ClaimReferenceNo =$response->UploadMainClaimDocumentsResult[0]->INWARD_NO;
+            $ClaimReferenceNo = $response->UploadMainClaimDocumentsResult[0]->INWARD_NO;
 
             $email =  Auth::user()->email;
 
@@ -614,6 +624,5 @@ class ClaimController extends Controller
         } else {
             return redirect()->back()->with('error', 'Error occurred during form submission.');
         }
-
     }
 }

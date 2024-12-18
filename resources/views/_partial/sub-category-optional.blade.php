@@ -1,9 +1,10 @@
 @php
     //dd($userPolData[0]->ip_id);
 @endphp
-<div class="col-5">
-    <form id="subCategoryForm{{ $subCatId }}">
-    <table class="tab-content-table table-responsive mb-3 fs-11 col-3">
+
+<div class="col-5 additional-table">
+    <form id="subCategoryForm{{ $subCatId }}" class="table-responsive">
+    <table class="tab-content-table table table-bordered boder-primary mb-3 fs-11">
         <th>Additional Coverage</th>
         <th>TopUp Value</th>
         <th>Points</th>
@@ -33,8 +34,9 @@
                         {{ $item['policy']["name"] }}
                     </label>
                 </td>
-                <td>{{ $formatter->formatCurrency($item['policy']["sum_insured"], 'INR') }}</td>
-                <td id="policyCalcPoints{{ $item['policy']['id'] }}">{{ $formatter->formatCurrency($item['policy']["points"], 'INR') }}</td>
+                <td>{{ number_format($item['policy']["sum_insured"], 0, '.', ',') }} </td>
+                <td id="policyCalcPoints{{ $item['policy']['id'] }}">{{ number_format($item['policy']["points"], 0, '.', ',') }} </td>
+
             </tr>
         @endforeach                        
     </table>
@@ -42,7 +44,7 @@
 </div>
 <div class="col-7">
     <div class="row">
-        <div class="col-6">
+        <div class="col-6 text-center custom-heading">
             <div class="section-heading">
                 <h4 class="mt-1 mb-1">Coverage Period</h4>                                        
             </div>   
@@ -79,7 +81,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-6 text-center custom-heading">
             <div class="section-heading">
                 <h4 class="mt-1 mb-1">Premium Calculations</h4>                                        
             </div>   
@@ -109,14 +111,14 @@
                             <dd class="col" id="prorationFactor{{ $subCatId }}"><label id="prorf{{ $subCatId }}"></label></dd>
                         </dl>
                     </div>
-                    <div class="col-6">
+                    <div class="col-6 pe-0 col-left">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="right" title="Price Tag for currently selected plan">Annual Premium</dt>
                             <dd class="col" id="annualPremium{{ $subCatId }}"><label id="annup{{ $subCatId }}"></label></dd>
                         </dl>
                     </div>
-                    <div class="col-6">
+                    <div class="col-6 ps-0 col-right">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top" title="Points available after selections">Effective Premium</dt>
@@ -128,13 +130,13 @@
         </div>                    
     </div>
     <div class="row">
-        <div class="col">
+        <div class="col text-center custom-heading">
             <div class="section-heading">
                 <h4 class="mt-1 mb-1">Summary</h4>                                        
             </div>   
             <div class="fp-numbers" id="fp-numbers-coverage{{ $subCatId }}">                                            
                 <div class="row fs-13">
-                    <div class="col-4 offset-1">
+                    <div class="col-4">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top" >
@@ -142,7 +144,7 @@
                             </dt>
                         </dl>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top" >
@@ -150,7 +152,7 @@
                             </dt>
                         </dl>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top" >
@@ -160,7 +162,7 @@
                     </div>
                 </div>                               
                 <div class="row fs-13" style="display:none;" id="coresumRow{{ $subCatId }}">
-                    <div class="col-4 offset-1">
+                    <div class="col-4">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top" title="Total allocated points for current user">
@@ -184,7 +186,7 @@
                     </div>
                 </div>                               
                 <div class="row fs-13">
-                    <div class="col-4 offset-1">
+                    <div class="col-4">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top" title="Total allocated points for current user">
@@ -192,14 +194,14 @@
                                 </dt>
                         </dl>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <dl>
                             <dd class="col">
                                 <label id="opplsa{{ $subCatId }}"></label>
                             </dd>
                         </dl>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <dl>
                             <dd class="col">
                                 <label id="opplpt{{ $subCatId }}"></label>
@@ -208,7 +210,7 @@
                     </div>
                 </div>                                      
                 <div class="row fs-13">
-                    <div class="col-4 offset-1">
+                    <div class="col-4">
                         <dl>
                             <dt class="col" data-toggle="tooltip"
                                 data-placement="top" title="Total allocated points for current user">
@@ -216,14 +218,14 @@
                                 </dt>
                         </dl>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <dl>
                             <dd class="col">
                                 <label id="totsa{{ $subCatId }}"></label>
                             </dd>
                         </dl>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <dl>
                             <dd class="col">
                                 <label id="totpt{{ $subCatId }}"></label>
@@ -235,7 +237,7 @@
         </div>
     </div>
     <div class="row" id="fp-numbers-mcoverage{{ $subCatId }}">
-        <div class="col">
+        <div class="col text-center custom-heading">
             <div class="section-heading">
                 <h4 class="mt-1 mb-1">Member Covered</h4>                                        
             </div>   
@@ -244,8 +246,8 @@
                     <div class="col-12">
                         <dl>
                             <dt data-toggle="tooltip"
-                                data-placement="top" >
-                                <div id="memcvrd{{ $subCatId }}"></div>
+                                data-placement="top" style="display:flex;     font-size: 14px;">
+                                <div id="memcvrd{{ $subCatId }}" ></div>
                             </dt>
                         </dl>
                     </div>
@@ -271,7 +273,7 @@
         </div> --}}
     </div>
     <div class="row mb-3">
-        <div class="col" id="parentSubLimit{{ $subCatId }}" style="display:none;">
+        <div class="col custom-heading" id="parentSubLimit{{ $subCatId }}" style="display:none;">
             <div class="section-heading">
                 <h4 class="mt-1 mb-1">Parent Sub Limit</h4>                                        
             </div>   

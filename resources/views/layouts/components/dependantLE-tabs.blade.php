@@ -260,7 +260,7 @@ function removeUsedRelations() {
             listAction: '/dependants/listLE',
             createAction: '/dependants/saveLifeEvent',
             updateAction: '/dependants/updateLE',
-            <!-- deleteAction: '/dependants/delete' -->
+            deleteAction: '/dependants/delete'
         },
         fields: {
             id: {

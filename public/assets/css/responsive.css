@@ -10,16 +10,69 @@
 
 /* // Small devices (landscape phones, less than 768px) */
 @media (max-width: 767.98px) { 
+  
     .plan h2 {
         font-size: 1.5rem;
     }
+    .custom-nav .header-nav{
+        padding: 10px 12px;
+    }
     .custom-nav .navbar-brand {
-        width: 250px;
+        width: 210px;
+    }
+    .custom-nav .navbar-toggler{
+        padding: 2px 6px;
+        background-color: var(--blue);
+    }
+    .custom-nav .navbar-toggler:focus{
+box-shadow: none;
+    }
+    .custom-nav .navbar-nav .nav-link{
+        padding: var(--bs-nav-link-padding-y) 1rem;
+    }
+    .custom-nav .navbar-toggler .navbar-toggler-icon{
+        width: 1.3em;
+        height: 1.3em;
+    }
+    .loginModal .modal-dialog{
+        width: auto;
+    }
+    .table--custom thead, .table--custom tbody{
+        font-size: 14px;
+    }
+    .table.inner-table tbody td {
+        display: block;
+        text-align: center;
+    }
+    #tabcontent_section{
+        padding: 20px 10px;
+    }
+    .plan h2 {
+        font-size: 1.5rem;
+    }
+
+    #medicalModelContent .modal-footer .btn {
+        width: 100%;
+        margin: 5px;
     }
  }
 
 /* // Medium devices (tablets, less than 992px) */
 @media (max-width: 991.98px) { 
+    h2.header-dark {
+        font-size: 2rem;
+    }
+    .intake-banner__section .main-banner h1{
+        font-size: 2rem;
+    }
+    .intake-banner__section .main-banner h2{
+        font-size: 1rem;
+    }
+    
+    .intake-banner__section .main-banner {
+        padding: 2rem;
+        margin-block: 3rem;
+    }
     .main-banner {
         padding: 2rem;
     }
@@ -35,9 +88,14 @@
         left: 0px;
         background: aliceblue;
         z-index: 1;
-        width: 340px;
+        width: 300px;
         padding: 20px;
         height: 100%;
+    }
+    
+    .custom-video{
+        flex-wrap: wrap;
+        justify-content: center;
     }
  }
 
