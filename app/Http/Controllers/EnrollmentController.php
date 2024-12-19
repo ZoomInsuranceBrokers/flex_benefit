@@ -582,7 +582,7 @@ class EnrollmentController extends Controller
                 'enrollment_submit_date' => now(),
                 'submission_by' => Auth::user()->id
             ];
-            // User::whereIn('id',Auth::user()->id)->update($userUpdateData);
+            User::where('id',Auth::user()->id)->update($userUpdateData);
 
             $email =  Auth::user()->email;
             $user = DB::table('users')->where('email', $email)->first();

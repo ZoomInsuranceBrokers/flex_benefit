@@ -11,7 +11,7 @@ class NewJoiningCredentials extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public $users;
 
 
     /**
@@ -19,9 +19,9 @@ class NewJoiningCredentials extends Mailable
      *
      * @return void
      */
-    public function __construct($user)
+    public function __construct($users)
     {
-        $this->user = $user;
+        $this->users = $users;
     }
 
     /**
@@ -32,7 +32,7 @@ class NewJoiningCredentials extends Mailable
     public function build()
     {
         return $this->view('emails.new_joining_credentials')
-        ->with(['user' => $this->user])
+        ->with(['users' => $this->users])
         ->subject('Your MyBenefits@Zoom Login Credentials');
     }
 }

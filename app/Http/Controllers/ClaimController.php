@@ -359,10 +359,10 @@ class ClaimController extends Controller
             )
         );
 
-        echo '<pre>';
-        print_r($data2);
-        echo '</pre>';
-        exit;
+        // echo '<pre>';
+        // print_r($data2);
+        // echo '</pre>';
+        // exit;
 
         curl_setopt_array(
             $curl,
@@ -583,11 +583,7 @@ class ClaimController extends Controller
             "DT_OF_DISCHARGE" => date('d M Y', strtotime($validatedData['claim_date_of_discharge'])),
             "base64string" => base64_encode($request->file('document')->get()),
         ];
-        echo '<pre>';
-        print_r($data2);
-        echo '</pre>';
-        exit;
-
+    
         $curl = curl_init();
 
         curl_setopt_array($curl, array(

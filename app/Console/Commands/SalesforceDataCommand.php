@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Crypt;
 use App\Traits\EnrollmentTraitMethods;
 use App\Traits\dependantTraitMethods;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules\Password;
 
 class SalesforceDataCommand extends Command
@@ -62,11 +63,12 @@ class SalesforceDataCommand extends Command
     public function handle()
     {
         try {
-            
+            Session::put('confirmUpdate', true);
+
             $accessToken = $this->getAccessToken();
 
             $salesforceData = $this->getSalesforceDependentDataUsingToken($accessToken);
-            } catch (\Exception $e) {
+        } catch (\Exception $e) {
             // Log any errors
             \Log::error('ProcessSalesforceData error: ' . $e->getMessage());
         }
@@ -92,7 +94,7 @@ class SalesforceDataCommand extends Command
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
-        ])->post('https://zoominsurancebrokers--pc.sandbox.my.salesforce.com/services/apexrest/getUpdates', [
+        ])->post('https://zoominsurancebrokers.my.salesforce.com/services/apexrest/getUpdates', [
             'clientids' => ['001UN000001lfNPYAY'],
             'reqtype' => 'EMP_DEPENDANT_SCHEMA',
         ]);
@@ -121,6 +123,7 @@ class SalesforceDataCommand extends Command
             return  $response;
         }
     }
+
 
     private function _getGradeArray($existingGrades)
     {
