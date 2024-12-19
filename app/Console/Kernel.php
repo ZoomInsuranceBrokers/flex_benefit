@@ -15,10 +15,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('salesforce:data')->daily();
-        $schedule->command('send:enrollment-reminders')->daily();
-        $schedule->command('enrollment:auto-submit')->daily();
-
+        $schedule->command('salesforce:data')->dailyAt('11:00')->withoutOverlapping();
+        $schedule->command('send:enrollment-reminders')->dailyAt('11:00')->withoutOverlapping();
+        $schedule->command('enrollment:auto-submit')->dailyAt('11:00')->withoutOverlapping();
     }
 
 

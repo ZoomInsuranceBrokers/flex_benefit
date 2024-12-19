@@ -26,7 +26,7 @@
             period.
           </p>
           @if(!Auth::check())
-          <button class="login-btn">Login Now</button>
+          <button class="login-btn" data-bs-toggle="modal" data-bs-target="#loginModal">Login Now</button>
           @endif
         </div>
       </div>

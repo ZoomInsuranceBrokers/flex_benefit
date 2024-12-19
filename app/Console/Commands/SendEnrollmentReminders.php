@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendReminderEmail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class SendEnrollmentReminders extends Command
 {
@@ -24,15 +26,19 @@ class SendEnrollmentReminders extends Command
 
         $users = DB::table('users')
             ->where('is_enrollment_submitted', 0)
+            ->where('is_reminder_mail_sent', 0)
             ->whereDate('enrollment_end_date', $twoDaysFromNow)
             ->get();
 
+        $userUpdateData = [
+            'is_reminder_mail_sent' => 1,
+        ];
+
         foreach ($users as $user) {
             Mail::to($user->email)->send(new SendReminderEmail($user));
+            User::where('id', $user->id)->update($userUpdateData);
         }
 
         $this->info('Reminder emails sent successfully.');
     }
-
-   
 }

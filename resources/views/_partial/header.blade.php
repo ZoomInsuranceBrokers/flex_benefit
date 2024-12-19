@@ -174,8 +174,8 @@
                                 <a class="dropdown-item" href="{{ asset('assets/documents/ECard -Demo.pdf') }}"
                                     target="_blank">Download Ecard</a>
                             @else
-                                <a class="dropdown-item" href="/user/ecard" target="_blank">Download
-                                    Ecard</a>
+                                <!-- <a class="dropdown-item" href="/user/ecard" target="_blank">Download
+                                    Ecard</a> -->
                             @endif
                         <!-- <li>
                             <hr class="dropdown-divider" />

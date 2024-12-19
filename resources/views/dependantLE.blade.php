@@ -9,7 +9,6 @@
     .bold {
         font-weight: bold;
     }
-
 </style>
 
 @if(session('error'))
@@ -29,7 +28,7 @@
         <div class="modal-content" style="border-radius: 0px; padding:15px; background-color: #ececec;">
             <div class="modal-overlay"></div>
             <div class="modal-body">
-                <div class="col-12 logout-text" >
+                <div class="col-12 logout-text">
                     <h3 class="errorModallabel">Error</h3>
                     <p>Currently you have an open enrollment portal you can add or edit your dependents there!</p>
                 </div>
@@ -48,11 +47,11 @@ $isSubmitted = session('is_submitted');
 @endphp
 
 @if(!$isSubmitted)
-    <script>
-        $(document).ready(function() {
-            $('#sessionMessage').modal('show');
-        });
-    </script>
+<script>
+    $(document).ready(function() {
+        $('#sessionMessage').modal('show');
+    });
+</script>
 @endif
 
 @if(session('success'))
@@ -61,7 +60,8 @@ $isSubmitted = session('is_submitted');
     Swal.fire({
         icon: 'success',
         title: 'Success!',
-        text: '{{ session('success') }}',
+        text: '{{ session('
+        success ') }}',
     });
 </script>
 @endif
@@ -75,10 +75,7 @@ $isSubmitted = session('is_submitted');
                     </h1>
                     <h1>Life Event Updated</h1>
                     <p style="margin-top: 0.8rem;">
-                        The system has already uploaded your details based on the
-                        information available from the company's records. If you need to
-                        make any changes to the dependant information, please use the
-                        editing function located in the tab
+                        This section allows you to easily add your newly married spouse and/or newly born child to your existing flex benefits plan. We understand that life events like marriage and childbirth bring about significant changes, and we want to ensure your loved ones are covered.
                     </p>
                 </div>
             </div>
@@ -333,11 +330,10 @@ $isSubmitted = session('is_submitted');
 </div>
 
 <script>
-
     //For Error Message
     document.getElementById('error-btn').addEventListener('click', function() {
-        document.getElementById("sessionMessage").style.display="none";
-    });                         
+        document.getElementById("sessionMessage").style.display = "none";
+    });
 
 
     // For  Data Table
@@ -540,4 +536,3 @@ $isSubmitted = session('is_submitted');
 </script>
 
 @stop
-

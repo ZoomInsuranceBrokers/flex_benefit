@@ -164,7 +164,7 @@ class ApiController extends Controller
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
-        ])->post('https://zoominsurancebrokers--pc.sandbox.my.salesforce.com/services/apexrest/getUpdates', [
+        ])->post('https://zoominsurancebrokers.my.salesforce.com/services/apexrest/getUpdates', [
             'clientids' => ['001UN000001lfNPYAY'],
             'reqtype' => 'EMP_DEPENDANT_SCHEMA',
         ]);
@@ -288,7 +288,7 @@ class ApiController extends Controller
                             //$formattedData['user'][$jsonRow['Details']['Id']]['id'] = $userId;
                             $email = $formattedData['user'][$jsonRow['Details']['Id']]['email'];
                             $users = $formattedData['user'][$jsonRow['Details']['Id']]['fname'];
-
+                            
                             Mail::to($email)->send(new NewJoiningCredentials($users));
                             echo '<br>' . __FUNCTION__ . ':INFO:New user(' . implode(' ', [
                                 $formattedData['user'][$jsonRow['Details']['Id']]['fname'],
@@ -359,7 +359,7 @@ class ApiController extends Controller
                 // for end date calculations
                 $extEndDate = new DateTime($endDate);
                 if ($extEndDate > $fyLastEnrollmentDate) {  // case when user end date is crossing last enrollment date 
-                    $enrollmentData['userEnrollmentEndDate'] = date('Y-m-d', $fyData[0]['last_enrollment_date']);
+                    // $enrollmentData['userEnrollmentEndDate'] = date('Y-m-d', $fyData[0]['last_enrollment_date']);
                 }
             }
             return $enrollmentData;
