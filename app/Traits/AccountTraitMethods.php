@@ -140,17 +140,10 @@ trait accountTraitMethods
 
             if (!$validator->fails()) {
                 foreach ($grade as $gradeRow) { // multiple grade add/update through loop
-<<<<<<< HEAD
-                    echo '<br>----------' . __FUNCTION__ . ':INFO:Grade [Name:' . $gradeRow['grade_name'] . '] with details[Ext ID:' . 
-                    $gradeRow['external_id'] . ' to be created/updated<br>';
-                
-                    session('confirmUpdate') ? Grade::updateOrCreate(['external_id' => $gradeRow['external_id']],$gradeRow) : '';
-=======
                     echo '<br>----------' . __FUNCTION__ . ':INFO:Grade [Name:' . $gradeRow['grade_name'] . '] with details[Ext ID:' .
                         $gradeRow['external_id'] . ' to be created/updated<br>';
 
                     session('confirmUpdate') ? Grade::updateOrCreate(['external_id' => $gradeRow['external_id']], $gradeRow) : '';
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
                 }
             } else {
                 $error = '';
@@ -184,11 +177,7 @@ trait accountTraitMethods
         foreach ($jsonData as $accRow) {
             $insuranceCategories = [];
             foreach ($accRow['Response']['Client']['FY_InsurancePolicy']['PolicyCluster'] as $policyClusterRow) {
-<<<<<<< HEAD
-                $insuranceCategories[$policyClusterRow['InsurancePolicy']['RecordTypeId']] = 
-=======
                 $insuranceCategories[$policyClusterRow['InsurancePolicy']['RecordTypeId']] =
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
                     $this->_extractInsCatData($policyClusterRow['InsurancePolicy']);
             }
 
@@ -200,13 +189,8 @@ trait accountTraitMethods
 
             if (!$validator->fails()) {
                 foreach ($insuranceCategories as $insCategory) {
-<<<<<<< HEAD
-                    echo '<br>----------' . __FUNCTION__ . ':INFO:Insurance Category [Name:' . $insCategory['name'] . '] with details[Ext ID:' . 
-                    $insCategory['external_id'] . ' to be created/updated<br>';
-=======
                     echo '<br>----------' . __FUNCTION__ . ':INFO:Insurance Category [Name:' . $insCategory['name'] . '] with details[Ext ID:' .
                         $insCategory['external_id'] . ' to be created/updated<br>';
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
 
                     session('confirmUpdate') ? InsuranceCategory::updateOrCreate(['external_id' => $insCategory['external_id']], $insCategory) : '';
                 }
@@ -238,12 +222,9 @@ trait accountTraitMethods
         ];
     }
 
-<<<<<<< HEAD
-    private function _prepareGradeCatMapping($jsonData) {
-=======
     private function _prepareGradeCatMapping($jsonData)
     {
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
+        // dd($jsonData);
         echo '<br><br>';
         // fetch all insurance categories
         $insCategories = InsuranceCategory::select(['id', 'external_id'])
@@ -294,12 +275,6 @@ trait accountTraitMethods
         print_r($mapGradeCat);
         echo '</pre>';
 
-<<<<<<< HEAD
-        return $mapGradeCat;
-    }
-
-    public function upsertInsuranceSubCategory($jsonData) {
-=======
         // Process each mapping individually
         foreach ($mapGradeCat as $mapping) {
             MapGradeCategory::updateOrCreate(
@@ -317,7 +292,6 @@ trait accountTraitMethods
 
     public function upsertInsuranceSubCategory($jsonData)
     {
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
         $insCategories = InsuranceCategory::select(['id', 'external_id'])
             ->where('is_active', true)
             ->get()->toArray();
@@ -393,14 +367,9 @@ trait accountTraitMethods
         ];
     }
 
-<<<<<<< HEAD
-    public function upsertInsurancePolicy($jsonData) {
-        $insSubCat = InsuranceSubCategory::select(['id','name'])->get()->toArray();
-=======
     public function upsertInsurancePolicy($jsonData)
     {
         $insSubCat = InsuranceSubCategory::select(['id', 'name'])->get()->toArray();
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
         $rules = [
             '*.name' => 'required',
             '*.sum_insured' => 'required|numeric',
@@ -410,7 +379,7 @@ trait accountTraitMethods
             foreach ($accRow['Response']['Client']['FY_InsurancePolicy']['PolicyCluster'] as $policyClusterRow) {
                 $insurancePolicies[] = $this->_extractPolicyData(
                     $policyClusterRow,
-                     $insSubCat
+                    $insSubCat
                 );
             }
 
@@ -481,12 +450,8 @@ trait accountTraitMethods
         ];
     }
 
-<<<<<<< HEAD
-    public function upsertFYPolicyMapping ($jsonData) {
-=======
     public function upsertFYPolicyMapping($jsonData)
     {
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
         echo '<br><br>';
         // fetch all insurance policies
         $insPol = InsurancePolicy::select(['id', 'external_id'])
@@ -498,17 +463,14 @@ trait accountTraitMethods
                 $insPolArr[$insPolRow['external_id']] = $insPolRow['id'];
             }
         } else {
-<<<<<<< HEAD
-            die(__FUNCTION__ . ':ERROR:Insurance policies not found.');
-=======
             // die(__FUNCTION__ . ':ERROR:Insurance policies not found.');
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
         }
 
         // fetch financial year
         $fys = FinancialYear::select(['id', 'external_id'])
-            //->where('is_active', true)
+            ->where('is_active', true)
             ->get()->toArray();
+
         $fyArr = [];
         if (count($fys)) {
             foreach ($fys as $fyRow) {
@@ -526,12 +488,9 @@ trait accountTraitMethods
         $mapFYPol = [];
         foreach ($jsonData as $accRow) {
             if (array_key_exists($accRow['Response']['Client']['FY_InsurancePolicy']['FinancialYear']['Id'], $fyArr)) {
-<<<<<<< HEAD
-                foreach($accRow['Response']['Client']['FY_InsurancePolicy']['PolicyCluster'] as $policyClusterRow) {
-=======
                 foreach ($accRow['Response']['Client']['FY_InsurancePolicy']['PolicyCluster'] as $policyClusterRow) {
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
                     if (array_key_exists($policyClusterRow['Id'], $insPolArr)) {
+                      
                         $mapFYPol[] = [
                             'external_id' => $policyClusterRow['FY_Insurance_Policy__c'],
                             'ins_policy_id_fk' => $insPolArr[$policyClusterRow['Id']],
@@ -547,21 +506,19 @@ trait accountTraitMethods
                 die('<br>' . __FUNCTION__ . ':ERROR:FY not found in DB. No mapping possible.');
             }
         }
-<<<<<<< HEAD
-        
-        echo '<br>'. __FUNCTION__ . ':INFO: FY-Insurance_Policy-Mapping:<pre>';
-=======
-
         echo '<br>' . __FUNCTION__ . ':INFO: FY-Insurance_Policy-Mapping:<pre>';
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd
         print_r($mapFYPol);
         echo '</pre>';
-        session('confirmUpdate') ? MapFYPolicy::updateOrCreate([], $mapFYPol) : '';
+        foreach ($mapFYPol as $mapping) {
+            MapFYPolicy::updateOrCreate(
+                [
+                    'ins_policy_id_fk' => $mapping['ins_policy_id_fk'],  // Search by ins_policy_id_fk and fy_id_fk
+                    'fy_id_fk' => $mapping['fy_id_fk']
+                ],
+                $mapping  // This will provide the data for either update or create
+            );
+        }
+        
+        // session('confirmUpdate') ? MapFYPolicy::Create([], $mapFYPol) : '';
     }
 }
-<<<<<<< HEAD
-
-
-?>
-=======
->>>>>>> 35fe09aaa14658341c3a2227eaeb95c7812d4bdd

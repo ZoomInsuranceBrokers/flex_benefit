@@ -85,7 +85,8 @@ Route::get('/test-hardeep', function (Request $request) {
     echo json_encode(['textMsg' => 'Hello Hardeep']);
 });
 Route::get('/user/defaultpolicymapping/', function (Request $request) {
-    if (!MapUserFYPolicy::all()->count()) {
+    // dd(MapUserFYPolicy::all()->count());
+    if (MapUserFYPolicy::all()->count()) {
         $users = User::where('is_active', 1)->get()->toArray();
         $mapFYpolicyData = DB::table('map_financial_year_policy as mfyp')
             ->select('mfyp.id')

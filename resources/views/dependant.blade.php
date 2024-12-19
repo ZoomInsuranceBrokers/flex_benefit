@@ -3,13 +3,13 @@
 @section('content')
 
 <style>
-    .left-banner{
+    .left-banner {
         position: relative;
         left: 5vw;
         z-index: -1;
         width: 50%;
         border-radius: 15px;
-    
+
     }
 </style>
 
@@ -22,7 +22,8 @@
     Swal.fire({
         icon: 'error',
         title: 'Error!',
-        text: '{{ session('error') }}',
+        text: '{{ session('
+        error ') }}',
     });
 </script>
 @endif
@@ -32,7 +33,8 @@
     Swal.fire({
         icon: 'success',
         title: 'Success!',
-        text: '{{ session('success') }}',
+        text: '{{ session('
+        success ') }}',
     });
 </script>
 
@@ -218,6 +220,15 @@
                             </td>
                             <td>
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-whatever="@mdo" onclick="getEditData( {{$dependant['id']}} )"><img src="{{ asset('assets/images/edit-icon.png') }}" alt="edit icon" class="me-2 action-img" /></a>
+                                @if(session('is_submitted') != 1)
+                                <form action="{{ route('dependants.delete') }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="dependant_id" value="{{ $dependant['id'] }}">
+                                    <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;">
+                                        <img src="{{ asset('assets/images/delete-icon.png') }}" alt="delete icon" class="me-2 action-img" />
+                                    </button>
+                                </form>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
