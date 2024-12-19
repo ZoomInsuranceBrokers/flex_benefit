@@ -66,8 +66,14 @@ class UserController extends Controller
 
     public function getUsedPoints()
     {
+
+
         $mapUserFYPolicyData = MapUserFYPolicy::where('user_id_fk', '=', Auth::user()->id)->with(['fyPolicy']);
-        
+
+        $fy_id = FinancialYear::where('is_active',1)->first();
+
+        $mapUserFYPolicyData->whereRelation('fyPolicy.financialYears', 'id', $fy_id->id);
+
         $mapUserFYPolicyData = $mapUserFYPolicyData->get()->toArray();
 
         return response()->json(['mapUserFYPolicyData' =>  $mapUserFYPolicyData]);
@@ -77,14 +83,14 @@ class UserController extends Controller
         //echo bcrypt('1234567890');
         //dd(Crypt::decryptString('$2y$10$2OhRE\/zTnRX3OJIfUcBrAuySK375QJf0F2WarzkB3bRor7TYWRdj2'));
         session(['is_enrollment_window' => false]);
-        
+
 
         if (Auth::check()) {
-            $accountData = Account::where('is_active',true)->get()->toArray();
+            $accountData = Account::where('is_active', true)->get()->toArray();
             $todayDate       = new DateTime(); // Today
             $enrollmentDateBegin = new DateTime($accountData[0]['enrollment_start_date']);
             $enrollmentDateEnd = new DateTime($accountData[0]['enrollment_end_date']);
-            
+
             // user level window opening
             if (!is_null(Auth::user()->enrollment_start_date) && !is_null(Auth::user()->enrollment_end_date)) {
                 $uenrollmentDateBegin = new DateTime(Auth::user()->enrollment_start_date);
@@ -160,7 +166,7 @@ class UserController extends Controller
                     curl_close($curl);
 
                     $response = json_decode($response);
-                   
+
                     if (isset($response->GetFamilyECardResult)  && $response->GetFamilyECardResult[0]->STATUS == 'SUCCESS') {
                         $url = $response->GetFamilyECardResult[0]->E_Card;
 
@@ -354,7 +360,8 @@ class UserController extends Controller
         }
     }
 
-    public function createUsers(Request $request) {
+    public function createUsers(Request $request)
+    {
         // if (
         //     $request->isMethod('get') && $request->has('authKey') &&
         //     $request->authKey == base64_encode(env('APP_API_SECRET_KEY') . '@' . date('d-m-Y'))
@@ -362,7 +369,7 @@ class UserController extends Controller
 
         {
             if ($request->has('confirmUpdate') && $request->confirmUpdate) {
-                session(['confirmUpdate'=> true]);
+                session(['confirmUpdate' => true]);
             } else {
                 session(['confirmUpdate' => false]);
             }
@@ -396,25 +403,26 @@ class UserController extends Controller
         }
     }
 
-    private function _getGenderId($genderText, $rowData, $isDependant = false) {
+    private function _getGenderId($genderText, $rowData, $isDependant = false)
+    {
         if (strlen($genderText)) {
             $genderCode = config('constant.$_GENDER_OTHER');
-            switch(strtolower($genderText)) {
+            switch (strtolower($genderText)) {
                 case 'm':
                 case 'male': {
-                    $genderCode = config('constant.$_GENDER_MALE');
-                    break;
-                }
+                        $genderCode = config('constant.$_GENDER_MALE');
+                        break;
+                    }
                 case 'f':
                 case 'female': {
-                    $genderCode = config('constant.$_GENDER_FEMALE');
-                    break;
-                }
+                        $genderCode = config('constant.$_GENDER_FEMALE');
+                        break;
+                    }
             }
-            return $genderCode;            
+            return $genderCode;
         } else {
             $entryType = 'user';
-            $entryName = $rowData['FirstName'] . ' ' . $rowData['LastName'] . '[' . $rowData['Employee_Id_c']. ']';
+            $entryName = $rowData['FirstName'] . ' ' . $rowData['LastName'] . '[' . $rowData['Employee_Id_c'] . ']';
             if ($isDependant) {
                 $entryType = 'dependant';
                 $entryName = $rowData['Name__c'] . '[EMPID:' . $rowData['Employee__c'] . ', DEPID:' . $rowData['Id'] . ']';
@@ -423,10 +431,11 @@ class UserController extends Controller
         }
     }
 
-    private function _getGradeArray($existingGrades) {
+    private function _getGradeArray($existingGrades)
+    {
         $gradeData = [];
         if (count($existingGrades)) {
-            foreach($existingGrades as $gData) {
+            foreach ($existingGrades as $gData) {
                 $gradeData[$gData['id']] = strtolower($gData['grade_name']);
             }
             return $gradeData;
@@ -435,42 +444,45 @@ class UserController extends Controller
         }
     }
 
-    private function _saveUserData($jsonData){
+    private function _saveUserData($jsonData)
+    {
         $formattedData = [];
-        $fyData = FinancialYear::where('is_active',1)->get()->toArray();
+        $fyData = FinancialYear::where('is_active', 1)->get()->toArray();
         if (count($jsonData)) {
             // user data
             foreach ($jsonData as $jsonRow) {
-                $formattedData['user'][$jsonRow['Details']['Id']]['external_id'] = htmlspecialchars($jsonRow['Details']['Id']); 
-                $formattedData['user'][$jsonRow['Details']['Id']]['fname'] = htmlspecialchars(strlen($jsonRow['Details']['FirstName']) ? 
-                $jsonRow['Details']['FirstName'] : $jsonRow['Details']['LastName']); 
-                $formattedData['user'][$jsonRow['Details']['Id']]['lname'] = htmlspecialchars($jsonRow['Details']['LastName']); 
-                
-                array_key_exists('MiddleName',$jsonRow['Details']) ?
-                    $formattedData['user'][$jsonRow['Details']['Id']]['mname'] = htmlspecialchars($jsonRow['Details']['MiddleName']) : ''; 
+                $formattedData['user'][$jsonRow['Details']['Id']]['external_id'] = htmlspecialchars($jsonRow['Details']['Id']);
+                $formattedData['user'][$jsonRow['Details']['Id']]['fname'] = htmlspecialchars(strlen($jsonRow['Details']['FirstName']) ?
+                    $jsonRow['Details']['FirstName'] : $jsonRow['Details']['LastName']);
+                $formattedData['user'][$jsonRow['Details']['Id']]['lname'] = htmlspecialchars($jsonRow['Details']['LastName']);
+
+                array_key_exists('MiddleName', $jsonRow['Details']) ?
+                    $formattedData['user'][$jsonRow['Details']['Id']]['mname'] = htmlspecialchars($jsonRow['Details']['MiddleName']) : '';
 
                 $employeeId = $jsonRow['Details']['Employee_Id__c'];
-                $formattedData['user'][$jsonRow['Details']['Id']]['employee_id'] = htmlspecialchars($employeeId); 
-                
+                $formattedData['user'][$jsonRow['Details']['Id']]['employee_id'] = htmlspecialchars($employeeId);
+
                 // GRADE
                 $gradeId = array_search($jsonRow['Details']['Designation__c'], session('grades'));
                 $formattedData['user'][$jsonRow['Details']['Id']]['grade_id_fk'] = $gradeId ? $gradeId : array_search('na', session('grades'));
 
-                $formattedData['user'][$jsonRow['Details']['Id']]['dob'] = htmlspecialchars($jsonRow['Details']['Birthdate']); 
-                $formattedData['user'][$jsonRow['Details']['Id']]['hire_date'] = htmlspecialchars($jsonRow['Details']['Hire_Date__c']); 
+                $formattedData['user'][$jsonRow['Details']['Id']]['dob'] = htmlspecialchars($jsonRow['Details']['Birthdate']);
+                $formattedData['user'][$jsonRow['Details']['Id']]['hire_date'] = htmlspecialchars($jsonRow['Details']['Hire_Date__c']);
                 $formattedData['user'][$jsonRow['Details']['Id']]['salary'] = htmlspecialchars($jsonRow['Details']['Annual_CTC__c']);
-                $formattedData['user'][$jsonRow['Details']['Id']]['points_used'] = 0; 
-                $formattedData['user'][$jsonRow['Details']['Id']]['points_available'] = (int)$jsonRow['Details']['Points_Allotted__c']; 
+                $formattedData['user'][$jsonRow['Details']['Id']]['points_used'] = 0;
+                $formattedData['user'][$jsonRow['Details']['Id']]['points_available'] = (int)$jsonRow['Details']['Points_Allotted__c'];
                 $formattedData['user'][$jsonRow['Details']['Id']]['mobile_number'] = array_key_exists('Phone', $jsonRow['Details']) ? htmlspecialchars($jsonRow['Details']['Phone']) : '';
                 // $formattedData['user'][$jsonRow['Details']['Id']]['title'] = array_key_exists('Title', $jsonRow['Details']) ? htmlspecialchars($jsonRow['Details']['Title']) : null;
                 // $formattedData['user'][$jsonRow['Details']['Id']]['suffix'] =array_key_exists('Suffix', $jsonRow['Details']) ? htmlspecialchars($jsonRow['Details']['Suffix']) : null;
                 $formattedData['user'][$jsonRow['Details']['Id']]['gender'] = $this->_getGenderId(htmlspecialchars($jsonRow['Details']['Gender__c']), $jsonRow['Details']);
-                $enrollmentData = $this->_getEnrollmentData($jsonRow['Details'],
+                $enrollmentData = $this->_getEnrollmentData(
+                    $jsonRow['Details'],
                     $fyData,
                     $jsonRow['Details']['Hire_Date__c'],
                     $jsonRow['Details']['FB_Window_Start_Date__c'],
-                    $jsonRow['Details']['FB_Window_End_Date__c']);
-                
+                    $jsonRow['Details']['FB_Window_End_Date__c']
+                );
+
                 $formattedData['user'][$jsonRow['Details']['Id']]['enrollment_start_date'] = $enrollmentData['userEnrollmentStartDate'];
                 $formattedData['user'][$jsonRow['Details']['Id']]['enrollment_end_date'] = $enrollmentData['userEnrollmentEndDate'];
 
@@ -482,15 +494,15 @@ class UserController extends Controller
 
                 $formattedData['user'][$jsonRow['Details']['Id']]['email'] = htmlspecialchars($jsonRow['Details']['Email']);
                 $timestamp = strtotime($jsonRow['Details']['Birthdate']);
-                $formattedData['user'][$jsonRow['Details']['Id']]['password'] = bcrypt(htmlspecialchars($employeeId) . '@' . ( date('dmY', $timestamp)));
-                $formattedData['user'][$jsonRow['Details']['Id']]['country_id_fk'] = CountryCurrency::where(DB::raw('UPPER(name)'),strtoupper($jsonRow['Details']['MailingCountry']))->select('id')->first()->toArray()['id'];
+                $formattedData['user'][$jsonRow['Details']['Id']]['password'] = bcrypt(htmlspecialchars($employeeId) . '@' . (date('dmY', $timestamp)));
+                $formattedData['user'][$jsonRow['Details']['Id']]['country_id_fk'] = CountryCurrency::where(DB::raw('UPPER(name)'), strtoupper($jsonRow['Details']['MailingCountry']))->select('id')->first()->toArray()['id'];
                 $formattedData['user'][$jsonRow['Details']['Id']]['created_by'] = 0;    // admin
                 $formattedData['user'][$jsonRow['Details']['Id']]['modified_by'] = 0;    // admin
                 $formattedData['user'][$jsonRow['Details']['Id']]['created_at'] = now();
                 $formattedData['user'][$jsonRow['Details']['Id']]['updated_at'] = now();
                 $formattedData['user'][$jsonRow['Details']['Id']]['is_active'] = $jsonRow['Details']['Is_Active__c'];
-                
-                if (1 
+
+                if (1
                     //&& $formattedData['user'][$jsonRow['Details']['Id']]['external_id'] == '003UN000001Ov2UYAS'
                 ) {
                     $user = User::where(
@@ -498,49 +510,54 @@ class UserController extends Controller
                             'external_id' => $formattedData['user'][$jsonRow['Details']['Id']]['external_id'],
                             //'email' => $formattedData['user'][$jsonRow['Details']['Id']]['email'],
                             //'employee_id' => $formattedData['user'][$jsonRow['Details']['Id']]['employee_id'],
-                        ])->get()->toArray();
+                        ]
+                    )->get()->toArray();
                     if (!count($user)) {
                         $userId = NULL;
                         // save new user data
-                        if(session('confirmUpdate')) {
+                        if (session('confirmUpdate')) {
                             $userId = User::insertGetId($formattedData['user'][$jsonRow['Details']['Id']]);
                             //$formattedData['user'][$jsonRow['Details']['Id']]['id'] = $userId;
                             echo '<br>' . __FUNCTION__ . ':INFO:New user(' . implode(' ', [
                                 $formattedData['user'][$jsonRow['Details']['Id']]['fname'],
                                 $formattedData['user'][$jsonRow['Details']['Id']]['lname'],
-                                $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']]) . ') added with Id:' . $userId;
-                                
+                                $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']
+                            ]) . ') added with Id:' . $userId;
+
                             // create default policy entries for new user
                             $this->generateBaseDefaultPolicyMapping(
-                                [['id' => $userId]], 
+                                [['id' => $userId]],
                                 $enrollmentData['autoSubmit'],
                                 session('confirmUpdate')
                             );
-                        } else {                            
+                        } else {
                             echo '<br>' . __FUNCTION__ . ':INFO:User Data(' . implode(' ', [
                                 $formattedData['user'][$jsonRow['Details']['Id']]['fname'],
                                 $formattedData['user'][$jsonRow['Details']['Id']]['lname'],
-                                $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']]) . ') will be added';
+                                $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']
+                            ]) . ') will be added';
                         }
                     } else {
                         // update user details only
                         unset($formattedData['user'][$jsonRow['Details']['Id']]['created_at']); // only modified date will be changed
                         unset($formattedData['user'][$jsonRow['Details']['Id']]['created_by']); // only updated by  will be changed
-                        if(session('confirmUpdate')) {
-                            $userUpdateStatus = User::where('id',$user[0]['id'])->update($formattedData['user'][$jsonRow['Details']['Id']]);
+                        if (session('confirmUpdate')) {
+                            $userUpdateStatus = User::where('id', $user[0]['id'])->update($formattedData['user'][$jsonRow['Details']['Id']]);
                             if ($userUpdateStatus) {
                                 echo '<br>' . __FUNCTION__ . ':INFO:User(' . implode(' ', [
                                     $formattedData['user'][$jsonRow['Details']['Id']]['fname'],
                                     $formattedData['user'][$jsonRow['Details']['Id']]['lname'],
-                                    $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']]) . ') data updated with id:' . $user[0]['id'];
-                                }
+                                    $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']
+                                ]) . ') data updated with id:' . $user[0]['id'];
+                            }
                         } else {
                             echo '<br>' . __FUNCTION__ . ':INFO:User Data(' . implode(' ', [
                                 $formattedData['user'][$jsonRow['Details']['Id']]['fname'],
                                 $formattedData['user'][$jsonRow['Details']['Id']]['lname'],
-                                $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']]) . ') to be updated with id:' . $user[0]['id'];
-                            }
+                                $formattedData['user'][$jsonRow['Details']['Id']]['employee_id']
+                            ]) . ') to be updated with id:' . $user[0]['id'];
                         }
+                    }
                     // user id added to formatted data
                     $formattedData['user'][$jsonRow['Details']['Id']]['id'] = count($user) ? $user[0]['id'] : $userId;
                 }
@@ -551,7 +568,8 @@ class UserController extends Controller
         }
     }
 
-    private function _getEnrollmentData($userData, $fyData, $hireDate, $startDate, $endDate) {
+    private function _getEnrollmentData($userData, $fyData, $hireDate, $startDate, $endDate)
+    {
         $enrollmentData = [];
         if (!is_null($hireDate) && trim($hireDate) != '') {
             $hireDate = new DateTime($hireDate);
@@ -563,25 +581,26 @@ class UserController extends Controller
                 $enrollmentData['userEnrollmentEndDate'] = null;
             } else {    // window will open based on date calculations and auto submit will not happen
                 $enrollmentData['autoSubmit'] = false;
-                $enrollmentData['userEnrollmentStartDate'] = $startDate;// default case; setting date to received date
+                $enrollmentData['userEnrollmentStartDate'] = $startDate; // default case; setting date to received date
                 $enrollmentData['userEnrollmentEndDate'] = $endDate;    // default case; setting date to received date
                 // for end date calculations
                 $extEndDate = new DateTime($endDate);
                 if ($extEndDate > $fyLastEnrollmentDate) {  // case when user end date is crossing last enrollment date 
                     $enrollmentData['userEnrollmentEndDate'] = date('Y-m-d', $fyData[0]['last_enrollment_date']);
-                }                   
-
+                }
             }
             return $enrollmentData;
         } else {
             die(__FUNCTION__ . ':ERROR: EMPTY/INVALID HIRE DATA FOR USER:' . implode(' ', [
                 $userData['FirstName'],
                 $userData['LastName'],
-                $userData['Employee_Id__c']]));
+                $userData['Employee_Id__c']
+            ]));
         }
     }
 
-    private function _saveDependantData ($userInsertData, $jsonData) {
+    private function _saveDependantData($userInsertData, $jsonData)
+    {
         if (count($userInsertData) && count($jsonData)) {
             foreach ($jsonData as $userExtId => $jsonRow) {
                 if (
@@ -599,17 +618,17 @@ class UserController extends Controller
                         $depData['dob'] = date('Y-m-d', strtotime($depRow['Date_of_Birth__c']));
                         $depData['gender'] = $this->_getGenderId(htmlspecialchars($depRow['Gender__c']), $depRow, true);
                         $depData['nominee_percentage'] = array_key_exists('Nominee_Percentage__c', $depRow) ? $depRow['Nominee_Percentage__c'] : 0;
-                        $depData['relationship_type'] = array_search(strtolower($depRow['Relationship_Type__c']),$lowerCaseRltnNames);
-                        $depData['approval_status'] = array_search(strtolower($depRow['Approval_Status__c']),$lowerCaseApprovalStatus);      
+                        $depData['relationship_type'] = array_search(strtolower($depRow['Relationship_Type__c']), $lowerCaseRltnNames);
+                        $depData['approval_status'] = array_search(strtolower($depRow['Approval_Status__c']), $lowerCaseApprovalStatus);
                         $depData['is_active'] = config('constant.$_YES');
-                        $depData['is_deceased'] = array_search(strtolower($depRow['Deceased__c']),$lowerCaseBoolean);
+                        $depData['is_deceased'] = array_search(strtolower($depRow['Deceased__c']), $lowerCaseBoolean);
                         echo $this->validatedUpsertDependant($depData, $userInsertData['user'][$userExtId], $depRow);
                     }
                 } else {
-                    echo '<br>----------' . __FUNCTION__ . ':INFO:No dependant found for user ' . 
-                    $jsonRow['Details']['Name'];
+                    echo '<br>----------' . __FUNCTION__ . ':INFO:No dependant found for user ' .
+                        $jsonRow['Details']['Name'];
                 }
-            }            
+            }
         } else {
             die(__FUNCTION__ . ':ERROR: EMPTY JSON OR USER DATA RECEIVED');
         }

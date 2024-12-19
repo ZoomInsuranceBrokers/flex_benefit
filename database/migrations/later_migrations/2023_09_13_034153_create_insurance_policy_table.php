@@ -20,7 +20,7 @@ class CreateInsurancePolicyTable extends Migration
             $table->double('sum_insured',16,2);
             $table->foreignId('ins_subcategory_id_fk')->constrained('insurance_subcategory');;  // id from array in env file
             $table->mediumText('description')->nullable();
-            $table->float('price_tag',3,4)->nullable();
+            $table->double('price_tag', 8, 4)->nullable();
             $table->integer('points')->nullable();
             $table->integer('extra_assured_amount')->nullable();
             $table->string('dependent_structure')->nullable();

@@ -20,7 +20,7 @@ class CreateMapGradeCategoryTable extends Migration
             $table->foreignId('category_id_fk')->constrained('insurance_category');      
             $table->float('amount',12,2)->nullable();
             $table->boolean('is_active')->default(true);            
-            //$table->timestamps();
+            $table->timestamps();
             //$table->string('created_by')->nullable();
             //$table->string('modified_by')->nullable();
         });

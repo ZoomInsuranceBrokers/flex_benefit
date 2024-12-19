@@ -356,29 +356,24 @@ class DependantController extends Controller
     public function delete(Request $request)
     {
         //Return result to jTable
-        $jTableResult = array();
         if ($request->isMethod('post')) {
             try {
                 $input = $request->all();
-
-                $dependant = Dependant::find($input['id']);
+                $dependant = Dependant::find($input['dependant_id']);
                 $dependant->is_active = false;
                 $dependant->modified_by = Auth::user()->id;
                 $dependant->save();
 
-                $jTableResult['Result'] = "OK";
-                $jTableResult['Record'] = $dependant->toArray();
+                return redirect()->back()->with('success', 'Dependent Edit Successfully');
+
             } catch (Exception $e) {
-                $jTableResult['Result'] = "ERROR";
-                $jTableResult['Message'] = json_encode($e->getMessage());
+                return redirect()->back()->with('error', 'Error While Deleting Dependent');
             }
         } else {
             // throw error
+            return redirect()->back()->with('error', 'Error While Deleting Dependent');
 
-            $jTableResult['Result'] = "ERROR";
-            $jTableResult['Message'] = 0;
         }
-        return json_encode($jTableResult);
     }
 
     /**

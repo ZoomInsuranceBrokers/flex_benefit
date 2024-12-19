@@ -16,26 +16,26 @@ class UpdateUserTable extends Migration
         //
         Schema::table('users', function (Blueprint $table) {            
             $table->string('external_id')->after('id');
-            $table->string('modified_by')->nullable()->after('sfdc_id');
-            $table->string('created_by')->nullable()->after('sfdc_id');
-            $table->float('nominee_percentage')->nullable()->after('sfdc_id');
-            $table->tinyInteger('gender')->nullable()->after('sfdc_id');
-            $table->string('suffix', 64)->nullable()->after('sfdc_id');
-            $table->tinyInteger('title')->nullable()->after('sfdc_id');
-            $table->tinyInteger('salutation')->nullable()->after('sfdc_id');
-            $table->string('mobile_number')->nullable()->after('sfdc_id');  // with country code
-            $table->foreignId('country_id_fk')->constrained('country_currency')->after('sfdc_id'); // zipcode ??
-            $table->integer('points_available')->after('sfdc_id');
-            $table->integer('points_used')->after('sfdc_id');
-            $table->string('address')->nullable()->after('sfdc_id');
-            $table->string('salary')->after('sfdc_id');
-            $table->date('hire_date')->after('sfdc_id');
-            $table->string('grade', 32)->after('sfdc_id');
-            $table->string('employee_id',32)->unique()->after('sfdc_id');
-            $table->string('lname', 64)->nullable()->after('sfdc_id');
-            $table->string('mname', 64)->nullable()->after('sfdc_id');
-            $table->string('fname', 64)->after('sfdc_id');
-            $table->boolean('is_active')->after('sfdc_id')->default(true);
+            $table->string('modified_by')->nullable();
+            $table->string('created_by')->nullable();
+            $table->float('nominee_percentage')->nullable();
+            $table->tinyInteger('gender')->nullable();
+            $table->string('suffix', 64)->nullable();
+            $table->tinyInteger('title')->nullable();
+            $table->tinyInteger('salutation')->nullable();
+            $table->string('mobile_number')->nullable();  // with country code
+            $table->foreignId('country_id_fk')->constrained('country_currency'); // zipcode ??
+            $table->integer('points_available');
+            $table->integer('points_used');
+            $table->string('address')->nullable();
+            $table->string('salary');
+            $table->date('hire_date');
+            $table->string('grade', 32);
+            $table->string('employee_id',32)->unique();
+            $table->string('lname', 64)->nullable();
+            $table->string('mname', 64)->nullable();
+            $table->string('fname', 64);
+            $table->boolean('is_active')->default(true);
 
 
             // drop column from user table
