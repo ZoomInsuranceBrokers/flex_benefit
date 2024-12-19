@@ -133,7 +133,7 @@
                                         style="width: 28px;" />
                                 </span>
                                 <div style="font-size: 10px; margin-left:10px; color: #2d2f30; font-weight:700;">
-                                    <div>{{ Auth::user()->points_available }}*</div>
+                                    <div id="walletPointsLiveUpdate">{{ Auth::user()->points_available }}*</div>
                                     <div style="font-size: 8px;">Avl. Points</div>
                                 </div>
                             </a>
@@ -177,12 +177,12 @@
                                 <a class="dropdown-item" href="/user/ecard" target="_blank">Download
                                     Ecard</a>
                             @endif
-                        <li>
+                        <!-- <li>
                             <hr class="dropdown-divider" />
-                        </li>
-                        <li>
+                        </li> -->
+                        <!-- <li>
                             <a class="dropdown-item" href="/download-pdf" >Enrollment Summary</a>
-                        </li>
+                        </li> -->
                         <li>
                             <hr class="dropdown-divider" />
                         </li>

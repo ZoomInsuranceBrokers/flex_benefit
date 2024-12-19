@@ -224,6 +224,7 @@ trait accountTraitMethods
 
     private function _prepareGradeCatMapping($jsonData)
     {
+        // dd($jsonData);
         echo '<br><br>';
         // fetch all insurance categories
         $insCategories = InsuranceCategory::select(['id', 'external_id'])
@@ -378,7 +379,7 @@ trait accountTraitMethods
             foreach ($accRow['Response']['Client']['FY_InsurancePolicy']['PolicyCluster'] as $policyClusterRow) {
                 $insurancePolicies[] = $this->_extractPolicyData(
                     $policyClusterRow,
-                     $insSubCat
+                    $insSubCat
                 );
             }
 
@@ -467,8 +468,9 @@ trait accountTraitMethods
 
         // fetch financial year
         $fys = FinancialYear::select(['id', 'external_id'])
-            //->where('is_active', true)
+            ->where('is_active', true)
             ->get()->toArray();
+
         $fyArr = [];
         if (count($fys)) {
             foreach ($fys as $fyRow) {
@@ -488,6 +490,7 @@ trait accountTraitMethods
             if (array_key_exists($accRow['Response']['Client']['FY_InsurancePolicy']['FinancialYear']['Id'], $fyArr)) {
                 foreach ($accRow['Response']['Client']['FY_InsurancePolicy']['PolicyCluster'] as $policyClusterRow) {
                     if (array_key_exists($policyClusterRow['Id'], $insPolArr)) {
+                      
                         $mapFYPol[] = [
                             'external_id' => $policyClusterRow['FY_Insurance_Policy__c'],
                             'ins_policy_id_fk' => $insPolArr[$policyClusterRow['Id']],
@@ -503,10 +506,19 @@ trait accountTraitMethods
                 die('<br>' . __FUNCTION__ . ':ERROR:FY not found in DB. No mapping possible.');
             }
         }
-
         echo '<br>' . __FUNCTION__ . ':INFO: FY-Insurance_Policy-Mapping:<pre>';
         print_r($mapFYPol);
         echo '</pre>';
-        session('confirmUpdate') ? MapFYPolicy::updateOrCreate([], $mapFYPol) : '';
+        foreach ($mapFYPol as $mapping) {
+            MapFYPolicy::updateOrCreate(
+                [
+                    'ins_policy_id_fk' => $mapping['ins_policy_id_fk'],  // Search by ins_policy_id_fk and fy_id_fk
+                    'fy_id_fk' => $mapping['fy_id_fk']
+                ],
+                $mapping  // This will provide the data for either update or create
+            );
+        }
+        
+        // session('confirmUpdate') ? MapFYPolicy::Create([], $mapFYPol) : '';
     }
 }

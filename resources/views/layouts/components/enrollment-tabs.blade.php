@@ -150,8 +150,12 @@ $formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
                 </li>
                 @endforeach
                 @endif
+                @php
+                $current_fy_id = collect($data['fyData'])->firstWhere('is_active', 1)['id'] ?? 0;
+                @endphp
+
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="Summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab" aria-controls="summary" aria-selected="false">
+                    <button class="nav-link" id="Summary-tab{{ base64_encode($current_fy_id) }}" data-bs-toggle="tab" data-id="{{ base64_encode($current_fy_id) }}" data-bs-target="#summary" type="button" role="tab" aria-controls="summary" aria-selected="false">
                         <img src="{{ asset('assets/images/icon-img5.png') }}" alt="query icon" />
                         Summary
                     </button>
@@ -513,84 +517,79 @@ function generateDependentItems(subCatId, depList) {
     $('#memcvrd' + subCatId).html('');
     var memCvrdStr = '';
     var parentRadio = false;
+
     if (depList.length > 0) {
         if (depList[0] == '/') {
             parentRadio = true;
-            depList.splice(0,1); 
+            depList.splice(0, 1);
         }
-        {{-- $('[id^=dependant-list]').each(function(){
-            var dCode = $(this).attr('data-depcode');
-            var depId = $(this).attr('data-depId');
-            var depName = $(this).attr('data-name');
-            var depNom = $(this).attr('data-depNom');
-            depList.forEach(function(x) {
-                if(dCode.toLowerCase() == x.toLowerCase()) {
-                    if(['PIL','P'].includes(dCode)) {   // match if dependant added is PIL or P case
-                        memCvrdStr += '<input id="depMemCrvd' + depId + '" name="depMemCrvd[]" type="' + (parentRadio ? 'radio' : 'checkbox')  + '" value="' 
-                        + depId + '"/>&nbsp;<label for="depMemCrvd' + depId + '">' + depName + '[' + 
-                        getMemberFullNames(dCode) + ',Nomination(%):' +  depNom + ']' + '</label>';
-                    } else {
-                        memCvrdStr += '<input id="depMemCrvd' + depId + '" name="depMemCrvd[]" type="checkbox" value="' 
-                        + depId + '"/>&nbsp;<label for="depMemCrvd' + depId + '">' + depName + '[' + 
-                        getMemberFullNames(dCode) + ',Nomination(%):' +  depNom + ']' + '</label>';   
-                    }
-                }  
+
+        console.log(depList);
+
+        // Check for condition: if 'P' is present and '1' is present in depList
+        if (depList.includes('P') && depList.includes('1')) {
+            Swal.fire({
+                title: 'Parent Coverage Warning',
+                text: 'Single parent plan will be offered only to employees whose other parent is not alive.  In addition, cross-selection of single parent from each parent-set is not allowed.Are you sure you want to continue?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, continue',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    // Exit the function if user cancels
+                    return;
+                }
             });
-        }); --}}
-        //console.log(parentRadio);
+        }
+
         var existingDependent = [];
-        var i = 0;
-        $('[id^=dependant-list]').each(function(){
+        $('[id^=dependant-list]').each(function () {
             var dCode = $(this).attr('data-depcode');
             var depId = $(this).attr('data-depId');
             var depName = $(this).attr('data-name');
             var depNom = $(this).attr('data-depNom');
-            if (typeof existingDependent[dCode] === 'undefined'){
-                existingDependent[dCode] = [[depId,depName,depNom]];    // array of array
+
+            if (typeof existingDependent[dCode] === 'undefined') {
+                existingDependent[dCode] = [[depId, depName, depNom]]; // array of array
             } else {
-                existingDependent[dCode].splice(
-                    existingDependent[dCode].length,0,[depId,depName,depNom]
-                );
+                existingDependent[dCode].push([depId, depName, depNom]);
             }
         });
-        //console.log(existingDependent);
-        for(depCode in existingDependent) {
-            depId = [];
-            depName = [];
-            depCodeFullName = getMemberFullNames(depCode);
-            existingDependent[depCode].forEach(function(depRow){
-                //console.log(depRow);
+
+        for (var depCode in existingDependent) {
+            var depId = [];
+            var depName = [];
+            var depCodeFullName = getMemberFullNames(depCode);
+
+            existingDependent[depCode].forEach(function (depRow) {
                 depId.push(depRow[0]);
-                depName.push( depRow[1] );
+                depName.push(depRow[1]);
             });
-            //console.log('DepCode/:' + depCode);
-            depList.forEach(function(x) {
-                if(depCode.toLowerCase() == x.toLowerCase()) {
-                    //console.log(['PIL','P'].find(depList), depCode.toLowerCase(), x.toLowerCase(),depList);
-                    if(['PIL','P'].includes(x.toUpperCase())) {   // match if dependant added is PIL or P case
-                        memCvrdStr += '<div class="col-12 m-1 mt-2 mb-2"><input id="depMemCrvd_' + depId.join('_')  + 
-                            '" type="' + (parentRadio ? 'radio' : 'checkbox' ) + '" name="depMemCrvd[]" value="' + depId.join(',') + 
-                            '" checked /><label for="depMemCrvd_' + depId.join('_')  + 
+
+            depList.forEach(function (x) {
+                if (depCode.toLowerCase() == x.toLowerCase()) {
+                    if (['PIL', 'P'].includes(x.toUpperCase())) {
+                        memCvrdStr += '<div class="col-12 m-1 mt-2 mb-2"><input id="depMemCrvd_' + depId.join('_') +
+                            '" type="' + (parentRadio ? 'radio' : 'checkbox') + '" name="depMemCrvd[]" value="' + depId.join(',') +
+                            '" checked /><label for="depMemCrvd_' + depId.join('_') +
                             '">' + depName.join(',') + '[' + depCodeFullName + ']' + '</label></div>';
                     } else {
-                        memCvrdStr += '<div class="col-12 m-1 mt-2 mb-2"><input id="depMemCrvd_' + depId.join('_') + '"' + 
-                            (x.toLowerCase() == 'e'? 'disabled checked' : '' )  +
-                            ' type="checkbox" name="depMemCrvd[]" value="' + depId.join(',') + 
-                            '" checked/><label for="depMemCrvd_' + depId.join('_')  + 
+                        memCvrdStr += '<div class="col-12 m-1 mt-2 mb-2"><input id="depMemCrvd_' + depId.join('_') + '"' +
+                            (x.toLowerCase() == 'e' ? 'disabled checked' : '') +
+                            ' type="checkbox" name="depMemCrvd[]" value="' + depId.join(',') +
+                            '" checked/><label for="depMemCrvd_' + depId.join('_') +
                             '">' + depName.join(',') + '[' + depCodeFullName + ']' + '</label></div>';
                     }
                 }
             });
         }
-        /* existingDependent.forEach(function(dep, index, currArr){
-            console.log(dep);
-        }); */
-        //console.log(existingDependent);
+
         $('#memcvrd' + subCatId).html(memCvrdStr);
-        //return memCvrdStr;
     }
     return memCvrdStr;
 }
+
 
 function planBindEvents() {
     // trigger for radio button 
@@ -709,7 +708,7 @@ function policyDetailsforSubCategory(subCatId) {
                     var planId = $(this).attr('data-plan-id');
 
                     // price tag vs points
-                    $('#policyCalcPoints' + planId).html($('#planDetails' + planId).attr('data-opplpt'));
+                    $('#policyCalcPoints' + planId).html($(planId).attr('data-opplpt'));
                     $('#planName' + subCatId).html($('#planDetails' + planId).attr('data-name'));    
                 });
                 triggerInitialClick();
@@ -869,6 +868,7 @@ function updatePoints() {
             countNumber('points-head-tot', response.userpts[0]['points_used'] + response.userpts[0]['points_available']); 
             countNumber('points-head-used', response.userpts[0]['points_used']); 
             countNumber('points-head-avail', response.userpts[0]['points_available']); 
+            $("#walletPointsLiveUpdate").html(response.userpts[0]['points_available']);
             $("#launchEnrollmentModal").hide();
 
         }
@@ -918,13 +918,12 @@ $('[id^="fyClick"]').on('click', function(){
     $('#enrollment_history_year').html($(this).text());
     $('#enrollment_history_content').load('/enrollment/summary?fid=' + $(this).attr('data-id'));
 });
-$('#Summary-tab').on('click', function(){
-    $('#summary_content').load('/enrollment/summary', function(response){
-        
-        
-    });
-}); 
-    });
+
+$('[id^="Summary-tab"]').on('click', function(){
+    $('#summary_content').load('/enrollment/summary?fid=' + $(this).attr('data-id'));
+});
+
+});
 </script>
 
 <script>

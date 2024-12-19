@@ -75,7 +75,9 @@ class EnrollmentController extends Controller
         }
 
         // check if data already final submission made
-        $is_submitted = MapUserFYPolicy::where('user_id_fk', Auth::user()->id)->where('is_submitted', true)->get();
+        // $is_submitted = MapUserFYPolicy::where('user_id_fk', Auth::user()->id)->where('is_submitted', true)->get();
+        $is_submitted = User::where('id', Auth::user()->id)->where('is_enrollment_submitted', true)->get();
+
         if ($is_submitted->count()) {
             $is_submitted = TRUE;
         } else {
@@ -108,7 +110,8 @@ class EnrollmentController extends Controller
             foreach ($fypmapData as $fypRow) {
                 if (!$fypRow['fy_policy']['policy']['is_base_plan'] && !$fypRow['fy_policy']['policy']['is_default_selection']) {
                     $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
-                        'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']
+                        'polName' => $fypRow['fy_policy']['policy']['name'],
+                        'points' => $fypRow['points_used']
                     ];
                 }
             }
@@ -116,13 +119,12 @@ class EnrollmentController extends Controller
         // dd($currentSelectedData);
 
         $basePlan = InsurancePolicy::where('is_base_plan', 1)
-            ->orWhere('is_default_selection', 1)
             ->where('is_active', 1)
+            ->orWhere('is_default_selection', 1)
             ->with('subcategory')
             ->get()->toArray();
 
         session(['base_default_plans' => $basePlan]);
-        //dd($basePlan);
 
 
         // mappedgrade data
@@ -130,17 +132,20 @@ class EnrollmentController extends Controller
             ->with(['grade'])
             ->whereRelation('grade', 'id', Auth::user()->grade_id_fk)
             ->get()->toArray();
+
         $gradeData = [];
         if (count($mappedGradeData)) {
             foreach ($mappedGradeData[0]['grade']['category_mapping'] as $gradeCatData) {
-                $gradeData[$gradeCatData['category_id_fk']] = $gradeCatData['amount'];
+                if ($gradeCatData['is_active'] == 1) {
+                    $gradeData[$gradeCatData['category_id_fk']] = $gradeCatData['amount'];
+                }
             }
         }
 
         session(['gradeData' => $gradeData]);
 
         // dependant
-        $dependants = Dependant::where('is_active', config('constant.$_YES'))
+        $dependants = Dependant::where('is_active', 1)
             //->where('is_deceased',config('constant.$_NO'))
             ->where('user_id_fk', Auth::user()->id)
             ->where('is_deceased', 0)
@@ -582,7 +587,7 @@ class EnrollmentController extends Controller
                 'enrollment_submit_date' => now(),
                 'submission_by' => Auth::user()->id
             ];
-            // User::whereIn('id',Auth::user()->id)->update($userUpdateData);
+            User::where('id',Auth::user()->id)->update($userUpdateData);
 
             $email =  Auth::user()->email;
             $user = DB::table('users')->where('email', $email)->first();
@@ -697,7 +702,8 @@ class EnrollmentController extends Controller
             foreach ($fypmapData as $fypRow) {
                 if (!$fypRow['fy_policy']['policy']['is_base_plan'] && !$fypRow['fy_policy']['policy']['is_default_selection']) {
                     $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
-                        'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']
+                        'polName' => $fypRow['fy_policy']['policy']['name'],
+                        'points' => $fypRow['points_used']
                     ];
                 }
             }
@@ -941,7 +947,8 @@ class EnrollmentController extends Controller
             foreach ($fypmapData as $fypRow) {
                 if (!$fypRow['fy_policy']['policy']['is_base_plan'] && !$fypRow['fy_policy']['policy']['is_default_selection']) {
                     $currentSelectedData[$fypRow['fy_policy']['policy']['ins_subcategory_id_fk']][] = [
-                        'polName' => $fypRow['fy_policy']['policy']['name'], 'points' => $fypRow['points_used']
+                        'polName' => $fypRow['fy_policy']['policy']['name'],
+                        'points' => $fypRow['points_used']
                     ];
                 }
             }
@@ -1024,10 +1031,10 @@ class EnrollmentController extends Controller
         $forward_img_data = file_get_contents($forward_img);
         $image_base64 = base64_encode($image_data);
         $forward_image_base64 =  base64_encode($forward_img_data);
-        
+
         // Get authenticated user's information
         $user = Auth::user();
-        
+
         // Construct the HTML template
         $html = '
         <!DOCTYPE html>
@@ -1225,14 +1232,14 @@ class EnrollmentController extends Controller
         <body>
             <div class="container">
                 <div class="first-part">
-                    <img src="data:image/jpeg;base64,'. $image_base64 .'" alt="Invoice">
+                    <img src="data:image/jpeg;base64,' . $image_base64 . '" alt="Invoice">
                 </div>
                 <div class="second-part">
                     <div class="second1">
                         <div class="semi-circle"></div>
                         <div class="">
-                            <h3 class="light-text" style="margin-left:25%;">'. $user->fname . ' ' . $user->lname .'</h3>
-                            <h3 class="light-text" style="margin-left:25%;">'. $user->employee_id .'</h3>
+                            <h3 class="light-text" style="margin-left:25%;">' . $user->fname . ' ' . $user->lname . '</h3>
+                            <h3 class="light-text" style="margin-left:25%;">' . $user->employee_id . '</h3>
                         </div>
                     </div>
                     <div class="lines">
@@ -1252,20 +1259,20 @@ class EnrollmentController extends Controller
                             <div class="bold-text box box1">Name</div>
                             <div class="bold-text box box2">Detail</div>
                         </div>';
-    
-    foreach ($summaryData as $item) {
-        $html .= '
+
+        foreach ($summaryData as $item) {
+            $html .= '
                         <div style="display: flex;margin-top: 1%; border-bottom: 3px solid #B5B5B5;">
                             <div class="box1 bold-text">
                                 <ul>
                                     <li>' . $item['category'] . '
                                         <ul class="inner-li" style="margin-top: 2%;">
                                             <li>
-                                                <img  src="data:image/png;base64,'. $forward_image_base64 .'" alt="Invoice">
+                                                <img  src="data:image/png;base64,' . $forward_image_base64 . '" alt="Invoice">
                                                 ' . $item['subcategory'] . '
                                                 <ul class="inner-li" style="margin-top: 2%;">
                                                     <li>
-                                                        <img src="data:image/png;base64,'. $forward_image_base64 .'" alt="Invoice">
+                                                        <img src="data:image/png;base64,' . $forward_image_base64 . '" alt="Invoice">
                                                         ' . $item['policy'] . '
                                                     </li>
                                                 </ul>
@@ -1283,9 +1290,9 @@ class EnrollmentController extends Controller
                                 <p style="width: 100%;padding:10px; margin: 0px; text-align: left;" class="bold-text">Point Used <br> <span class="light-text"></span></p>
                             </div>
                         </div>';
-    }
+        }
 
-           $html .= '   <div style="display: flex;justify-content: center;flex-direction: column; height:30%;  border-bottom: 3px solid #B5B5B5; " class="bold-text">
+        $html .= '   <div style="display: flex;justify-content: center;flex-direction: column; height:30%;  border-bottom: 3px solid #B5B5B5; " class="bold-text">
            <p style="margin:0px; margin-left: 47%;  display: inline;">Total Points Used: 31100</p>
                 <p style="margin:0px; margin-left: 47%; display: inline;">Salary Contribuation: 26900</p>
                 <p style="margin:0px; margin-left: 47%; display: inline;">Monthly Installment:
@@ -1306,7 +1313,7 @@ class EnrollmentController extends Controller
 
         // echo $html;
         // exit;
-        
+
         // Generate PDF
         $dompdf = new Dompdf();
 
@@ -1322,7 +1329,6 @@ class EnrollmentController extends Controller
         $output = $dompdf->output();
 
         $dompdf->stream("Membership Form", array("Attachment" => 1));
-        
     }
 
     /* public function generateBaseDefaultPolicyMapping ($users, $confirmUpdate) {

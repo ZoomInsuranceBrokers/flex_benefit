@@ -28,8 +28,6 @@ class AccountController extends Controller
 
         $jsonData = json_decode(json_decode($testJson, true)['details'], true);
 
-        // dd([$jsonData]);
-
         //DB::beginTransaction();
 
         //try {
